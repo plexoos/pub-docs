@@ -725,6 +725,54 @@ Dmitri~Smirnov}
 
 
 %===============================================================================
+\myfoilhead{-30mm}{Primary Track Association in \muDST Reco}
+%{{{
+
+\noindent
+\begin{pspicture}(0,0)(\textwidth,\textheight)
+
+\rput[rt](0.5\textwidth, 0.9\textheight){\includegraphics[height=0.5\textheight]{graphics/McRecMulAny_eff_wemb_PPV_bl1D_muDst_sigmaXX_comprsn}}
+\rput[lt](0.5\textwidth, 0.9\textheight){\includegraphics[height=0.5\textheight]{graphics/McRecMulGood_eff_wemb_PPV_bl1D_muDst_sigmaXX_comprsn}}
+
+
+\rput[b](0.5\textwidth, -2) {%
+\begin{minipage}{0.90\textwidth}
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item Assuming fully correlated uncertainties on track DCA and vertex, $\sigma_\text{DCA}$ and
+   $\sigma_\text{vertex}$, we select primary tracks satisfying the following
+   condition in both transverse and longitudinal directions:
+   %
+   \begin{equation*}
+      d \Big/ \sqrt{ \sigma^2_\text{DCA} + \sigma^2_\text{vertex} } < N_\sigma
+   \end{equation*}
+
+   \item Reconstruction efficiencies for different values of $N_\sigma =$ 1, 2,
+      3, 4, and 5 are shown above
+
+   \item The larger $N_\sigma$ the more ``wrong'' tracks being selected as primary
+
+   \item For v3.0 we choose $N_\sigma = 3$
+
+\end{list}
+
+\end{minipage}
+}
+
+
+
+%\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
+
+\end{pspicture}
+%}}}
+
+
+
+%===============================================================================
 \myfoilhead{-30mm}{Summary}
 %{{{
 
