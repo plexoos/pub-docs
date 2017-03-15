@@ -7,12 +7,23 @@
 \usepackage{geometry}
 \usepackage{graphicx}
 \usepackage[usenames,dvipsnames,svgnames]{xcolor}
+\usepackage{xspace}
 \usepackage{amsmath,amssymb,amsfonts} % Typical maths resource packages
-\usepackage{comment}
-\usepackage[colorlinks=false,bookmarks=false,pageanchor=true]{hyperref}
+\usepackage{pifont}
+\usepackage{hyperref}
 \usepackage{authblk}
 \usepackage{pstricks}
 \usepackage{pst-node}
+\usepackage{booktabs}
+
+\hypersetup{colorlinks=true, urlcolor=blue, urlbordercolor=blue,
+   pdfauthor={Dmitri Smirnov <d.s@plexoos.com>}
+}
+% Overrides border style set with colorlinks=true. Hyperlink border style will
+% be underline of width 1pt
+\makeatletter
+\Hy@AtBeginDocument{ \def\@pdfborder{0 0 1} \def\@pdfborderstyle{/S/U/W 1} }
+\makeatother
 
 \input{../common/input_foils.tex}
 \input{../common/input_colors.tex}
@@ -26,9 +37,17 @@
           centering=true, nomarginpar, headsep=0mm, headheight=0mm,
           tmargin=1mm, bmargin=1mm, lmargin=1mm, rmargin=1mm}
 
-\hypersetup {
-   pdfauthor={Dmitri Smirnov <d.s@plexoos.com>}
-}
+
+\newcommand{\StMuTrack}{\texttt{StMuTrack}\xspace}
+\newcommand{\StTrack}{\texttt{StTrack}\xspace}
+\newcommand{\Sti}{\texttt{Sti}\xspace}
+\newcommand{\MinuitVF}{\texttt{MinutVF}\xspace}
+\newcommand{\PPV}{\texttt{PPV}\xspace}
+\newcommand{\muDST}{\texttt{muDST}\xspace}
+
+% Symbols from pifont package
+\newcommand{\cmark}{\textcolor{greenDark}{\ding{51}}}%
+\newcommand{\xmark}{\textcolor{redDark}{\ding{55}}}%
 
 
 \MyLogo{}
@@ -42,18 +61,14 @@
 \psset{framearc=.1,fillcolor=blueDark!10,linecolor=blueDark,linewidth=0.1,fillstyle=solid,arrowscale=3}
 
 
-\title{\vspace{20mm} \Large Vertex Reconstruction\\[3mm] with STAR muDST Data Format}
+\title{\vspace{20mm} \Large Vertex Reconstruction at STAR\\[3mm] with \muDST Data Format}
 
 \author{\quad\\[3mm]
 Dmitri~Smirnov}
 
 \affil{BNL}
 
-\date{\small January 12, 2017}
-
-
-\newcommand{\StMuTrack}{\texttt{StMuTrack}}
-\newcommand{\StTrack}{\texttt{StTrack}}
+\date{\small February 22, 2017}
 
 
 
@@ -66,10 +81,9 @@ Dmitri~Smirnov}
 \small
 
 
-\begin{comment}
 
 %===============================================================================
-\myfoilhead{-30mm}{Current State}
+\myfoilhead{-30mm}{Motivation}
 %{{{
 
 \noindent
@@ -78,97 +92,39 @@ Dmitri~Smirnov}
 
 
 \rput(0.50\textwidth,0.45\textheight) {%
-\begin{minipage}{0.90\textwidth}
+\begin{minipage}{0.95\textwidth}
 
 \raggedright
 
 \begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
                           \setlength{\topsep}{0mm}}
 
-   \item Vertex reconstruction at STAR is integral part of full event reconstruction
+   \item Two main vertex finders \MinuitVF and \PPV used for heavy-ion and
+      proton-proton data respectively
 
    \begin{list}{\labelitemii}{\setlength{\itemsep}{3mm}
                               \setlength{\topsep}{0mm}}
 
-      \item Raw data files (.daq)
+      \item Classic vertex reconstruction algorithms with track pre-selection,
+         seeding, fitting, and ranking stages
 
    \end{list}
 
-   \item Propose to run vertex finders over muDst files
-
-
-   \fbox{%
-   \begin{minipage}{0.44\textwidth}
-
-   Pros
+   \item Vertex reconstruction at STAR is an integral part of full event
+   reconstruction
 
    \begin{list}{\labelitemii}{\setlength{\itemsep}{3mm}
                               \setlength{\topsep}{0mm}}
 
-      \item No need to create track DCAs
+      \item Event reconstruction runs over raw data (.daq) files with complete event information
 
-   \end{list}
+      \item Tracking algorithm (e.g. \Sti) reconstructs global tracks, i.e.\\
+      provides helix parametrization in Point of Closest Approach to $(x,y) = (0,0)$\\
+      (track's DCA state) $\Longrightarrow$
 
-   \end{minipage} }
-   %
-   \fbox{%
-   \begin{minipage}{0.44\textwidth}
+      \item Vertex finder reconstructs vertices using the DCAs $\Longrightarrow$
 
-   Cons
-
-   \begin{list}{\labelitemii}{\setlength{\itemsep}{3mm}
-                              \setlength{\topsep}{0mm}}
-
-      \item
-
-   \end{list}
-
-   \end{minipage} }
-
-\end{list}
-
-\end{minipage}
-}
-
-
-
-%\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
-
-\end{pspicture}
-%}}}
-
-\end{comment}
-
-
-
-%===============================================================================
-\myfoilhead{-30mm}{Some Implementation Details}
-%{{{
-
-\noindent
-\begin{pspicture}(0,0)(\textwidth,\textheight)
-
-
-
-\rput(0.50\textwidth,0.45\textheight) {%
-\begin{minipage}{0.90\textwidth}
-
-\raggedright
-
-\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
-                          \setlength{\topsep}{0mm}}
-
-   \item Currently focus on PPV
-
-   \item In muDst VF track selection loose $\lesssim 10\%$ of tracks (if start from the same set)
-
-   \item Vertex daughters assigned at final stage
-
-   \begin{list}{\labelitemii}{\setlength{\itemsep}{3mm}
-                              \setlength{\topsep}{0mm}}
-
-		\item If track was used in seeding OR $ d/(\sigma_\text{DCA} + \sigma_\text{vertex}) < 2$ (fully correlated
-				$\sigma_\text{DCA}$ and $\sigma_\text{vertex}$)
+      \item Tracking algorithm assigns primary tracks to found vertices
 
    \end{list}
 
@@ -187,7 +143,550 @@ Dmitri~Smirnov}
 
 
 %===============================================================================
-\myfoilhead{-30mm}{muDst Reco vs. Std Reco}
+\myfoilhead{-30mm}{Proposal to Use \muDST}
+%{{{
+
+\noindent
+\begin{pspicture}(0,0)(\textwidth,\textheight)
+
+
+
+\rput(0.50\textwidth,0.45\textheight) {%
+\begin{minipage}{0.95\textwidth}
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item Run vertex finders over \muDST trees with limited information
+
+   \begin{list}{\labelitemii}{\setlength{\itemsep}{6mm}
+                              \setlength{\topsep}{0mm}}
+
+      \item Track information is available at DCA for global tracks in \StMuTrack\\[3mm]
+
+      $\Longrightarrow$ Can reuse existing code
+
+      \item Save time by reconstructing tracks once\\[3mm]
+
+      $\Longrightarrow$ Faster feedback when running as an afterburner for
+      tuning, studying, or optimization purposes
+
+      \item Track hits are not available in \muDST trees\\[3mm]
+
+      $\Longrightarrow$ Cannot re-fit tracks without hits as in default reconstruction
+
+   \end{list}
+
+\end{list}
+
+\end{minipage}
+}
+
+
+
+%\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
+
+\end{pspicture}
+%}}}
+
+
+
+%===============================================================================
+\myfoilhead{-30mm}{Source Code}
+%{{{
+
+\noindent
+\begin{pspicture}(0,0)(\textwidth,\textheight)
+
+
+\rput[lt](0.5\textwidth, 0.9\textheight){ \includegraphics[width=0.45\textwidth]{graphics/github-star-vertex} }
+
+
+\rput[l](0.0\textwidth, 0.45\textheight) {%
+\begin{minipage}{0.50\textwidth}
+
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item The source code with instructions/documentation available at\\
+   \url{https://github.com/star-bnl/star-vertex}
+
+   \item Periodically synchronized with STAR CVS
+
+\end{list}
+
+\end{minipage}
+}
+
+
+
+%\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
+
+\end{pspicture}
+%}}}
+
+
+
+%===============================================================================
+\myfoilhead{-30mm}{Release History: Major Features}
+%{{{
+
+\noindent
+\begin{pspicture}(0,0)(\textwidth,\textheight)
+
+
+\rput[t](0.5\textwidth, 0.9\textheight) {%
+\begin{minipage}{0.9\textwidth}
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item Summary of available options for vertex fitting
+
+\end{list}
+
+\quad
+
+\begin{center}
+\normalsize
+
+\begin{tabular}{c|c|c|c}
+
+ &
+  & \texttt{beamline}
+   & \texttt{beamline3D}
+    \\
+%
+ & w/o beamline
+  & forced 1D fit
+   & 3D fit
+    \\ \midrule
+
+\MinuitVF
+ & \cmark
+  & \cmark
+   & \xmark
+    \\[3mm]
+
+\PPV
+ & \xmark
+  & \cmark
+   & \xmark
+    \\[3mm]
+
+\end{tabular}
+\end{center}
+
+
+\end{minipage}
+}
+
+
+\rput[t](0.5\textwidth, 0.30\textheight) {%
+\begin{minipage}{0.9\textwidth}
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item \textbf{v1.0} --- 2016-03-11
+
+   \begin{list}{\labelitemii}{}
+
+      \item Original code inherited from previous developers
+      \item Build with \texttt{cmake}, continuous integration
+
+   \end{list}
+
+\end{list}
+
+\end{minipage}
+}
+
+
+
+%\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
+
+\end{pspicture}
+%}}}
+
+
+
+%===============================================================================
+\myfoilhead{-30mm}{Release History: Major Features}
+%{{{
+
+\noindent
+\begin{pspicture}(0,0)(\textwidth,\textheight)
+
+
+\rput[t](0.5\textwidth, 0.9\textheight) {%
+\begin{minipage}{0.9\textwidth}
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item Summary of available options for vertex fitting
+
+\end{list}
+
+\quad
+
+\begin{center}
+\normalsize
+
+\begin{tabular}{c|c|c|c}
+
+ &
+  & \texttt{beamline}
+   & \texttt{beamline3D}
+    \\
+%
+ & w/o beamline
+  & forced 1D fit
+   & 3D fit
+    \\ \midrule
+
+\MinuitVF
+ & \cmark
+  & \cmark
+   & \cmark
+    \\[3mm]
+
+\PPV
+ & \xmark
+  & \cmark
+   & \cmark
+    \\[3mm]
+
+\end{tabular}
+\end{center}
+
+
+\end{minipage}
+}
+
+
+\rput[t](0.5\textwidth, 0.30\textheight) {%
+\begin{minipage}{0.9\textwidth}
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item \textbf{v2.0} --- 2016-12-12
+
+   \begin{list}{\labelitemii}{}
+
+       \item Support 3D vertex fits in \MinuitVF and \PPV
+       \item Optional vertex position constraint by the beam line
+
+       \begin{list}{\labelitemiii}{}
+          \item Routine to calculate $\chi^2$ for the vertex and the beam line
+          \item Proper calculation of uncertainties
+       \end{list}
+   \end{list}
+
+\end{list}
+
+\end{minipage}
+}
+
+
+
+%\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
+
+\end{pspicture}
+%}}}
+
+
+
+%===============================================================================
+\myfoilhead{-30mm}{Release History: Major Features}
+%{{{
+
+\noindent
+\begin{pspicture}(0,0)(\textwidth,\textheight)
+
+
+\rput[t](0.5\textwidth, 0.9\textheight) {%
+\begin{minipage}{0.9\textwidth}
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item Summary of available options for vertex fitting
+
+\end{list}
+
+\quad
+
+\begin{center}
+\normalsize
+
+\begin{tabular}{c|c|c|c}
+
+ &
+  & \texttt{beamline}
+   & \texttt{beamline3D}
+    \\
+%
+ & w/o beamline
+  & forced 1D fit
+   & 3D fit
+    \\ \midrule
+
+\MinuitVF
+ & \cmark
+  & \cmark
+   & \cmark
+    \\[3mm]
+
+\PPV
+ & \cmark
+  & \cmark
+   & \cmark
+    \\[3mm]
+
+\parbox{0.1\textwidth}{\small \centering \PPV\\[-3mm]\&muDST}
+ & \cmark
+  & \cmark
+   & \cmark
+    \\[3mm]
+
+\parbox{0.1\textwidth}{\small \centering \MinuitVF\\[-3mm]\&muDST}
+% & \textcolor{redDark}{?}
+ & \xmark
+  & \xmark
+   & \xmark
+    \\[3mm]
+
+\end{tabular}
+\end{center}
+
+\end{minipage}
+}
+
+
+\rput[t](0.5\textwidth, 0.30\textheight) {%
+\begin{minipage}{0.9\textwidth}
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item \textbf{v3.0-rc} --- in progress
+
+   \begin{list}{\labelitemii}{}
+
+      \item Vertex reconstruction using \muDST trees and \PPV vertex finder
+      \item Finalize common approach to fitting in \PPV and \MinuitVF
+      \item Consolidate track selection in \PPV and \MinuitVF
+      \item Unified selection of seeding and fitting algorithms:
+
+      \begin{list}{\labelitemiii}{}
+         \item \texttt{SeedFinder: MinuitVF, PPVLikelihood, TSpectrum}
+         \item \texttt{VertexFit: NoBeamline, Beamline1D, Beamline3D}
+      \end{list}
+
+   \end{list}
+
+\end{list}
+
+\end{minipage}
+}
+
+
+
+%\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
+
+\end{pspicture}
+%}}}
+
+
+
+%===============================================================================
+\myfoilhead{-30mm}{Release History: Major Features}
+%{{{
+
+\noindent
+\begin{pspicture}(0,0)(\textwidth,\textheight)
+
+
+\rput[t](0.5\textwidth, 0.9\textheight) {%
+\begin{minipage}{0.9\textwidth}
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item Summary of available options for vertex fitting
+
+\end{list}
+
+\quad
+
+\begin{center}
+\normalsize
+
+\begin{tabular}{c|c|c|c}
+
+ &
+  & \texttt{beamline}
+   & \texttt{beamline3D}
+    \\
+%
+ & w/o beamline
+  & forced 1D fit
+   & 3D fit
+    \\ \midrule
+
+\MinuitVF
+ & \cmark
+  & \cmark
+   & \cmark
+    \\[3mm]
+
+\PPV
+ & \cmark
+  & \cmark
+   & \cmark
+    \\[3mm]
+
+\parbox{0.1\textwidth}{\small \centering \PPV\\[-3mm]\&muDST}
+ & \cmark
+  & \cmark
+   & \cmark
+    \\[3mm]
+
+\parbox{0.1\textwidth}{\small \centering \MinuitVF\\[-3mm]\&muDST}
+% & \textcolor{redDark}{?}
+ & \cmark
+  & \cmark
+   & \cmark
+    \\[3mm]
+
+\end{tabular}
+\end{center}
+
+\end{minipage}
+}
+
+
+\rput[t](0.5\textwidth, 0.30\textheight) {%
+\begin{minipage}{0.9\textwidth}
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item \textbf{v3.x} --- planned
+
+   \begin{list}{\labelitemii}{}
+
+      \item Support \muDST-based reconstruction for \MinuitVF
+
+      \item Add primary track association when reconstruct from \muDST
+
+      \item New seed finder based on \texttt{TSpectrum}
+
+      \item Get rid of debugging histograms in production code
+
+      \item \ldots
+
+   \end{list}
+
+\end{list}
+
+\end{minipage}
+}
+
+
+
+%\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
+
+\end{pspicture}
+%}}}
+
+
+
+%===============================================================================
+\myfoilhead{-30mm}{Test Samples and Performance Metric}
+%{{{
+
+\noindent
+\begin{pspicture}(0,0)(\textwidth,\textheight)
+
+
+
+\rput(0.50\textwidth,0.45\textheight) {%
+\begin{minipage}{0.90\textwidth}
+
+\raggedright
+
+\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
+                          \setlength{\topsep}{0mm}}
+
+   \item Fully simulated $W$ sample generated with Pythia embedded in Run~13 minbias data\\
+   ($pp$ at $\sqrt{s}=510$~GeV)
+
+   \item Vertex reconstruction efficiency is based on known contribution by simulated particles and vertices
+
+   \begin{list}{\labelitemii}{\setlength{\itemsep}{3mm}
+                              \setlength{\topsep}{0mm}}
+
+      \item Reconstructed track is matched to a simulated particle by identifying the dominant contributor
+
+   \end{list}
+
+   \item Vertex reconstruction efficiency can be calculated for all vertices or
+   only the best match to the simulated one, i.e. the max-rank vertex
+
+   { \centering \rule{0.5\textwidth}{1pt}}
+
+   \item In \muDST reconstruction vertex daughters assigned at final stage
+
+   \begin{list}{\labelitemii}{\setlength{\itemsep}{3mm}
+                              \setlength{\topsep}{0mm}}
+
+      \item If track was used in seeding OR $ d/(\sigma_\text{DCA} + \sigma_\text{vertex}) < 1$
+
+      \item Currently assume fully correlated $\sigma_\text{DCA}$ and $\sigma_\text{vertex}$
+
+   \end{list}
+
+\end{list}
+
+\end{minipage}
+}
+
+
+
+%\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
+
+\end{pspicture}
+%}}}
+
+
+
+%===============================================================================
+\myfoilhead{-30mm}{\muDST Reco vs. Std Reco}
 %{{{
 
 \noindent
@@ -205,69 +704,17 @@ Dmitri~Smirnov}
 \begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
                           \setlength{\topsep}{0mm}}
 
-   \item Case of PPV with 1D beamline fit
-   \item 3D and no beamline cases look similar
+   \item Unlike with default \Sti-based reconstruction we keep original track-vertex association at seeding stage
+
+   \item This can cause the higher efficiency at low multiplicities
+
+   \item Deficiency for max-rank vertex can arise from non-optimized track-vertex matching criteria
 
 \end{list}
 
 \end{minipage}
 }
 
-
-
-%\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
-
-\end{pspicture}
-%}}}
-
-
-
-%===============================================================================
-\myfoilhead{-30mm}{Vertex Eff. With vs Without Cut on \StTrack-s}
-%{{{
-
-\noindent
-\begin{pspicture}(0,0)(\textwidth,\textheight)
-
-\rput[rt](0.5\textwidth,22){\includegraphics[height=0.5\textheight]{graphics/wemb_PPV_bl1D_muDst_reco_cut_nocut/event/McRecMulAny_eff}}
-\rput[lt](0.5\textwidth,22){\includegraphics[height=0.5\textheight]{graphics/wemb_PPV_bl1D_muDst_reco_cut_nocut/event/McRecMulGood_eff}}
-
-
-\rput(0.5\textwidth, 2) {%
-\begin{minipage}{0.90\textwidth}
-
-\raggedright
-
-\begin{list}{\labelitemi}{\setlength{\itemsep}{0mm}
-                          \setlength{\topsep}{0mm}}
-
-   \item Efficiency does not change significantly when all \StTrack-s converted to \StMuTrack-s
-
-\end{list}
-
-\end{minipage}
-}
-
-
-
-%\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
-
-\end{pspicture}
-%}}}
-
-
-
-%===============================================================================
-\myfoilhead{-30mm}{Need to understand \ldots}
-%{{{
-
-\noindent
-\begin{pspicture}(0,0)(\textwidth,\textheight)
-
-\rput[rt](0.5\textwidth,25){\includegraphics[height=0.5\textheight]{graphics/wemb_PPV_bl3D_muDst_vs_std_reco/vertex/hVertexPullX}}
-\rput[lt](0.5\textwidth,25){\includegraphics[height=0.5\textheight]{graphics/wemb_PPV_bl3D_muDst_vs_std_reco/vertex/hVertexPullY}}
-
-\rput[t](0.5\textwidth,12){\includegraphics[height=0.5\textheight]{graphics/wemb_PPV_bl3D_muDst_vs_std_reco/vertex/hVertexPullZ}}
 
 
 %\psgrid[gridlabels=0.7,subgriddiv=0, griddots=3](1,-1)(0,-3)(\textwidth,\textheight)
@@ -299,20 +746,24 @@ Dmitri~Smirnov}
    \begin{list}{\labelitemii}{\setlength{\itemsep}{3mm}
                               \setlength{\topsep}{0mm}}
 
-      \item Speed up factor for vertex studies $\sim 100$'s (no track (re-)reconstruction needed)
+      \item Speed up factor for VF studies/tuning $\sim 100$'s (no track (re-)reconstruction needed)
 
       \item Comparable vertex reconstruction efficiency as with \StTrack-s
 
+      \item The code and documentation available $\Longrightarrow$ Can be used by PWG's
+
    \end{list}
 
-   \item Next steps
+   \item Next
 
    \begin{list}{\labelitemii}{\setlength{\itemsep}{3mm}
                               \setlength{\topsep}{0mm}}
 
-      \item Investigate systematic shifts in pull distributions (3D fit)
+      \item Investigate different primary track matching methods/cuts
 
-      \item Refit StMuTrack-s (i.e. innermost track state)
+      \item Release v3.0 of STAR vertex libraries. Timescale: $\sim$ one week
+
+      \item Next v3.x release(s) on timescale of $\sim$ one month
 
    \end{list}
 
