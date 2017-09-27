@@ -1,0 +1,335 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+   <title>Vertex Finder Options and Past Findings Summary</title>
+
+   <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+   <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
+
+   <!-- Theme used for syntax highlighting of code -->
+   <link rel="stylesheet" href="../reveal.js/lib/css/github-gist.css">
+
+   <script src='../plotly.js/plotly.min.js'></script>
+
+   <style>
+
+   c {
+     white-space: pre;
+     font-family: Courier New, monospace;
+   }
+
+   </style>
+
+   <script>
+     var link = document.createElement( 'link' );
+     link.rel = 'stylesheet';
+     link.type = 'text/css';
+     link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+     document.getElementsByTagName( 'head' )[0].appendChild( link );
+   </script>
+
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Vertex Finder Options and<br>Past Findings Summary</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+<h4>September 27, 2017</h4>
+
+</section>
+
+
+
+<section>
+
+<ul>
+
+   <li>Motivated by concerns expressed after QA of recently reconstructed Run 17 pp
+   510 GeV data
+   
+   <ul>
+      <li>Increased number of negatively charged tracks with higher \( P_T \)
+      <br>
+      <a href=https://drupal.star.bnl.gov/STAR/system/files/QAtestproduction.pdf>link 1</a>,
+      <a href=https://drupal.star.bnl.gov/STAR/system/files/Trackbyday_0.pdf>link 2</a> by Jinlong Zhang
+   
+      <li>Comparison is for<br>
+      Run 17 pp500 st_W stream reconstructed with P17g<br>
+      Run 13 pp500 st_WB stream reconstructed with P16g
+   
+      <li>Quite different set of options:
+   
+<pre style="font-size: 0.8em;">
+DbV20170915 pp2017a StiCA btof mtd mtdCalib PicoVtxDefault
+fmsDat fmsPoint fpsDat BEmcChkStat OSpaceZ2 OGridLeakFull -hitfilt
+
+DbV20140905 pp2013b StiCA mtd btof VFPPVnoCTB beamline StiHftP
+BEmcChkStat -evout Corr4 OSpaceZ2 OGridLeak3D -hitfilt
+</pre>
+   
+      <li>Need to see logs to compare unrolled list of all options
+   
+      <li>Change from <code>beamline</code> to <code>beamline3D</code> option is the primary suspect?
+   </ul>
+   
+   <li>Also, <code>picoDst</code> vertex selection options
+
+</ul>
+
+</section>
+
+
+
+<section><h1>Beam Line in Vertex Reconstruction</h1>
+
+<table style="margin-top: 3em;" >
+
+<tr>
+   <th style="border: 0px">
+   <th style="border: 0px"> &langle; w/o beamline &rangle;
+   <th style="border: 0px" colspan=2> <code>beamline </code>
+   <th style="border: 0px"> <code>beamline3D</code>
+</tr>
+<tr>
+   <td class="liketh">
+   <td class="liketh"> 3D fit
+   <td class="liketh"> naive 1D
+   <td class="liketh"> 1D fit
+   <td class="liketh"> 3D fit
+</tr>
+
+<tr>
+   <td> <code>PPV</code>
+   <td align="center"> <span id="crossmark">&#10007;</span>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center"> <span id="crossmark">&#10007;</span>
+   <td align="center">
+</tr>
+
+<tr>
+   <td> <code>MinuitVF</code>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center">
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center">
+</tr>
+
+</table>
+
+<ul style="margin-top: 2em;">
+   <li>Prior to <code>SL16k</code>
+</ul>
+
+</section>
+
+
+
+<section> <h1>Beam Line in Vertex Reconstruction</h1>
+
+<table style="margin-top: 3em;" >
+
+<tr>
+   <th style="border: 0px">
+   <th style="border: 0px"> &langle; w/o beamline &rangle;
+   <th style="border: 0px" colspan=2> <code>beamline </code>
+   <th style="border: 0px"> <code>beamline3D</code>
+</tr>
+<tr>
+   <td class="liketh">
+   <td class="liketh"> 3D fit
+   <td class="liketh"> naive 1D
+   <td class="liketh"> 1D fit
+   <td class="liketh"> 3D fit
+</tr>
+
+<tr>
+   <td> <code>PPV</code>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+</tr>
+
+<tr>
+   <td> <code>MinuitVF</code>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center">
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+</tr>
+
+</table>
+
+<ul style="margin-top: 2em;">
+   <li><code>SL17e</code> and thereafter
+</ul>
+
+</section>
+
+
+
+<section> <h1>Highlights of <code>beamline</code> vs <code>beamline3D</code> Algorithms</h1>
+
+<ul style="margin-top: 2em;">
+
+   <li>New functionality in STAR vertex finders does not affect past behavior,
+   i.e. the previously existed options are backward compatible
+
+   <li>In new vertex fits ( \( \ge \text{SL17e} \) ) the beam line is treated the
+   same way in both <code>PPV</code> and <code>MinuitVF</code>
+
+   <li>In PPV <code>beamline</code> option forces the vertex to be on the beam
+   line ignoring the track error matrices except along the \(z\) axis
+
+   <li>With <code>beamline3D</code> option the full track and the beam line
+   error matrices are used in the fit
+
+   <li>No additional cuts introduced for primary track candidate selection
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>How New Features Were Tested</h1>
+
+<ul style="margin-top: 0em;">
+
+   <li>During development performed tests with custom W and Hijing embedding
+   samples. Tested low level performance (number of tracks, vertex position,
+         errors, ...) rather than physics signals<br>
+   See <a href=https://drupal.star.bnl.gov/STAR/system/files/vertex-reco-star-collab-mtg.pdf>Collab. Meeting, May 19, 2017</a>
+
+   <li>Independent tests
+
+   <ul>
+      <li>Only known (to me) test for <code>beamline3D</code> was done by S.
+      Radhakrishnan and X. Dong.  They used Run 16 dAu 200 GeV data.<br>
+      See <a href=https://drupal.star.bnl.gov/STAR/system/files/dAu16_QA_beamline3D_0.pdf>S&C Meeting, April 26, 2017</a>
+
+      <li>Tests with <code>beamline3D</code> showed expected features including
+
+      <ul>
+         <li>Sharper vertex peak in \( x-y \) plane due to vertex attraction to beam line
+         <li>Similar distributions without
+         <li>Wider DCA distribution with <code>beamline</code>
+      </ul>
+
+      <li>Not <code>beamline3D</code> related but L. Adamczyk, L. Fulek, and R.
+      Sikora
+      (LFS/UPC) performed embedding studies with PPV to test recent tunes of
+      <code>beamline</code> option
+
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Run 16 dAu 200 GeV</h1>
+
+<img src="graphics/vertex_beamline3d_test.png" width="55%" />
+
+<ul>
+      <li>By S. Radhakrishnan and X. Dong
+      <li>As of today, no independent tests for <code>beamline3D</code> in pp data
+</ul>
+
+</section>
+
+
+
+<section> <h1>Vertex Options for <code>picoDst</code> Production</h1>
+
+<ul style="margin-top: 1em;">
+
+   <li>There are three vertex options:
+
+   <dt style="margin: 0.5em 0em;"> <code>PicoVtxMode::Default</code> </dt>
+   <dd>
+   Select the first vertex in the muDst vertex collection. Usually the highest
+   rank vertex
+   </dd>
+
+   <dt style="margin: 0.5em 0em;"> <code>PicoVtxMode::Vpd</code> </dt>
+   <dd>
+   Select a vertex matching the VPD one, i.e. select the first available
+   <code>muDst</code> vertex within a window around the VPD vertex
+   </dd>
+
+   <dt style="margin: 0.5em 0em;"> <code>PicoVtxMode::VpdOrDefault</code> </dt>
+   <dd>
+   If a vertex matching the VPD one is not found pick the first one from
+   the <code>muDst</code> collection
+   </dd>
+
+   <li> Somewhat confusing but <code>PicoVtxMode::Default</code> does not mean
+   the option will be selected by default!<br>
+   Might be a good idea to rename the option to <code>First</code>,
+   <code>Best</code>, <code>MaxRank</code>, or ...<br>
+   ...and use it by default when no other option is provided
+
+</ul>
+
+</section>
+
+
+</div>
+</div>
+
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // R = 0.8 WXGA
+   //width: 1024, height: 640,
+   // R = 0.875 WXGA
+   width: 1120, height: 700,
+   // R = 0.6 HD
+   //width: 1152, height: 648,
+   // R = 0.5 HD
+   //width: 960, height: 540,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_HTML-full'
+   },
+   dependencies: [
+      { src: 'https://root.cern.ch/js/notebook//scripts/JSRootCore' },
+      { src: '../reveal.js/plugin/markdown/marked.js' },
+      { src: '../reveal.js/plugin/markdown/markdown.js' },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
