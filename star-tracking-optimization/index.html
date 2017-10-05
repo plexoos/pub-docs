@@ -1,0 +1,612 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+   <title>STAR Tracking Optimization Studies</title>
+
+   <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+   <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
+
+   <!-- Theme used for syntax highlighting of code -->
+   <link rel="stylesheet" href="../reveal.js/lib/css/github-gist.css">
+
+   <script src='../plotly.js/plotly.min.js'></script>
+
+   <style>
+
+   c {
+     white-space: pre;
+     font-family: Courier New, monospace;
+   }
+
+   </style>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Optimizing STAR Event Reconstruction</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+</section>
+
+
+
+<section> <h1>Motivation</h1>
+
+<ul style="margin-top: 3em;">
+
+   <li> Speed up the existing event reconstruction
+
+   <li> The road map
+
+   <ul>
+      <li> Investigate bottle necks in the code \( \Longrightarrow \) Refactor individual routines
+
+      <li> Consider changes in algorithms to eliminate unnecessary calculations
+
+      <li> Benefit from "automatic" compiler optimization
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Alternative Implementations of Individual Routines</h1>
+
+<ul style="margin-top: 3em;">
+
+   <li> In reconstruction jobs most of the time is spent in <c>StiMaker::Make()</c>
+
+   <li> Matrix operation routines
+
+   <li> Made sure output for all implementations is identical for input based on real data
+
+   <li> Tests with Eigen implementation of matrix operations give up to 40% <br>
+   May translate to up to 10% additional speed-up in full reconstruction jobs
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Alternative Implementations: errPropag6()</h1>
+
+<iframe width="90%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="plot_results_errPropag6.html"></iframe>
+
+</section>
+
+
+
+<section> <h1>Alternative Implementations: joinTwo()</h1>
+
+<iframe width="90%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="plot_results_joinTwo.html"></iframe>
+
+</section>
+
+
+
+<section> <h1>Comparison of Optimization Options</h1>
+
+<iframe width="90%" height="50%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="plot_results_joinTwo_NxN_5.html"></iframe>
+
+<pre style="width: 90%; max-height: 33%; overflow: auto;">
+<code data-trim style="font-size: 0.7em;">
+    set1  = "-O2 -m32 -msse -mno-avx -ftree-vectorize"
+    set2  = "-O2 -m32 -msse -mno-avx -fno-tree-vectorize"
+    set3  = "-O2 -m32 -msse -mno-avx -ftree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set4  = "-O2 -m32 -msse -mno-avx -fno-tree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set5  = "-O3 -m32 -msse -mno-avx -ftree-vectorize"
+    set6  = "-O3 -m32 -msse -mno-avx -fno-tree-vectorize"
+    set7  = "-O3 -m32 -msse -mno-avx -ftree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set8  = "-O3 -m32 -msse -mno-avx -fno-tree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set9  = "-O2 -m64 -msse -mno-avx -ftree-vectorize"
+    set10 = "-O2 -m64 -msse -mno-avx -fno-tree-vectorize"
+    set11 = "-O2 -m64 -msse -mno-avx -ftree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set12 = "-O2 -m64 -msse -mno-avx -fno-tree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set13 = "-O3 -m64 -msse -mno-avx -ftree-vectorize"
+    set14 = "-O3 -m64 -msse -mno-avx -fno-tree-vectorize"
+    set15 = "-O3 -m64 -msse -mno-avx -ftree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set16 = "-O3 -m64 -msse -mno-avx -fno-tree-vectorize -D EIGEN_DONT_VECTORIZE"
+</code>
+</pre>
+
+
+</section>
+
+
+
+<section> <h1>Changes in Sti Tracking Algorithm</h1>
+
+<ul style="margin-top: 3em;">
+
+   <li> Attempted to speed up Kalman smoother by skipping calculation of internal track states
+
+   <li> Expected no change in reconstructed track parameters
+
+   <li> Unfortunately the change in Kalman smoother affects reconstructed tracks
+
+   <li> Giving up? ... Need to revisit this result and quantify the change more precisely
+
+<!--
+   <li>Tests with Eigen implementation of matrix operations give approx. 8-10%
+   speed-up in full reconstruction jobs
+-->
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Event Reconstruction with 64 bit Libraries</h1>
+
+<ul>
+
+   <li> Base release is <c>SL17h</c> (... dNdx)
+
+   <ul>
+      <li> 64 and 32 libraries available tagged releases. <c>DEV</c> has only 32 bit
+
+      <li> Not sure what options are used for the builds but 64 bit case maybe unoptimized...
+
+      <li> I use <c>cmake</c> to compile locally (Most of the libraries used in "reco" are build locally)
+   </ul>
+
+   <li> Use regular <c>root</c> to run <c>bfc.C</c> macro
+
+   <li> Currently remove <c>btof</c> option to avoid the need for <c>geant</c> libraries
+
+   <li> <c>StBFChain</c> distinguishes <c>root</c> from <c>root4star</c> and sets "VMC" options
+   internally for <c>root</c>. Got rid of them
+
+   <li> Seems safe to remove unused options/libraries <c>ctf</c>, <c>St_ctf</c>, <c>St_ctf_Make</c>
+   invoked by <c>Sti</c>, <c>VFPPV</c>, <c>VFPPVEv</c>, <c>genvtx</c>, and <c>tables</c>
+
+   <ul>
+      <li> <c>globT</c> and <c>sim_T</c> removed for this studies but need to confirm later
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Tests for Modified Libraries</h1>
+
+<p>Compare the following reconstruction chains
+
+<ul>
+
+   <li> <strong>Test 1.</strong> <span class="my-border-grn">32-bit root4star, SL17h</span> vs
+                                 <span class="my-border-red">32-bit root4star, ds-tof-tgeo</span>
+
+   <li> <strong>Test 2.</strong> <span class="my-border-red">32-bit root4star, ds-tof-tgeo</span> vs
+                                 <span class="my-border-blu">32-bit root, ds-tof-tgeo, ds-root-reco</span>
+
+   <li> <strong>Test 3.</strong> <span class="my-border-red">32-bit root4star, ds-tof-tgeo</span> vs
+                                 <span class="my-bg-blu">64-bit root, ds-tof-tgeo, ds-root-reco</span>
+
+     <ul>
+        <li> `ds-tof-tgeo` is the branch with modified code `StBTofUtil/StBTofGeometry`, `StiMaker`
+        <li> Reconstruction with `root` assumes elimination of `St_geant_Maker` and `VMCMaker` through removal of special
+        treatment of `root`.  Changes on `ds-root-reco` branch modifying `StBFChain`, `bfc.C`
+     </ul>
+
+   <li> <strong>Test 4.</strong> <span class="my-bg-blu">64-bit root, ds-tof-tgeo, ds-root-reco</span> vs<br>
+                                 <span class="my-bg-gry">64-bit root, ds-tof-tgeo, ds-root-reco, ds-optim-eigen</span>
+
+     <ul>
+        <li> `ds-optim-eigen` contains new implementations of `joinTwo()` and `errPropag6()`
+     </ul>
+</ul>
+
+</section>
+
+
+
+<section> <h1>Summary for Tests</h1>
+
+<ul>
+
+   <li> <strong>Test 1.</strong> Identical results
+
+   <li> <strong>Test 2.</strong> Identical results
+
+   <li> <strong>Test 3.</strong>
+
+   <ul>
+      <li> Difference in 1-2 tracks is observed in many events (~0.5&permil;). In total track count and/or after vertex cuts
+
+      <li> Similar level of discrepancy (~10 out of 40&ndash;50k hits) is already seen in the hits<br>
+        The difference does not appear to be systematic
+
+      <li> Not worth tracking down but may try a special compiler flag to guarantee the order of arithmetic operations
+
+      <li> Confirmed gain in total BFC speed 10&ndash;15%
+   </ul>
+
+   <li> <strong>Test 4.</strong> Eigen library is used for matrix operations
+
+   <ul>
+      <li> Numerical difference is smaller than in Test 2 (1 track in ~5% of events)
+
+      <li> Gain additional 5% in total BFC speed
+   </ul>
+
+</ul>
+
+</section>
+
+
+<section> <h1>Preliminary Results</h1>
+
+<ul>
+
+   <li> Based on 100 events
+
+   <li> Results are for local builds unless noted
+
+   <pre><code>cmake -D CMAKE_CXX_FLAGS="-O2 -msse -mno-avx -fno-tree-vectorize"</code></pre>
+
+   <li>Notes:<br>
+   [1] pp 510GeV run 2017<br>
+   [2] auau 200GeV run 2016<br>
+   [3] pp 200GeV run 2015
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Preliminary Results: Sti</h1>
+
+
+<table style="margin: 2em;" >
+
+<thead>
+
+<tr>
+<th> Data
+<th> Notes
+<th>
+<th> bfc, cpu
+<th> StiMaker, %
+
+</thead>
+
+<tr>
+<td rowspan=2> st_physics_18060106_raw_0000008.daq
+ <td rowspan=2>[1]
+  <td> -m32 <td> 1366 <td> 57.7
+
+<tr>
+
+  <td> -m64 <td> 1208 <span class="my-dark-red">(-11%)</span> <td> 57.5
+
+
+<tr>
+<td rowspan=2> st_physics_17072001_raw_3500002.daq
+ <td rowspan=2>[2]
+  <td> -m32 <td> 2575 <td> 43.9
+
+<tr>
+
+  <td> -m64 <td> 2284 <span class="my-dark-red">(-11%)</span> <td> 42.0
+
+
+<tr>
+<td rowspan=2> st_physics_16067017_raw_1000020.daq
+ <td rowspan=2>[3]
+  <td> -m32 <td> 1258 <td> 34.1
+
+<tr>
+
+  <td> -m64 <td> 1130 <span class="my-dark-red">(-10%)</span> <td> 32.0
+
+</table>
+
+
+</section>
+
+
+
+<section> <h1>Preliminary Results: StiCA</h1>
+
+
+<table style="margin: 2em;" >
+
+<thead>
+
+<tr>
+<th> Data
+<th> Notes
+<th>
+<th> bfc, cpu
+<th> StiMaker, %
+
+</thead>
+
+<tr>
+<td rowspan=2> st_physics_18060106_raw_0000008.daq
+ <td rowspan=2>[1]
+  <td> -m32 <td> 1606 <td> 63.7
+
+<tr>
+
+  <td> -m64 <td> 1430 <span class="my-dark-red">(-11%)</span> <td> 45.7
+
+
+<tr>
+<td rowspan=2> st_physics_17072001_raw_3500002.daq
+ <td rowspan=2>[2]
+  <td> -m32 <td> 2932 <td> 43.9
+
+<tr>
+
+  <td> -m64 <td> 2505 <span class="my-dark-red">(-15%)</span> <td> 45.9
+
+
+</table>
+
+
+</section>
+
+
+
+<section> <h1>Preliminary Results: Discussion</h1>
+
+<ul>
+
+   <li> Consistent gain in speed (32 vs 64 bit) of at least 10% for various data sets
+
+   <li> StiCA is slower than Sti. Could be due to turned off auto vectorization
+
+</ul>
+
+</section>
+
+
+
+<section data-markdown> Summary
+
+<textarea data-template>
+
+# Summary
+
+* Using vectorized matrix operations gives up to 40% in individual routines w.r.t. current implementations
+
+* Running 64-bit vs 32-bit binaries on 64-bit architecture gives at least 10% gain in speed
+
+* Is there any difference when using root and root4star?
+
+* Next
+
+   * Need to see StiCA case with different vectorization options
+
+   * BTOF geometry needs to be made independent of `Geant` libraries
+
+</textarea>
+
+</section>
+
+
+
+<section> <h1>Back-Up Slides</h1>
+</section>
+
+
+
+<section> <h1>Comparison of Optimization Options</h1>
+
+<ul>
+   <li> Consider different RHIC Runs: 2017, 2016, and 2015
+</ul>
+
+<table style="font-size: 80%; margin: 1em;" >
+
+<thead>
+<tr>
+<th> File
+<th> Notes
+<th>
+<th> StiMaker, % (total mins)
+<th> joinTwo(), %
+<th> errPropag6(), %
+<th>
+</thead>
+
+<tr>
+<td rowspan=2> st_physics_18060106_raw_0000008.daq <td rowspan=2>
+ <td> Sti   <td> 57 (83) <td> 28 <td> 9  <td>
+
+<tr>
+ <td> StiCA <td> 63 (97) <td> 23 <td> 7 <td>
+
+<tr>
+<td rowspan=2> st_physics_17072001_raw_3500002.daq <td rowspan=2>
+ <td> Sti <td> 44 (155) <td> 22 <td> 7 <td>
+
+<tr>
+ <td> StiCA <td> 46 (177) <td> 19 <td> 6.4 <td>
+
+<tr>
+<td> st_physics_16067017_raw_1000020.daq <td>
+ <td> Sti <td> 34 (67) <td> 20.4 <td> 7.1 <td>
+
+</table>
+
+
+<iframe width="60%" height="30%" style="margin-top: 1em;" scrolling="auto" src="plot_components_StiMaker.html"></iframe>
+
+</section>
+
+
+
+<section> <h1>64-bit Libraries for Event Reconstruction</h1>
+
+<ul>
+
+   <li> Need to understand library dependencies and compile 64-bit libraries for
+   full event reconstruction
+
+   <ul>
+      <li> Test with real data reco jobs using already defined set of options
+   </ul>
+
+   <li> Already established that <c>StiMaker</c> depends on <c>St_geant_Maker</c> via BTOF geometry
+
+   <ul>
+      <li><c>St_geant_Maker</c> calls <c>TGiant3</c> in <c>root4star</c>
+
+      <li><c>TGiant3</c> is an adapter for <c>Geant3</c> library. Some Fortran components are not ready for 64-bit...
+   </ul>
+
+   <li> Removing dependence on <c>Geant</c> geometry will warrant uniform use of <c>TGeoManager</c>
+
+   <li> Effective calls to <c>St_geant_Maker</c> made via code:
+
+   <pre><code>TVolume* starHall = static_cast&lt;TVolume*&gt;( GetDataSet("HALL") );</code></pre>
+
+   <br>Need to refactor by using <c>TGeoManager</c> instead
+
+   <li> An internal BTOF geometry (tray/module/sensor structures) is built in
+   <c>StBTofGeometry</c> and is used in track to cell matching
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Understanding <c>Geant</c> Role in Event Reconstruction</h1>
+
+<p><strong>32-bit case:</strong>
+
+<ul>
+
+   <li> <c>Geant</c> not required for event reconstruction
+
+      <li> Removed "btof" option but still see <c>St_geant_Maker</c>
+
+      <li> Using <c>root</c> instead of <c>root4star</c> completely removes <c>St_geant_Maker</c>
+
+      <li> But some side effects observed </li>
+
+         <pre>StMtdHitMaker:INFO  - Process data from year -1</pre>
+
+      <ul>
+         <li>geant3/pythia/... libraries still loaded (perhaps not used)
+
+         <li> <c>StVMCMaker</c> is invoked and it seems the data is treated as simulation
+
+         <li> Yes, confirmed and the fix is to remove "VMC" options
+      </ul>
+
+      <li> Reconstruction works as expected with <c>root</c>
+
+</ul>
+
+<p><strong>64-bit case:</strong>  There is no 64-bit <c>root4star</c>, 64-bit libraries are not built daily
+
+</section>
+
+
+
+<section> <h1>Proposed Changes for Reco Chain</h1>
+
+<ul>
+
+   <li> Remove "VMC" options internally set in <c>StBFChain.cxx</c>. This also removes <c>geant3/pythia/...</c> libraries
+
+   <li> Remove unused options/libraries such as <c>ctf</c>, <c>St_ctf</c>, <c>St_ctf_Make</c> invoked by <c>genvtx</c>
+
+   <li> Most of the libraries used in 'reco' chain can be built with <c>cmake</c>
+
+</ul>
+
+
+<pre style="max-width: 100%; max-height: 48%; overflow: auto;">
+<code data-trim class="diff" style="font-size: 0.7em;">
+--- a/StBFChain/StBFChain.cxx
++++ b/StBFChain/StBFChain.cxx
+@@ -1475,14 +1475,6 @@ void StBFChain::SetFlags(const Char_t *Chain)
+       SetOption("-geantL","Default,-TGiant3");
+       SetOption("-geometry","Default,-TGiant3");
+       SetOption("-geomNoField","Default,-TGiant3");
+-      if (! (GetOption("Stv"))) {
+-       if (! (GetOption("VMC") || GetOption("VMCPassive"))) {
+-         SetOption("VMCPassive","Default,-TGiant3");
+-       }
+-       SetOption("pgf77","Default,-TGiant3");
+-       SetOption("mysql","Default,-TGiant3");
+-       SetOption("StarMiniCern","Default,-TGiant3");
+-      }
+     }
+     if (GetOption("ITTF") && ! (GetOption("Sti") || GetOption("StiCA")  || GetOption("Stv") || GetOption("StiVMC"))) {
+       TString STAR_LEVEL(gSystem->Getenv("STAR_LEVEL"));
+</code>
+</pre>
+
+
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // R = 0.8 WXGA
+   //width: 1024, height: 640,
+   // R = 0.875 WXGA
+   width: 1120, height: 700,
+   // R = 0.6 HD
+   //width: 1152, height: 648,
+   // R = 0.5 HD
+   //width: 960, height: 540,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_HTML-full'
+   },
+   dependencies: [
+      { src: '../reveal.js/plugin/markdown/marked.js' },
+      { src: '../reveal.js/plugin/markdown/markdown.js' },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
