@@ -1,0 +1,212 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+   <title>Matching Track To Fast Detectors in STAR Vertex Finders</title>
+
+   <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+   <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
+
+   <!-- Theme used for syntax highlighting of code -->
+   <link rel="stylesheet" href="../reveal.js/lib/css/zenburn.css">
+
+   <script src='../plotly.js/plotly.min.js'></script>
+
+   <style>
+
+   c {
+     white-space: pre;
+     font-family: Courier New, monospace;
+   }
+
+   </style>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1>Rethinking Track Matching to TOF in PPV</h1>
+
+<ul>
+   <li>In STAR fast detectors are used to mitigate effect on vertex position by pile-up tracks in slow TPC
+
+   <li>Track weight is based on the hit/signal and status of detector cell to which track is projected
+
+   <ul>
+      <li>Track weight contributes to overall vertex rank
+   </ul>
+
+<table style="font-size: 0.6em; margin: 2.5em auto" >
+
+<thead>
+<tr>
+<th>Track Points to Cell
+<th>Cell Status
+<th>Cell Signal
+<th>Track weight
+</thead>
+
+<tr>
+<td> <span id="checkmark">&#10004;</span>
+<td> <span id="checkmark">&#10004;</span>
+<td> <span id="checkmark">&#10004;</span>
+<td> higher
+
+<tr>
+<td> <span id="checkmark">&#10004;</span>
+<td> <span id="checkmark">&#10004;</span>
+<td> <span id="crossmark">&#10007;</span>
+<td> lower
+
+<tr>
+<td> <span id="checkmark">&#10004;</span>
+<td> <span id="crossmark">&#10007;</span>
+<td> <span id="crossmark">&#10007;</span>
+<td> no change
+
+</table>
+
+</ul>
+
+</section>
+
+
+
+<section>
+
+   <h1>Track Matching to TOF Details...</h1>
+
+   <ul>
+
+   <li> Track matching is available in
+
+   <ul>
+      <li> <c>StGenericVertexFinder</c>
+      <li> <c>StiMaker</c> via <c>StTrack2FastDetectorMatcher</c>
+      <li> <c>StBTofMatchMaker</c>
+   </ul>
+
+   <li><c>StTrack</c> flags are set by <c>StTrack2FastDetectorMatcher</c> in <c>StiMaker</c>.
+   Only match/no match set, cell status ignored
+
+   <li>We can modify <c>StTrack2FastDetectorMatcher</c> to do matching with <c>StBTofMatchMaker</c>
+
+   <li><c>StBTofMatchMaker</c> can work with both <c>StTrack</c> and <c>StMuTrack</c>
+
+   <li>PPV uses <c>StiKalmanTrack</c> rather than <c>StTrack</c>. <span class="my-dark-red">Need to fix this</span>
+
+   </ul>
+
+</section>
+
+
+
+<section>
+
+<h1>Track Matching Algorithm: <c>StTrack2FastDetectorMatcher</c></h1>
+
+<ul>
+
+   <li> Track matching is done on per cell geometry using <c>StBTofGeometry::HelixCrossCellIds()</c>
+
+   <li> But matching is done via a 2D \(\eta-\phi\) binned lattice
+
+   <ul>
+      <li> Binning is based on ideal (? - verify) cell positions
+
+      <li> It is done to have a "common" approach for all fast detectors BEMC, EEMC, TOF, and CTB
+   </ul>
+
+   <li> The status of a fast detector "cell" is accessed by a unique Id (e.g. towerId, module/tray/cellId)
+
+</ul>
+
+</section>
+
+
+
+<section>
+
+<h1>Track Matching Algorithm: <c>StBTofMatchMaker</c></h1>
+
+<ul>
+
+   <li> Track matching is done on per cell geometry using <c>StBTofGeometry::HelixCrossCellIds()</c>
+
+   <ul>
+      <li> Additional cut in local z &lt; XX
+   </ul>
+
+   <li> Adjacent cells with signal are also considered a match (Potentially increasing efficiency)
+
+   <li> Tracks with multiple cell matches assigned best matched cell based on ToT and distance to cells center
+
+   <li> Cells with multiple tracks are not associated with any track (Potentially increasing purity, decreasing efficiency)
+
+   <ul>
+      <li> This requires additional loop over tracks to calculate the multiplicity
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section>
+
+<h1>Track Matching Algorithm: <c>StBTofMatchMaker</c></h1>
+
+<ul>
+   <li> For each track:
+
+   <ul>
+      <li> Project track to TOF \( \Longrightarrow \) get directly matched cell ids + adjacent cells
+      <li> Check only directly matched cells (?): if ( fabs( track_projected_local_z) &lt; mZLocalCut) {   // to be consistent with GEANT geometry
+      <li> Check IF these selected cells have a signal ( in StSPtrVecBTofHit or StMuBTofHit containers)
+      <li>
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_HTML-full'
+   },
+   dependencies: [
+      { src: '../reveal.js/plugin/markdown/marked.js' },
+      { src: '../reveal.js/plugin/markdown/markdown.js' },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/math/math.js', async: true }
+   ],
+   center: false,
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
