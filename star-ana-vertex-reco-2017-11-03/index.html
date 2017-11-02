@@ -1,0 +1,416 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+   <title>Vertex Reconstruction Status</title>
+
+   <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+   <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
+
+   <!-- Theme used for syntax highlighting of code -->
+   <link rel="stylesheet" href="../reveal.js/lib/css/github-gist.css">
+
+   <script src='../plotly.js/plotly.min.js'></script>
+
+   <style>
+
+   c {
+     white-space: pre;
+     font-family: Courier New, monospace;
+   }
+
+   </style>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Vertex Reconstruction Status</h1>
+
+<h3 class="title">Dmitri Smirnov for the S&C</h3>
+
+<h4>November 3, 2017</h4>
+
+<h4>STAR Analysis Meeting</h4>
+
+</section>
+
+
+
+<section> <h1>Current Status Highlights</h1>
+
+<ul>
+
+   <li> Since last Collaboration Meeting
+
+   <ul>
+      <li> Independent tests by UPC/LFS and HF groups with real data (Thanks!)
+
+      <li> No major changes in vertex finding algorithms
+   </ul>
+
+   <li style="margin: 2em 0em;"> Highlighted modifications introduced under the S&amp;C's watch
+
+   <ul>
+
+      <li> Beam line constraint is available and treated the same way in both
+      <c>PPV</c> and <c>MinuitVF</c>
+
+      <li> With <c>beamline3D</c> option the full track and the beam line error
+      matrices are used in the fit
+
+      <li> New functionality does not affect past behavior, i.e. the previously
+      existed options are backward compatible
+
+      <li> No change in primary track candidate selection
+
+      <li> <strong>Re-vertexing is now possible with <c>muDst</c>
+      tracks</strong>
+
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Beam Line Options</h1>
+
+<ul>
+   <li> <strong>Prior to <code>SL16k</code></strong>
+</ul>
+
+<table>
+
+<tr>
+   <th style="border: 0px">
+   <th style="border: 0px"> &langle; w/o beamline &rangle;
+   <th style="border: 0px" colspan=2> <code>beamline </code>
+   <th style="border: 0px"> <code>beamline3D</code>
+</tr>
+<tr>
+   <td class="liketh">
+   <td class="liketh"> 3D fit
+   <td class="liketh"> naive 1D
+   <td class="liketh"> 1D fit
+   <td class="liketh"> 3D fit
+</tr>
+
+<tr>
+   <td> <code>PPV</code>
+   <td align="center"> <span id="crossmark">&#10007;</span>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center"> <span id="crossmark">&#10007;</span>
+   <td align="center">
+</tr>
+
+<tr>
+   <td> <code>MinuitVF</code>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center">
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center">
+</tr>
+
+</table>
+
+<ul>
+   <li> <strong>naive 1D fit</strong>: Position of local peaks in binned (and weighted) track distribtion along \( z \)
+   <li> <strong>1D fit</strong>: By TMinuit with one free parameter&mdash;vertex position along \( z \). Forced to stay on beam line
+   <li> <strong>3D fit</strong>: By TMinuit with vertex coordinates \( (x, y, z) \) as free parameters
+</ul>
+
+</section>
+
+
+
+<section> <h1>Beam Line Options</h1>
+
+<ul>
+   <li> <strong><code>SL17e</code> and thereafter</strong>
+</ul>
+
+<table>
+
+<tr>
+   <th style="border: 0px">
+   <th style="border: 0px"> &langle; w/o beamline &rangle;
+   <th style="border: 0px" colspan=2> <code>beamline </code>
+   <th style="border: 0px"> <code>beamline3D</code>
+</tr>
+<tr>
+   <td class="liketh">
+   <td class="liketh"> 3D fit
+   <td class="liketh"> naive 1D
+   <td class="liketh"> 1D fit
+   <td class="liketh"> 3D fit
+</tr>
+
+<tr>
+   <td> <code>PPV</code>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+</tr>
+
+<tr>
+   <td> <code>MinuitVF</code>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center">
+   <td align="center"> <span id="checkmark">&#10004;</span>
+   <td align="center"> <span id="checkmark">&#10004;</span>
+</tr>
+
+</table>
+
+<ul>
+   <li> <strong>naive 1D fit</strong>: Position of local peaks in binned (and weighted) track distribtion along \( z \)
+   <li> <strong>1D fit</strong>: By TMinuit with one free parameter&mdash;vertex position along \( z \). Forced to stay on beam line
+   <li> <strong>3D fit</strong>: By TMinuit with vertex coordinates \( (x, y, z) \) as free parameters
+</ul>
+
+</section>
+
+
+
+<section> <h1>Independent Tests by HF group</h1>
+
+<ul>
+
+   <li> Many thanks to S. Radhakrishnan and X. Dong for testing <c>beamline3D</c> option in Run 16 dAu 200 GeV data.
+   See <a href=https://drupal.star.bnl.gov/STAR/system/files/dAu16_QA_beamline3D_0.pdf>S&C Meeting, April 26, 2017</a>
+
+</ul>
+
+<table style="border: 0px solid black;">
+<tr>
+<td width="65%">
+   <img src="graphics/vertex_beamline3d_test.png" class="plain" />
+
+<td style="vertical-align: top;">
+
+   Observed expected features including
+
+   <ul style="margin: 0.5em;">
+
+      <li> Sharper vertex peak in \( x-y \) plane due to vertex "attraction" to
+      beam line and similar distributions without the beam line (HFT tracks!)
+
+      <li> Wider DCA distribution with <c>beamline</c>
+
+   </ul>
+</tr>
+
+</table>
+
+
+</section>
+
+
+
+<section> <h1>Independent Tests by UPC/LFS group</h1>
+
+<ul>
+
+   <li> Many thanks to L. Adamczyk, L. Fulek, and R. Sikora for performing
+   embedding and data studies with <c>PPV</c>. Tested recent tunes of
+   <c>beamline</c> options and re-vertexing with <c>muDst</c>.
+   See <a href="https://drupal.star.bnl.gov/STAR/system/files/fulek_September_25_17.pdf">S&C Meeting, September 25, 2017</a>
+
+</ul>
+
+<table style="border: 0px solid black; margin-top: -1em;">
+<tr>
+<td width="65%" style="text-align: center;">
+   <img src="graphics/upc_nvertices_1d_vs_3d.png" class="plain" width="45%" />
+   <img src="graphics/upc_ntracks_1d_vs_3d.png" class="plain" width="45%" />
+   <img src="graphics/upc_invariant_mass_revertexing.png" class="plain" width="50%" />
+
+<td style="border: 0px solid black; vertical-align: top;">
+
+   <ul style="margin: 0.5em;">
+
+      <li> Consistent results with <c>beamline</c> and <c>beamline3D</c>. 3D fit
+      improves resolution (although not used directly in this analysis)
+
+      <li> Beam line helps to recover low multiplicity (1-2 tracks) vertices
+
+      <li> Using only BTOF-matched tracks in vertex fit leads to two-fold
+      increase in signal
+
+   </ul>
+</tr>
+
+</table>
+
+</section>
+
+
+
+<section> <h1>Track Matching to BTOF<br>(and other fast detectors)</h1>
+
+<ul>
+   <li> In STAR fast detectors are used to mitigate effect on vertex position by pile-up tracks in slow TPC
+
+   <li> Track weight is based on the hit/signal and status of detector cell to which track is projected
+
+   <ul>
+      <li> Track weights then translate to overall vertex rank
+   </ul>
+
+<table style="font-size: 0.8em; margin: 1em auto" >
+
+<thead>
+<tr>
+<th>Track Points to Cell
+<th>Cell Status
+<th>Cell Signal
+<th>Track weight
+</thead>
+
+<tr>
+<td> <span id="checkmark">&#10004;</span>
+<td> <span id="checkmark">&#10004;</span>
+<td> <span id="checkmark">&#10004;</span>
+<td> higher
+
+<tr>
+<td> <span id="checkmark">&#10004;</span>
+<td> <span id="checkmark">&#10004;</span>
+<td> <span id="crossmark">&#10007;</span>
+<td> lower
+
+<tr>
+<td> <span id="checkmark">&#10004;</span>
+<td> <span id="crossmark">&#10007;</span>
+<td> &mdash;
+<td> no change
+
+<tr>
+<td> <span id="crossmark">&#10007;</span>
+<td> &mdash;
+<td> &mdash;
+<td> no change
+
+</table>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Issues with BTOF Track Matching</h1>
+
+<ul>
+
+   <li> Tests by UPS/LFS uncovered inconsistencies in BTOF matching.
+   See details in G. Van Buren's <a href="https://drupal.star.bnl.gov/STAR/blog/genevb/btof-matching-tracking-and-vertexing">blog</a>
+
+   <li> BTOF track matching is available in three variants:
+
+   <ul>
+      <li> <strong><c>StGenericVertexFinder</c>:</strong> Module-based matching used in vertex ranking
+      <li> <strong><c>StTrack2FastDetectorMatcher</c>:</strong> Aggregate vertex flags based on cell-based match
+      <li> <strong><c>StBTofMatchMaker</c>:</strong> Sets matching flags for <c>StMuTrack</c>s
+   </ul>
+
+   <li> BTOF matching flags for <c>muDst</c> tracks do not reflect track matching in vertex finders
+
+   <li> Similarly aggregate vertex counters for daughter tracks are not based on <c>StMuTrack</c> flags
+
+   <li> The above may lead to inconsistent track selections depending on fields used in <c>muDst</c> trees
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Summary and Action Items</h1>
+
+<ul>
+
+   <li> Independent tests by PWGs added confidence in recent Vertex Finder
+   modifications
+
+   <li> Re-vertexing is now possible with <c>muDst</c> tracks
+
+   <li> Moving towards solutions for remaining issues
+
+   <ul>
+
+      <li> Ongoing discussion with TOF team on a possibility to converge to
+      a single BTOF matching algorithm
+
+      <li> A related issue with BTOF is its geometry based on <c>Geant</c>
+      volumes instead of the <c>ROOT</c>'s <c>TGeoManager</c>
+
+      <li> Common approach to misaligned <c>TGeo</c> allow for better matching accuracy
+
+      <li> Considering an option of splitting <c>StiMaker</c> into a global and
+      primary track makers with detector-matching and vertex finding run in between
+
+      <li> Lessons learned from BTOF should be extended to ETOF and calorimeters
+
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // R = 0.8 WXGA
+   //width: 1024, height: 640,
+   // R = 0.875 WXGA
+   width: 1120, height: 700,
+   // R = 0.6 HD
+   //width: 1152, height: 648,
+   // R = 0.5 HD
+   //width: 960, height: 540,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_HTML-full'
+   },
+   dependencies: [
+      { src: '../reveal.js/plugin/markdown/marked.js' },
+      { src: '../reveal.js/plugin/markdown/markdown.js' },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
