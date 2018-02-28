@@ -1,0 +1,171 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+   <title>TOF Geometry</title>
+
+   <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+   <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
+
+   <!-- Theme used for syntax highlighting of code -->
+   <link rel="stylesheet" href="../reveal.js/lib/css/github-gist.css">
+
+   <script src='../plotly.js/plotly.min.js'></script>
+
+   <style>
+
+   c {
+     white-space: pre;
+     font-family: Courier New, monospace;
+   }
+
+   </style>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section> <h1>Constructing BTOF Geometry from ROOT's TGeo<br><span style="font-size: 0.5em;">Dmitri Smirnov, S&C<br>February 28, 2018</span></h1>
+
+<ul style="margin-top: 2em;">
+
+   <li> Position of BTOF modules is used in official <c>StBTofMatchMaker</c> to
+   match tracks to BTOF cells
+
+   <li> BTOF library creates an internal set of volumes based on ROOT's
+   <c>TVolume</c> using full <c>Geant3</c> geometry as input
+
+   <li> This makes real data reconstruction jobs depend on <c>Geant3</c> <strong>simulation</strong> library
+
+   <ul>
+      <li> There is no other need for <c>Geant3</c> in reco jobs. Therefore, it is desirable to remove such dependency
+   </ul>
+
+   <li> Changes to BTOF geometry in <c>StBTofUtil</c> have been proposed by
+   S&amp;C and reviewed by Frank (TOF expert)
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Tests for new BTOF Geometry</h1>
+
+<ul>
+
+   <li> Verified the BTOF volume positions and dimensions before and after switching to <c>TGeo</c>
+
+   <ul>
+      <li> Observed small difference in the 4-5th decimal digits. This converts
+      to ~10 micron variations, negligible for vast majority of physics analyses
+
+      <li> Numerical differences also expected as <c>Geant3</c> uses single
+      precision for volume position whereas <c>TGeo</c> uses double.
+      Spacial transformations are also different
+
+   </ul>
+
+   <li> With high level tests verified the number of BTOF matched tracks
+
+   <ul>
+
+      <li> Reconstructed 100 events from Runs 15, 16, and 17
+
+      <li> Small difference in the number of total matches. In Run 16, 3 out
+      of 100 events had 1 mismatch in ~1000 tracks per event
+
+      <li> For this statistics no difference found in number of "good" track matches
+
+   </ul>
+
+   <li> After integration the nightly tests did not report any issues
+
+   <li> More precise tests are left to the BTOF users and experts...
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Summary</h1>
+
+<ul style="margin-top: 3em;">
+
+   <li> BTOF geometry in <c>StBTofUtil</c> has been refactored to use
+   <c>TGeo</c>. Deployed on Feb 26, 2018
+
+   <li> Removal of <c>Geant3</c> from reconstruction jobs has a positive impact
+
+   <ul>
+
+      <li> Opens path to 64-bit builds of STAR libraries. From this alone we
+      already expect speed up of reco jobs by ~15% 
+
+      <li> Possible switch to vanilla <c>root</c> in place of <c>root4star</c>
+      for jobs where interface to Fortran <c>Geant3</c> libraries and dependency
+      on <c>cernlib</c> libraries are not required
+
+      <li> Allowed to avoid problems with optimized fortran code (See Gene's
+      report on missing half of BTOF detector)
+
+   </ul>
+
+   <li> There is an ongoing work on ETOF software (Daniel B., Florian S.) for
+   which a similar approach to geometry construction should be taken
+
+</ul>
+
+</section>
+
+
+</div>
+</div>
+
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // R = 0.8 WXGA
+   //width: 1024, height: 640,
+   // R = 0.875 WXGA
+   width: 1120, height: 700,
+   // R = 0.6 HD
+   //width: 1152, height: 648,
+   // R = 0.5 HD
+   //width: 960, height: 540,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_HTML-full'
+   },
+   dependencies: [
+      { src: '../reveal.js/plugin/markdown/marked.js' },
+      { src: '../reveal.js/plugin/markdown/markdown.js' },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
