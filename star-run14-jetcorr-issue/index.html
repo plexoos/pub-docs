@@ -1,0 +1,594 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+   <title>Investigating Run14 Issues in JetCorr</title>
+
+   <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+   <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
+
+   <!-- Theme used for syntax highlighting of code -->
+   <link rel="stylesheet" href="../reveal.js/lib/css/github-gist.css">
+
+   <script src='../plotly.js/plotly.min.js'></script>
+
+   <style>
+
+   c {
+     white-space: pre;
+     font-family: Courier New, monospace;
+   }
+
+   </style>
+
+   <script>
+     var link = document.createElement( 'link' );
+     link.rel = 'stylesheet';
+     link.type = 'text/css';
+     link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+     document.getElementsByTagName( 'head' )[0].appendChild( link );
+   </script>
+
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Investigating Run14 Issues in JetCorr</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+</section>
+
+
+
+<section> <h1>Data Samples and Options Used in Our Tests</h1>
+
+<p>
+Original requests
+
+<ul>
+
+   <li>SL16d, AuAu 200GeV run 2014 reproduction with HFT tracking (fixed PXL code)
+
+<pre style="font-size: 0.7em;">
+DbV20160418 P2014a pxlHit istHit
+btof mtd mtdCalib BEmcChkStat -evout CorrX OSpaceZ2 OGridLeak3D -hitfilt
+</pre>
+
+	<li>SL17d, AuAu 200GeV run 2014 st_physics data reproduction with selected
+	trigger and w/o HFT tracking by request of JetCorr PWG
+
+<pre style="font-size: 0.7em;">
+DbV20150316 DbV20170712_trg_Calibrations FiltTrg_JetCorrTrgs P2014a
+btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt
+</pre>
+
+   <li>SL18f, (which options?)
+
+   <li>Test file
+
+<pre style="font-size: 0.7em;">
+/star/rcf/test/daq/2014/086/st_physics_15086051_raw_2500017.daq
+</pre
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Simulation Samples and Options Used in Our Tests</h1>
+
+<ul>
+   <li> Original set of options from nightly test
+
+<pre style="font-size: 0.7em;">
+fzin tpcRS y2014a AgML pxlFastSim istFastSim usexgeom FieldOn MakeEvent Sti
+NoSsdIt NoSvtIt StiHftC TpcHitMover TpxClu Idst BAna l0 Tree logger genvtx tpcDB
+bbcSim btofsim vpdSim mtdSim tags emcY2 EEfs evout geantout -dstout IdTruth big
+MiniMcMk <span style="color: #f00;">cl</span>
+</pre>
+
+   <li> For the test of "baseline" code remove <span style="color: #f00;"><c>cl</c></span> option
+
+</section>
+
+
+
+<section> <h1>Data</h1>
+
+<p>
+Let's compare
+
+<ul>
+
+   <li>P16id, AuAu 200GeV run 2014 reproduction with HFT tracking (fixed PXL code)
+
+<pre style="font-size: 0.7em;">
+P2014a btof mtd mtdCalib BEmcChkStat -evout CorrX OSpaceZ2 OGridLeak3D -hitfilt
+</pre>
+
+   <li>P17id, AuAu 200GeV run 2014 st_physics data reproduction with selected trigger and w/o HFT tracking by request of JetCorr PWG
+
+<pre style="font-size: 0.7em;">
+P2014a pxlHit istHit btof mtd mtdCalib BEmcChkStat -evout CorrX OSpaceZ2 OGridLeak3D -hitfilt
+</pre>
+
+<pre style="font-size: 0.7em;">
+P2014a btof mtd mtdCalib BEmcChkStat -evout CorrX OSpaceZ2 OGridLeak3D -hitfilt
+</pre>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Observations</h1>
+
+<ul>
+
+   <li>Comparing SL16d and SL17d
+
+   <li>Using the same options the number of global tracks is different
+
+   <li>Geometries differ according to messages in log files
+
+	<p>SL16d
+<pre style="font-size: 0.6em;">
+StiMaker:INFO  - TGeoManager::CloseGeometry : <b>282755 nodes/ 2991 volume UID's</b> in The STAR Geometry Manager
+</pre>
+
+   <p>SL17d, AGML2
+<pre style="font-size: 0.6em;">
+StiMaker:INFO  - TGeoManager::CloseGeometry : <b>281515 nodes/ 2975 volume UID's</b> in The STAR Geometry Manager
+</pre>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Looking for Problematic Code Changes</h1>
+
+<ul>
+
+	<a href="graphics/git_bisect.png"><img style="float:right;" src="graphics/git_bisect.png" width="60%" /></a>
+
+   <li>Use <c>git-bisect</c> to pinpoint the modification causing the change in global track numbers
+
+	<li>Search between SL16f (good) and SL16g (bad)
+
+	<li>"good" &mdash; same number of global tracks as in SL16f
+	<li>"bad"  &mdash; different number of global tracks w.r.t SL16f
+	<li>"skip" &mdash; code cannot be compiled
+
+	<li> The offending change is somewhere between <c>bef93dd5</c> and <c>215fb8e2</c>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Changes Causing the Drop in Global Tracks</h1>
+
+<ul>
+   <li> Complete code diff available <a href="https://github.com/star-bnl/star-cvs/compare/master...plexoos:ds-jc-bad-patch?w=1">here</a>
+</ul>
+
+<pre style="max-width: 100%; max-height: 70%; overflow: auto;">
+<code data-trim class="diff" style="font-size: 0.6em;">
+diff --git a/StRoot/Sti/StiKalmanTrack.cxx b/StRoot/Sti/StiKalmanTrack.cxx
+index 5d008fb3ed..af3cf64a34 100644
+--- a/StRoot/Sti/StiKalmanTrack.cxx
++++ b/StRoot/Sti/StiKalmanTrack.cxx
+@@ -1551,7 +1551,7 @@ void StiKalmanTrack::print(const char *opt) const
+ #include "TProfile.h"
+ #endif // APPROX_DEBUG
+ //_____________________________________________________________________________
+-int StiKalmanTrack::approx(int mode)
++int StiKalmanTrack::approx(int mode,int nNodes)
+ {
+ static int nCall=0; nCall++;
+ StiDebug::Break(nCall);
+@@ -1572,7 +1572,7 @@ if(!myCanvas) {
+ #endif // APPROX_DEBUG
+
+ const double BAD_XI2[2]={99,22},XI2_FACT=9;
+-int nNode,nNodeIn,iNode=0;
++int nNode,nNodeIn;
+ double Xi2=0;
+   StiHitErrs hr;
+ //             Loop over nodes and collect global xyz
+@@ -1583,8 +1583,7 @@ double Xi2=0;
+   THelixFitter circ;
+   THelixTrack  cirl;
+   int zeroH = -1;
+-  for (source=rbegin();(targetNode=source());++source) {
+-    iNode++;
++  for (source=begin();(targetNode=source())&&nNode&lt;nNodes;++source) {
+     if (!targetNode->isValid())        continue;
+     const StiHit * hit = targetNode->getHit();
+     if (!hit)                          continue;
+@@ -1614,29 +1613,20 @@ double Xi2=0;
+   if (zeroH) circ.Set(kZEROCURV);
+   circ.MakeErrs();
+
++  circ.Backward();
+   double s=0,xyz[3];
+-  double curv = circ.GetRho();
+-  iNode = 0;
+-  for (source=rbegin();(targetNode=source());++source) {
+-    iNode++;
+-    if (!targetNode->isValid())        continue;
+-    const StiHit *hit = targetNode->getHit();
+-    if (hit) {
++  const StiHit *hit = firstNode->getHit();
++  assert(hit);
+   xyz[0] = hit->x_g();
+   xyz[1] = hit->y_g();
+   xyz[2] = hit->z_g();
+-    } else {
+-      xyz[0] = targetNode->x_g();
+-      xyz[1] = targetNode->y_g();
+-      xyz[2] = targetNode->z_g();
+-    }
+   double ds = circ.Path(xyz[0],xyz[1]);
++  double curv = circ.GetRho();
+   circ.Move(ds);
+-    s+=ds;
+   cirl = circ;
+-    double alfa = targetNode->getAlpha();
++  double alfa = firstNode->getAlpha();
+   cirl.Rot(-alfa);
+-    StiNodePars P = targetNode->fitPars();
++  StiNodePars P = firstNode->fitPars();
+   P.x()  =  cirl.Pos()[0];
+   P.y()  =  cirl.Pos()[1];
+   P.z()  =  cirl.Pos()[2];
+@@ -1650,18 +1640,12 @@ double Xi2=0;
+   P._cosCA = cirl.Dir()[0]/cirl.GetCos();
+   P._sinCA = cirl.Dir()[1]/cirl.GetCos();
+   if (fabs(P._cosCA)>0.99 || fabs(P._sinCA)>0.99) P.ready();
+-
+-    targetNode->fitPars() = P;
+-    int ians = targetNode->nudge();
+-    if(ians) {nNode--; targetNode->setInvalid();continue;}
+-    P = targetNode->fitPars();
+-    StiNodeErrs &E = targetNode->fitErrs();
++  firstNode->fitPars() = P;
++  P = firstNode->fitPars();
++  StiNodeErrs &E = firstNode->fitErrs();
+   cirl.StiEmx(E.G());
+   TCL::vscale(&(E._cPX),hh,&(E._cPX),5);
+   E._cPP*=hh; E._cTP*=hh;
+-    if ((mode&1)==0 && Xi2>XI2_FACT) E*=Xi2/XI2_FACT;
+-    E.check("In aprox");
+-  }
+   if (Xi2>BAD_XI2[mode])return 2;
+   if (nNode==nNodeIn)  return 0;
+   if (nNode<2)         return 3;
+
+</code>
+</pre>
+
+</section>
+
+
+
+<section> <h1>Changes Causing the Drop in Global Tracks</h1>
+
+<ul>
+   <li> Complete code diff available <a href="https://github.com/star-bnl/star-cvs/compare/master...plexoos:ds-jc-bad-patch?w=1">here</a>
+</ul>
+
+<pre style="max-width: 100%; max-height: 80%; overflow: auto;">
+<code data-trim class="diff" style="font-size: 0.6em;">
+diff --git a/StRoot/Sti/StiKalmanTrackFinder.cxx b/StRoot/Sti/StiKalmanTrackFinder.cxx
+index d7493f55f8..b457dd5fd3 100644
+--- a/StRoot/Sti/StiKalmanTrackFinder.cxx
++++ b/StRoot/Sti/StiKalmanTrackFinder.cxx
+@@ -184,12 +184,9 @@ Int_t StiKalmanTrackFinder::Fit(StiKalmanTrack *track, Double_t rMin) {
+
+   do { //technical do
+     track->setFlag(-1);
+-    status = track->approx(0); // should be filled by track->initialize()
+-    if (status)        {nTSeed++; errType = abs(status)*100 + kApproxFail; break;}
+     status = track->fit(kOutsideIn);
+     if (status)        {nTSeed++; errType = abs(status)*100 + kFitFail; break;}
+     status = extendTrack(track,rMin); // 0 - can't extend. 1 - can extend and refit -1 - can extend and can't refit.
+-    if (status != kExtended)                               {nTFail++; errType = abs(status)*100 + kExtendFail; break;}
+     if (_trackFilter){
+       status = _trackFilter->filter(track);
+       if (status) {nTFilt++; errType = abs(status)*100 + kCheckFail; break;}
+</code>
+</pre>
+
+</section>
+
+
+
+<section> <h1>Fixing Later Releases</h1>
+
+<ul>
+   <li> Identified changes can be reverted in the current code (2018-09-27)
+
+	<li> The number of global tracks increases as expected
+   <p>In fact, per event numbers can be higher than before 2016-06-29
+</ul>
+
+</section>
+
+
+
+<section id="update-2018-10-18"> <h1 style="margin-top: 5em;">Update October 10 (26), 2018</h1> </section>
+
+
+
+<section> <h1>Summary</h1>
+
+<ul>
+   <li> Consider effect of reverting the changes in <c>approx()</c>. See previous slides for details
+
+	<li> Run 14. Observe annoying inconsistency in the global track counts:
+	<ul>
+	   <li> Number of "good" globals as reported in log files increases!
+	   <li> <c>MuEvent.mEventSummary.mNumberOfGoodTracks</c> decreases!
+	</ul>
+
+	<li> Run 18
+	<ul>
+	   <li> Number of "good" globals as reported in log files about the same (?)
+	   <li> <c>MuEvent.mEventSummary.mNumberOfGoodTracks</c> decreases!
+	   <li> 560 $\to$ 520 averge number of tracks per event
+	</ul>
+
+   <li> In the following:<br>
+	     <span style="color: #f00;">Red:</span> Baseline code as of 10/15/18<br>
+	     <span style="color: #00f;">Blue:</span> With reverted changes related to <c>approx()</c><br>
+	     <span style="color: #f0f;">Magenta:</span> Ratio of <span style="color: #00f;">Blue</span>/<span style="color: #f00;">Red:</span>
+</ul>
+
+</section>
+
+
+
+<section> <h1>Run 14, Real Data</h1>
+<ul>
+    <li> We compare STAR code as of 2018-10-15 ("baseline") and its patched
+    version with reverted changes related to <c>approx()</c> function ("~approx()")
+</ul>
+</section>
+
+
+
+<section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mPt.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mPt_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mEta.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mEta_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mNHitsFit.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mNHitsFit_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mChiSqXY.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mChiSqXY_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_MuEvent.mEventSummary.mNumberOfGoodTracks.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_MuEvent.mEventSummary.mNumberOfGoodTracks_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_MuEvent.mEventSummary.mNumberOfGoodPrimaryTracks.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_MuEvent.mEventSummary.mNumberOfGoodPrimaryTracks_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 18, Real Data</h1>
+<ul style="margin-top: 5em;">
+	<li> The following plots are for Run 18 data
+	<li> Note that proper TPC calibrarion is not yet available for Run 18
+</ul>
+</section>
+
+
+
+<section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mPt.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mPt_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mEta.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mEta_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mNHitsFit.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mNHitsFit_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mChiSqXY.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mChiSqXY_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_MuEvent.mEventSummary.mNumberOfGoodTracks.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_MuEvent.mEventSummary.mNumberOfGoodTracks_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_MuEvent.mEventSummary.mNumberOfGoodPrimaryTracks.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_MuEvent.mEventSummary.mNumberOfGoodPrimaryTracks_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Simulation</h1>
+<ul style="margin-top: 5em;">
+	<li> The following plots are for Run 14 simulation
+    <li> We compare STAR code as of 2018-10-15 ("baseline") and its patched
+    version with reverted changes related to <c>approx()</c> function ("~approx()")
+</ul>
+</section>
+
+
+
+<section> <h1>Run 14 Simulation, "baseline" vs "~approx()"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mPt.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mPt_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Simulation, "baseline" vs "~approx()"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mEta.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mEta_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Simulation, "baseline" vs "~approx()"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mNHitsFit.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mNHitsFit_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Simulation, "baseline" vs "~approx()"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mChiSqXY.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mChiSqXY_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Simulation</h1>
+<ul style="margin-top: 5em;">
+	<li> In addition to applying "~approx()" patch we revert the value of <c>mCutEle</c> in <c>StTpcRSMaker.cxx</c> from 1e-5 back to 1e-4
+</ul>
+</section>
+
+
+
+<section> <h1>Run 14 Simu, "baseline" vs "~approx() & ~cutele"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mPt.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mPt_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Simu, "baseline" vs "~approx() & ~cutele"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mEta.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mEta_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Simu, "baseline" vs "~approx() & ~cutele"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mNHitsFit.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mNHitsFit_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Simu, "baseline" vs "~approx() & ~cutele"</h1>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mChiSqXY.html"></iframe>
+<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mChiSqXY_ratio.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Simulation Conclusions</h1>
+<ul style="margin-top: 5em;">
+	<li> In general, both simulation and real data distributions are modified in the same way when reverting the "approx()" changes
+    <li> Restoring the "cutele" change is not recommended as it causes significant modification in some shapes
+</ul>
+</section>
+
+
+</div>
+</div>
+
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // R = 0.8 WXGA
+   //width: 1024, height: 640,
+   // R = 0.875 WXGA
+   width: 1120, height: 700,
+   // R = 0.6 HD
+   //width: 1152, height: 648,
+   // R = 0.5 HD
+   //width: 960, height: 540,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_HTML-full'
+   },
+   dependencies: [
+      { src: 'https://root.cern.ch/js/notebook//scripts/JSRootCore' },
+      { src: '../reveal.js/plugin/markdown/marked.js' },
+      { src: '../reveal.js/plugin/markdown/markdown.js' },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>

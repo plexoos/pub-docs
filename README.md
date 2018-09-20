@@ -5,6 +5,8 @@ https://plexoos.github.io/pub-docs/
 
 [Exploration of Optimization Techniques](fitna-robust-fitter)
 
+[Investigating Run14 Issues in JetCorr](star-run14-jetcorr-issue), September
+
 [iTPC Software Integration](star-itpc-software), July
 
 [BTOF Geometry Refactoring](star-tof-geo), February 28
