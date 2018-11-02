@@ -1,0 +1,261 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+   <title>fitna</title>
+
+   <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+   <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
+
+   <!-- Theme used for syntax highlighting of code -->
+   <link rel="stylesheet" href="../reveal.js/lib/css/github-gist.css">
+
+   <script src='../plotly.js/plotly.min.js'></script>
+
+   <style>
+
+   c {
+     white-space: pre;
+     font-family: Courier New, monospace;
+   }
+
+   </style>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Exploration of Optimization Techniques</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+</section>
+
+
+
+<section> <h1>Motivation</h1>
+
+<ul style="margin-top: 3em;">
+   <li> Reconstruction of particle tracks and vertices is intrinsically an
+   optimization problem searching for best solution in a multidimensional
+   parameter space
+   
+   <li> In the field of particle physics we are constantly searching for
+   <b>fast</b> and <b>efficient</b> reconstruction techniques to cope with
+   growing number of particles produced in high energy collisions
+</ul>
+
+</section>
+
+
+<!--
+<section> <h1>Motivation</h1>
+
+"Track and vertex reconstruction: From classical to adaptive methods", A. Strandlie,R. Fruhwirth
+
+<blockquote>
+<p>
+<strong>VI. Outlook</strong>
+<br>
+...
+<br>
+<strong>D. Adaptive vertex reconstruction</strong>
+
+<br>... Is the multivertex fit really superior to a sequential application of the
+adaptive vertex fit, and if so in which circumstances?
+<!-
+A study with decay vertices of very short-lived particles should be able to shed
+some light on this question.
+->
+</p>
+</blockquote>
+
+</section>
+-->
+
+
+
+<section> <h1>Requirements</h1>
+
+<ul>
+
+   <li> Applicable to the following class of problems
+   <ul>
+      <li> A set of measurements coming from a number of underlying processes
+      that can be (approximately) described by (roughly) known models
+   </ul>
+
+   <li> Minimal tuning of initial parameters, i.e. defaults should satisfy
+   many problems
+   
+   <li> Perform for a wide range of the number of input measurements (orders of magnitude)
+
+   <li> Auto seeding. Components should be tried (identified) during the fit
+   automatically controlled by a minimal set of parameters
+
+   <li> Robustness. Converge to global optimum from different initial conditions
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>EM Algorithm</h1>
+
+<ul>
+    <li> After reviewing the literature we chose to explore the EM algorithm
+    (and its variations) due to the following:
+    
+    <ul>
+        <li> Simple implementation
+ 
+        <li> Guaranteed to converge
+
+        <li> Extensible and adoptable, with
+    </ul>
+ 
+
+    <li> References:
+    <ul>
+
+        <li> "The Expectation-Maximization (EM) algorithm (Dempster, Laird, and
+        Rubin, 1977) is an iterative statistical technique for computing maximum
+        likelihood parameter estimates from incomplete data", (DA Variant of the EM
+        Algorithm, Ueda, Nakano, 1995)
+ 
+        <li><a href="https://en.wikipedia.org/wiki/Expectation%E2%80%93maximization_algorithm">wiki article</a>
+    </ul>
+</ul>
+
+</section>
+
+
+
+<section> <h1>Software Stack</h1>
+
+<ul>
+    <li> For prototyping and quick tests of new ideas we chose to work within
+    Python ecosystem due to its reach codebase for data analysis 
+
+    <ul> Anticipated dependencies
+        <li> <c>numpy</c> for fast vector and matrix calculations
+        <li> <c>pandas</c> for easy data manipulation
+        <li> <c>plotly</c> for visualization
+    </ul>
+</ul>
+
+</section>
+
+
+
+<section> <h1>Development</h1>
+
+<ul>
+    <li> Source code available at <a href="https://github.com/plexoos/fitna">https://github.com/plexoos/fitna</a>
+    
+    <li> The current prototype can be exercised locally or from this URL <a href="https://fitna.herokuapp.com/">https://fitna.herokuapp.com</a> (may be slow)
+</ul>
+
+</section>
+
+
+
+<section> <h1>Release Schedule</h1>
+
+<ul>
+
+   <li>0.0.x
+   <ul>
+      <li> Initial implementation of EM
+      <li> Layout controls and visualization
+      <li> Sporadic updates while optimizing software stack
+      <li> Tests with toy data samples
+   </ul>
+
+   <li>0.1.0
+   <ul>
+      <li> Automatic seed creation
+      <li> Support multidimensional data $(N>2)$ with arbitrary 2D/(1D?) projections
+      <li> Read user data from files
+      <li> Tests with realistic data
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Release Schedule</h1>
+
+<ul>
+
+   <li>0.1.x
+   <ul>
+      <li> ...
+      <li> Automatic seed merging?
+   </ul>
+
+   <li>1.x.x
+   <ul>
+      <li> C++ implementation
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // R = 0.8 WXGA
+   //width: 1024, height: 640,
+   // R = 0.875 WXGA
+   width: 1120, height: 700,
+   // R = 0.6 HD
+   //width: 1152, height: 648,
+   // R = 0.5 HD
+   //width: 960, height: 540,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_HTML-full'
+   },
+   dependencies: [
+      { src: '../reveal.js/plugin/markdown/marked.js' },
+      { src: '../reveal.js/plugin/markdown/markdown.js' },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
