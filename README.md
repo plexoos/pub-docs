@@ -5,7 +5,10 @@ https://plexoos.github.io/pub-docs/
 
 [Exploration of Optimization Techniques](fitna-robust-fitter)
 
-[Investigating Run14 Issues in JetCorr](star-run14-jetcorr-issue), September
+[Investigating Run14 Issues in JetCorr](star-run14-jetcorr-issue), September<br>
+Support notebooks
+  - [Global tracks](http://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run14-jetcorr-issue/notebook_global_tracks.ipynb)
+  - [Primary tracks](http://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run14-jetcorr-issue/notebook_primary_tracks.ipynb)
 
 [iTPC Software Integration](star-itpc-software), July
 
