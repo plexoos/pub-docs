@@ -5,7 +5,7 @@
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-   <title>Investigating Run14 Issues in JetCorr</title>
+   <title>Investigating Issues with Track Reconstruction and Simulation in Run 14</title>
 
    <link rel="stylesheet" href="../reveal.js/css/reveal.css">
    <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
@@ -13,7 +13,7 @@
    <!-- Theme used for syntax highlighting of code -->
    <link rel="stylesheet" href="../reveal.js/lib/css/github-gist.css">
 
-   <script src='../plotly.js/plotly.min.js'></script>
+   <script src='/assets/plotly.min.js'></script>
 
    <style>
 
@@ -43,21 +43,102 @@
 
 <section>
 
-<h1 class="title">Investigating Run14 Issues in JetCorr</h1>
+<h1 class="title">Investigating Issues with Track Reconstruction and Simulation in Run 14 Data</h1>
 
 <h3 class="title">Dmitri Smirnov</h3>
+
+<h4 class="title">
+<script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+</h4>
 
 </section>
 
 
 
-<section> <h1>Data Samples and Options Used in Our Tests</h1>
+<section data-markdown> <textarea data-template> <h1>Observations by JetCorr Group </h1>
+
+- JetCorr reported unexpected deviations in global and primary track distributions
+  between `SL16d` and `SL17d/SL18f` releases for Run 14 data
+
+  - https://www.star.bnl.gov/protected/jetcorr/nelsey/y14_production/comprehensive_run14_status_wsu_08_13.pdf
+  - https://drupal.star.bnl.gov/STAR/system/files/Kolja_Run14_Issues_08_15.pdf
+
+- Also, embedded simulation (Run 14) significantly differs from data in events
+with high multiplicity
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Identified Two Problems</h1>
+
+- Changes in the track reconstruction code were found to cause a loss of ~10% of
+global tracks ($N_\text{hits} \ge 15$)
+
+  - Introduced on 2016-06-29 between `SL16f` and `SL16g`
+
+  - Main cause: Scaling of initial estimate of track error matrix with high $\chi^2$ was
+  removed causing early track rejection
+
+- A change on 2017-02-04 to `StTpcRSMaker` affecting *simulation only* was found
+to increase the number of global tracks ($N_\text{hits} \ge 15$) by ~5%
+
+  - More details in Gene's blog - [link](https://drupal.star.bnl.gov/STAR/blog/genevb/digging-production-changes-after-sl16d#comment-1616)
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Testing Restored Tracking Code</h1>
+
+- Effect from various implementations can be seen in the following notebooks
+
+  - [Global tracks](http://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run14-jetcorr-issue/notebook_primary_tracks.ipynb)
+
+  - [Primary tracks](http://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run14-jetcorr-issue/notebook_global_tracks.ipynb)
+
+- We verified that reverting changes on top of `SL16g` results in identical
+reconstructed tracks as with `SL16f`
+
+- With the same patch applied onto recent code (after `SL18f`) we see the
+expected 10% gain in global tracks
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Conclusions</h1>
+
+- We identified changes causing a ~10% drop in global tracks between `SL16f` and `SL16g` releases
+
+  - JetCorr observed differences between **`SL16d`** and **`SL17d`**
+
+    **`SL16d`** `&lt; SL16g &lt; SL16h &lt;` **`SL17d`**
+
+  - The found changes are **not justified** and **should be reverted**
+
+- The simulation and real data contain very different sets of tracks
+
+  - For this reason the effect of reverted changes should be tested with
+  embedding rather than with pure simulation
+
+</textarea>
+</section>
+
+
+
+<section> <h1 style="margin-top: 5em;">Details</h1> </section>
+
+
+<section> <h1>Real Data Samples and Options</h1>
 
 <p>
-Original requests
+From official production web page:
 
 <ul>
-
    <li>SL16d, AuAu 200GeV run 2014 reproduction with HFT tracking (fixed PXL code)
 
 <pre style="font-size: 0.7em;">
@@ -65,15 +146,13 @@ DbV20160418 P2014a pxlHit istHit
 btof mtd mtdCalib BEmcChkStat -evout CorrX OSpaceZ2 OGridLeak3D -hitfilt
 </pre>
 
-	<li>SL17d, AuAu 200GeV run 2014 st_physics data reproduction with selected
-	trigger and w/o HFT tracking by request of JetCorr PWG
+    <li>SL17d, AuAu 200GeV run 2014 st_physics data reproduction with selected
+    trigger and w/o HFT tracking by request of JetCorr PWG
 
 <pre style="font-size: 0.7em;">
 DbV20150316 DbV20170712_trg_Calibrations FiltTrg_JetCorrTrgs P2014a
 btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt
 </pre>
-
-   <li>SL18f, (which options?)
 
    <li>Test file
 
@@ -87,7 +166,10 @@ btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt
 
 
 
-<section> <h1>Simulation Samples and Options Used in Our Tests</h1>
+<section> <h1>Simulation Samples and Options</h1>
+
+<p>
+From official production web page:
 
 <ul>
    <li> Original set of options from nightly test
@@ -144,7 +226,7 @@ P2014a btof mtd mtdCalib BEmcChkStat -evout CorrX OSpaceZ2 OGridLeak3D -hitfilt
 
    <li>Geometries differ according to messages in log files
 
-	<p>SL16d
+    <p>SL16d
 <pre style="font-size: 0.6em;">
 StiMaker:INFO  - TGeoManager::CloseGeometry : <b>282755 nodes/ 2991 volume UID's</b> in The STAR Geometry Manager
 </pre>
@@ -164,17 +246,17 @@ StiMaker:INFO  - TGeoManager::CloseGeometry : <b>281515 nodes/ 2975 volume UID's
 
 <ul>
 
-	<a href="graphics/git_bisect.png"><img style="float:right;" src="graphics/git_bisect.png" width="60%" /></a>
+    <a href="graphics/git_bisect.png"><img style="float:right;" src="graphics/git_bisect.png" width="50%" /></a>
 
    <li>Use <c>git-bisect</c> to pinpoint the modification causing the change in global track numbers
 
-	<li>Search between SL16f (good) and SL16g (bad)
+    <li>Search between SL16f (good) and SL16g (bad)
 
-	<li>"good" &mdash; same number of global tracks as in SL16f
-	<li>"bad"  &mdash; different number of global tracks w.r.t SL16f
-	<li>"skip" &mdash; code cannot be compiled
+    <li>"good" &mdash; same number of global tracks as in SL16f
+    <li>"bad"  &mdash; different number of global tracks w.r.t SL16f
+    <li>"skip" &mdash; code cannot be compiled
 
-	<li> The offending change is somewhere between <c>bef93dd5</c> and <c>215fb8e2</c>
+    <li> The offending change is somewhere between <c>bef93dd5</c> and <c>215fb8e2</c>
 
 </ul>
 
@@ -325,7 +407,7 @@ index d7493f55f8..b457dd5fd3 100644
 <ul>
    <li> Identified changes can be reverted in the current code (2018-09-27)
 
-	<li> The number of global tracks increases as expected
+    <li> The number of global tracks increases as expected
    <p>In fact, per event numbers can be higher than before 2016-06-29
 </ul>
 
@@ -342,23 +424,23 @@ index d7493f55f8..b457dd5fd3 100644
 <ul>
    <li> Consider effect of reverting the changes in <c>approx()</c>. See previous slides for details
 
-	<li> Run 14. Observe annoying inconsistency in the global track counts:
-	<ul>
-	   <li> Number of "good" globals as reported in log files increases!
-	   <li> <c>MuEvent.mEventSummary.mNumberOfGoodTracks</c> decreases!
-	</ul>
+    <li> Run 14. Observe annoying inconsistency in the global track counts:
+    <ul>
+       <li> Number of "good" globals as reported in log files increases!
+       <li> <c>MuEvent.mEventSummary.mNumberOfGoodTracks</c> decreases!
+    </ul>
 
-	<li> Run 18
-	<ul>
-	   <li> Number of "good" globals as reported in log files about the same (?)
-	   <li> <c>MuEvent.mEventSummary.mNumberOfGoodTracks</c> decreases!
-	   <li> 560 $\to$ 520 averge number of tracks per event
-	</ul>
+    <li> Run 18
+    <ul>
+       <li> Number of "good" globals as reported in log files about the same (?)
+       <li> <c>MuEvent.mEventSummary.mNumberOfGoodTracks</c> decreases!
+       <li> 560 $\to$ 520 averge number of tracks per event
+    </ul>
 
    <li> In the following:<br>
-	     <span style="color: #f00;">Red:</span> Baseline code as of 10/15/18<br>
-	     <span style="color: #00f;">Blue:</span> With reverted changes related to <c>approx()</c><br>
-	     <span style="color: #f0f;">Magenta:</span> Ratio of <span style="color: #00f;">Blue</span>/<span style="color: #f00;">Red:</span>
+         <span style="color: #f00;">Red:</span> Baseline code as of 10/15/18<br>
+         <span style="color: #00f;">Blue:</span> With reverted changes related to <c>approx()</c><br>
+         <span style="color: #f0f;">Magenta:</span> Ratio of <span style="color: #00f;">Blue</span>/<span style="color: #f00;">Red:</span>
 </ul>
 
 </section>
@@ -375,176 +457,99 @@ index d7493f55f8..b457dd5fd3 100644
 
 
 <section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mPt.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mPt_ratio.html"></iframe>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_pt.html"></iframe>
 </section>
 
 
 
 <section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mEta.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mEta_ratio.html"></iframe>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_eta.html"></iframe>
 </section>
 
 
 
 <section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mNHitsFit.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mNHitsFit_ratio.html"></iframe>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_nhits.html"></iframe>
 </section>
 
 
 
 <section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mChiSqXY.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_GlobalTracks.mChiSqXY_ratio.html"></iframe>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_chi2.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14, Real Data</h1>
+<ul>
+    <li> We compare STAR code as of 2018-10-15 ("baseline") and <c>ds-jc-fix-perev-2</c>
+</ul>
 </section>
 
 
 
 <section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_MuEvent.mEventSummary.mNumberOfGoodTracks.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_MuEvent.mEventSummary.mNumberOfGoodTracks_ratio.html"></iframe>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix-perev-2/plot_pt.html"></iframe>
 </section>
 
 
 
 <section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_MuEvent.mEventSummary.mNumberOfGoodPrimaryTracks.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051/canvas_MuEvent.mEventSummary.mNumberOfGoodPrimaryTracks_ratio.html"></iframe>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix-perev-2/plot_eta.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix-perev-2/plot_nhits.html"></iframe>
+</section>
+
+
+
+<section> <h1>Run 14 Data, "baseline" vs "~approx()"</h1>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix-perev-2/plot_chi2.html"></iframe>
 </section>
 
 
 
 <section> <h1>Run 18, Real Data</h1>
 <ul style="margin-top: 5em;">
-	<li> The following plots are for Run 18 data
-	<li> Note that proper TPC calibrarion is not yet available for Run 18
+    <li> The following plots are for Run 18 data
+    <li> Note that proper TPC calibrarion is not yet available for Run 18
 </ul>
 </section>
 
 
 
 <section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mPt.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mPt_ratio.html"></iframe>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/plot_pt.html"></iframe>
 </section>
 
 
 
 <section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mEta.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mEta_ratio.html"></iframe>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/plot_eta.html"></iframe>
 </section>
 
 
 
 <section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mNHitsFit.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mNHitsFit_ratio.html"></iframe>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/plot_nhits.html"></iframe>
 </section>
 
 
 
 <section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mChiSqXY.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_GlobalTracks.mChiSqXY_ratio.html"></iframe>
-</section>
-
-
-
-<section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_MuEvent.mEventSummary.mNumberOfGoodTracks.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_MuEvent.mEventSummary.mNumberOfGoodTracks_ratio.html"></iframe>
-</section>
-
-
-
-<section> <h1>Run 18 Data, Code baseline 10/15/18 vs ~approx()</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_MuEvent.mEventSummary.mNumberOfGoodPrimaryTracks.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/canvas_MuEvent.mEventSummary.mNumberOfGoodPrimaryTracks_ratio.html"></iframe>
+<iframe width="80%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_19114030/plot_chi2.html"></iframe>
 </section>
 
 
 
 <section> <h1>Run 14 Simulation</h1>
 <ul style="margin-top: 5em;">
-	<li> The following plots are for Run 14 simulation
+    <li> The following plots are for Run 14 simulation
     <li> We compare STAR code as of 2018-10-15 ("baseline") and its patched
     version with reverted changes related to <c>approx()</c> function ("~approx()")
-</ul>
-</section>
-
-
-
-<section> <h1>Run 14 Simulation, "baseline" vs "~approx()"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mPt.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mPt_ratio.html"></iframe>
-</section>
-
-
-
-<section> <h1>Run 14 Simulation, "baseline" vs "~approx()"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mEta.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mEta_ratio.html"></iframe>
-</section>
-
-
-
-<section> <h1>Run 14 Simulation, "baseline" vs "~approx()"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mNHitsFit.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mNHitsFit_ratio.html"></iframe>
-</section>
-
-
-
-<section> <h1>Run 14 Simulation, "baseline" vs "~approx()"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mChiSqXY.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix/canvas_GlobalTracks.mChiSqXY_ratio.html"></iframe>
-</section>
-
-
-
-<section> <h1>Run 14 Simulation</h1>
-<ul style="margin-top: 5em;">
-	<li> In addition to applying "~approx()" patch we revert the value of <c>mCutEle</c> in <c>StTpcRSMaker.cxx</c> from 1e-5 back to 1e-4
-</ul>
-</section>
-
-
-
-<section> <h1>Run 14 Simu, "baseline" vs "~approx() & ~cutele"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mPt.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mPt_ratio.html"></iframe>
-</section>
-
-
-
-<section> <h1>Run 14 Simu, "baseline" vs "~approx() & ~cutele"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mEta.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mEta_ratio.html"></iframe>
-</section>
-
-
-
-<section> <h1>Run 14 Simu, "baseline" vs "~approx() & ~cutele"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mNHitsFit.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mNHitsFit_ratio.html"></iframe>
-</section>
-
-
-
-<section> <h1>Run 14 Simu, "baseline" vs "~approx() & ~cutele"</h1>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mChiSqXY.html"></iframe>
-<iframe width="70%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/simu_rcf15000_ds-jc-fix-cutele/canvas_GlobalTracks.mChiSqXY_ratio.html"></iframe>
-</section>
-
-
-
-<section> <h1>Run 14 Simulation Conclusions</h1>
-<ul style="margin-top: 5em;">
-	<li> In general, both simulation and real data distributions are modified in the same way when reverting the "approx()" changes
-    <li> Restoring the "cutele" change is not recommended as it causes significant modification in some shapes
 </ul>
 </section>
 
@@ -571,7 +576,6 @@ Reveal.initialize({
       config: 'TeX-AMS_HTML-full'
    },
    dependencies: [
-      { src: 'https://root.cern.ch/js/notebook//scripts/JSRootCore' },
       { src: '../reveal.js/plugin/markdown/marked.js' },
       { src: '../reveal.js/plugin/markdown/markdown.js' },
       { src: '../reveal.js/plugin/notes/notes.js', async: true },
