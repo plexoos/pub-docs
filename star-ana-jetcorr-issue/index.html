@@ -1,0 +1,287 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+   <title>Fixing Issues with Track Reconstruction and Simulation in Run 14</title>
+
+   <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+   <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
+
+   <!-- Theme used for syntax highlighting of code -->
+   <link rel="stylesheet" href="../reveal.js/lib/css/github-gist.css">
+
+   <script src='../assets/plotly.min.js'></script>
+
+   <style>
+
+   c {
+     white-space: pre;
+     font-family: Courier New, monospace;
+   }
+
+   </style>
+
+   <script>
+     var link = document.createElement( 'link' );
+     link.rel = 'stylesheet';
+     link.type = 'text/css';
+     link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+     document.getElementsByTagName( 'head' )[0].appendChild( link );
+   </script>
+
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Fixing Issues with Track Reconstruction and Simulation in Run 14 Data</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+<h4 class="title">
+<script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+</h4>
+
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Observations by JetCorr Group </h1>
+
+- JetCorr reported unexpected deviations in global and primary track distributions
+  between `SL16d` and `SL17d/SL18f` releases for Run 14 data
+
+  - https://www.star.bnl.gov/protected/jetcorr/nelsey/y14_production/comprehensive_run14_status_wsu_08_13.pdf
+  - https://drupal.star.bnl.gov/STAR/system/files/Kolja_Run14_Issues_08_15.pdf
+
+- Also reported that embedded simulation (Run 14) significantly differs from data in events
+with high multiplicity
+
+...
+
+[plots from the referenced slides]
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Identified Two Problems</h1>
+
+<center>
+<img src="graphics/timeline.png" width="70%" />
+</center>
+
+- **Bug #1**: Changes in the track reconstruction code were found to cause a loss of ~10% of
+global tracks ($N_\text{hits} \ge 15$)
+
+  - Introduced on 2016-06-29 between `SL16f` and `SL16g`
+
+  - Main cause: Scaling of initial estimate of track error matrix with high $\chi^2$ was
+  removed causing early track rejection
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Identified Two Problems</h1>
+
+<center>
+<img src="graphics/timeline.png" width="70%" />
+</center>
+
+- **Bug #2**: A change to `StTpcRSMaker` affecting *simulation only* was found
+to increase the number of global tracks ($N_\text{hits} \ge 15$) by ~5%
+
+  - Introduced on 2017-02-04
+
+  - Changed cut on electron energy produced in TPC simulation (`StTpcRSMaker.cxx`)
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Testing Restored Tracking Code</h1>
+
+- We verified that reverting changes on top of `SL16g` results in identical
+reconstructed tracks as with `SL16f`
+
+- With the same patch applied onto recent code (after `SL18f`) we see the
+expected 10% gain in global tracks
+
+- We use the Number of hits on track, track $P_T$, $\eta$, and  $\chi^2$ distributions to monitor the effect
+
+- Only "good" global tracks with $N_\text{hits} \ge 15$ 
+
+</textarea>
+</section>
+
+
+
+<section> <h1>Recover 10% of Global Tracks in Run 14 Data</h1>
+<iframe width="48%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_nhits.html"></iframe>
+<iframe width="48%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_pt.html"></iframe>
+</section>
+
+
+
+<section> <h1>Recover 10% of Global Tracks in Run 14 Data</h1>
+<iframe width="48%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_eta.html"></iframe>
+<iframe width="48%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_chi2.html"></iframe>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Issues with More Recent Changes?</h1>
+
+- No issues identified with iTPC integration (overseen by S&C)
+
+  - Ready and integraded for real data reconstruction (~summer 2018)
+  - Simulation is being finalized. Details in iTPC talk...
+
+- However, possible issues with "dE/dx" changes for iTPC
+
+  - Introduced on 2018-10-17
+  - Significant changes in the number of reconstructed tracks from simulation, but not real data
+  - Impacted both `TpcRS` and old `TRS` simulations, e.g. Run 7 and Run 10
+  - See open ticket 3371 https://www.star.bnl.gov/rt3/Ticket/Display.html?id=3371
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Summary</h1>
+
+- We identified changes causing change in global tracks between `SL16d` and `SL17d` releases
+
+  - **`SL16d`** &lt; `SL16g` &lt; "bug #1" &lt; `SL16h` &lt; `SL17a` &lt; "bug #2" &lt; `SL17b` &lt; **`SL17d`**
+
+  - "Bug #1" affects both real and simulated data
+
+     - Only productions using `Sti` are affected, later productions using `StiCA` are not sensitive
+
+  - "Bug #2" affects simulation only
+
+  - The found changes were **not justified** and have been **reverted**
+
+- Our tests with pure simulation contain very different sets of tracks than in data
+
+  - For this reason, the effect on physics from reverted changes should be tested with embedding by PWG
+
+- The patched code is availalble in ...
+
+</textarea>
+</section>
+
+
+
+<section> <h1 style="margin-top: 5em;">Details</h1> </section>
+
+
+<section> <h1>Real Data Samples and Options</h1>
+
+<p>
+From official production web page:
+
+<ul>
+   <li>SL16d, AuAu 200GeV run 2014 reproduction with HFT tracking (fixed PXL code)
+
+<pre style="font-size: 0.7em;">
+DbV20160418 P2014a pxlHit istHit
+btof mtd mtdCalib BEmcChkStat -evout CorrX OSpaceZ2 OGridLeak3D -hitfilt
+</pre>
+
+    <li>SL17d, AuAu 200GeV run 2014 st_physics data reproduction with selected
+    trigger and w/o HFT tracking by request of JetCorr PWG
+
+<pre style="font-size: 0.7em;">
+DbV20150316 DbV20170712_trg_Calibrations FiltTrg_JetCorrTrgs P2014a
+btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt
+</pre>
+
+   <li>Test file
+
+<pre style="font-size: 0.7em;">
+/star/rcf/test/daq/2014/086/st_physics_15086051_raw_2500017.daq
+</pre
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Simulation Samples and Options</h1>
+
+<p>
+From official production web page:
+
+<ul>
+   <li> Original set of options from nightly test
+
+<pre style="font-size: 0.7em;">
+fzin tpcRS y2014a AgML pxlFastSim istFastSim usexgeom FieldOn MakeEvent Sti
+NoSsdIt NoSvtIt StiHftC TpcHitMover TpxClu Idst BAna l0 Tree logger genvtx tpcDB
+bbcSim btofsim vpdSim mtdSim tags emcY2 EEfs evout geantout -dstout IdTruth big
+MiniMcMk <span style="color: #f00;">cl</span>
+</pre>
+
+   <li> For the test of "baseline" code remove <span style="color: #f00;"><c>cl</c></span> option
+
+</section>
+
+
+</div>
+</div>
+
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // R = 0.8 WXGA
+   //width: 1024, height: 640,
+   // R = 0.875 WXGA
+   width: 1120, height: 700,
+   // R = 0.6 HD
+   //width: 1152, height: 648,
+   // R = 0.5 HD
+   //width: 960, height: 540,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_HTML-full'
+   },
+   dependencies: [
+      { src: '../reveal.js/plugin/markdown/marked.js' },
+      { src: '../reveal.js/plugin/markdown/markdown.js' },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>

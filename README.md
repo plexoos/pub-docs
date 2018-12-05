@@ -3,6 +3,8 @@ https://plexoos.github.io/pub-docs/
 
 # 2018
 
+[Report on Recent Issues with Reconstruction and Simulation](star-ana-jetcorr-issue), December, STAR Analysis Meeting
+
 [Exploration of Optimization Techniques](fitna-robust-fitter)
 
 [Investigating Run14 Issues in JetCorr](star-run14-jetcorr-issue), September<br>
