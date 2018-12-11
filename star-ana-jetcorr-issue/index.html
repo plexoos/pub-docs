@@ -5,7 +5,7 @@
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
-   <title>Fixing Issues with Track Reconstruction and Simulation in Run 14</title>
+   <title>Fixing Issues in Track Reconstruction and Simulation</title>
 
    <link rel="stylesheet" href="../reveal.js/css/reveal.css">
    <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
@@ -43,32 +43,34 @@
 
 <section>
 
-<h1 class="title">Fixing Issues with Track Reconstruction and Simulation in Run 14 Data</h1>
+<h1 class="title">Fixing Issues in Track<br>Reconstruction and Simulation</h1>
 
-<h3 class="title">Dmitri Smirnov</h3>
+<h3 class="title">J. Lauret, V. Perevozchikov, <span style="text-decoration: underline;">D. Smirnov</span>, G. Van Buren, J. Webb</h3>
 
-<h4 class="title">
-<script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
-</h4>
+<h4 class="title">STAR Analysis Meeting</h4>
+
+<h4 class="title">December 12, 2018</h4>
 
 </section>
 
 
 
-<section data-markdown> <textarea data-template> <h1>Observations by JetCorr Group </h1>
+<section data-markdown style="font-size: smaller"> <textarea data-template> <h1>Observations by JetCorr Group </h1>
 
 - JetCorr reported unexpected deviations in global and primary track distributions
-  between `SL16d` and `SL17d/SL18f` releases for Run 14 data
+  between `SL16d` and `SL17d/SL18f` releases for Run 14 AuAu data (`NoHFT`)
 
-  - https://www.star.bnl.gov/protected/jetcorr/nelsey/y14_production/comprehensive_run14_status_wsu_08_13.pdf
-  - https://drupal.star.bnl.gov/STAR/system/files/Kolja_Run14_Issues_08_15.pdf
+  - See contributions by Nick Elsey and Kolja Kauder with additional work from Rongrong Ma and Terrence Edmonds
+  [S&C Offline Software meeting](https://drupal.star.bnl.gov/STAR/event/2018/08/16/sc-offline-software/) (August 16, 2018)
 
-- Also reported that embedded simulation (Run 14) significantly differs from data in events
-with high multiplicity
+- Also embedded simulation significantly differs from data in events with high multiplicity
 
-...
+- Main concern is **reproducibility** of physics results from older Runs with `SL16d`
 
-[plots from the referenced slides]
+<div class="hcenter">
+<img src="graphics/jetcorr_N_primary.png" class="plain" style="width: 48%;" />
+<img src="graphics/jetcorr_NHitsFit.png" class="plain" style="width: 48%;" />
+</div>
 
 </textarea>
 </section>
@@ -77,18 +79,18 @@ with high multiplicity
 
 <section data-markdown> <textarea data-template> <h1>Identified Two Problems</h1>
 
-<center>
-<img src="graphics/timeline.png" width="70%" />
-</center>
+<div class="hcenter">
+<img src="graphics/timeline.png" class="plain" style="width: 90%" />
+</div>
 
-- **Bug #1**: Changes in the track reconstruction code were found to cause a loss of ~10% of
-global tracks ($N_\text{hits} \ge 15$)
+- **Issue #1**: Changes in track reconstruction code were found to cause a loss
+of ~10% of global tracks ($N_\text{hits} \ge 15$)
 
   - Introduced on 2016-06-29 between `SL16f` and `SL16g`
 
-  - Main cause: Scaling of initial estimate of track error matrix with high $\chi^2$ was
+  - **Main cause:** Scaling of initial estimate of track error matrix with high $\chi^2$ was
   removed causing early track rejection
-
+  
 </textarea>
 </section>
 
@@ -96,16 +98,16 @@ global tracks ($N_\text{hits} \ge 15$)
 
 <section data-markdown> <textarea data-template> <h1>Identified Two Problems</h1>
 
-<center>
-<img src="graphics/timeline.png" width="70%" />
-</center>
+<div class="hcenter">
+<img src="graphics/timeline.png" class="plain" style="width: 90%" />
+</div>
 
-- **Bug #2**: A change to `StTpcRSMaker` affecting *simulation only* was found
-to increase the number of global tracks ($N_\text{hits} \ge 15$) by ~5%
+- **Issue #2**: A change in `StTpcRSMaker` increased the number of global tracks
+  ($N_\text{hits} \ge 15$) by ~5%. This modification impacts only **simulation** jobs
 
-  - Introduced on 2017-02-04
+  - Introduced on 2017-02-14 between `SL17a` and `SL17b`
 
-  - Changed cut on electron energy produced in TPC simulation (`StTpcRSMaker.cxx`)
+  - **Main cause:** Decreased cut on energy of soft electrons produced in TPC simulation
 
 </textarea>
 </section>
@@ -118,69 +120,137 @@ to increase the number of global tracks ($N_\text{hits} \ge 15$) by ~5%
 reconstructed tracks as with `SL16f`
 
 - With the same patch applied onto recent code (after `SL18f`) we see the
-expected 10% gain in global tracks
+expected 10% gain in global tracks in Run 14 and Run 18 data
 
-- We use the Number of hits on track, track $P_T$, $\eta$, and  $\chi^2$ distributions to monitor the effect
+- We use the following observables to monitor the effect on global tracks:
 
-- Only "good" global tracks with $N_\text{hits} \ge 15$ 
+  - Number of hits on track, track $P_T$, $\eta$, and $\chi^2$
+
+- Only "good" global tracks with $N_\text{hits} \ge 15$ are used
+
+  - Primary tracks show same trends
+
+- Our basic tests demonstrate that tracks are affected across a wide range of parameters
+
+  - PWGs should evaluate the impact for their specific analyses
 
 </textarea>
 </section>
 
 
 
-<section> <h1>Recover 10% of Global Tracks in Run 14 Data</h1>
-<iframe width="48%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_nhits.html"></iframe>
-<iframe width="48%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_pt.html"></iframe>
+<section> <h1>Recover ~10% of Global Tracks in Run 14 Data</h1>
+<img src="graphics/run_15086051-ds-jc-fix/plot_pt.png"  class="plain" style="width: 48%" />
+<img src="graphics/run_15086051-ds-jc-fix/plot_eta.png" class="plain" style="width: 48%" />
 </section>
 
 
 
-<section> <h1>Recover 10% of Global Tracks in Run 14 Data</h1>
-<iframe width="48%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_eta.html"></iframe>
-<iframe width="48%" height="80%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/run_15086051-ds-jc-fix/plot_chi2.html"></iframe>
+<section> <h1>Recover ~10% of Global Tracks in Run 14 Data</h1>
+<img src="graphics/run_15086051-ds-jc-fix/plot_nhits.png"  class="plain" style="width: 48%" />
+<img src="graphics/run_15086051-ds-jc-fix/plot_chi2.png" class="plain" style="width:   48%" />
 </section>
 
 
 
-<section data-markdown> <textarea data-template> <h1>Issues with More Recent Changes?</h1>
+<section data-markdown> <textarea data-template> <h1 style="margin-bottom: 1em;">Testing with Simulation</h1>
 
-- No issues identified with iTPC integration (overseen by S&C)
+- We wanted to verify the effect in simulation is similar to what we see in real data
 
-  - Ready and integraded for real data reconstruction (~summer 2018)
-  - Simulation is being finalized. Details in iTPC talk...
+  - As with the data we expect the same behavior from the same reconstruction code
 
-- However, possible issues with "dE/dx" changes for iTPC
+  - The effect of track recovery in simulation is less than in the data, at the level of ~4%
 
-  - Introduced on 2018-10-17
-  - Significant changes in the number of reconstructed tracks from simulation, but not real data
+  - We use a sample from nightly tests (Run 14, AuAu Hijing) that contains a quite different track distribution (it is not embedding)
+
+  - Further tests with embedding samples are required to confirm the expected
+  track recovery rate
+
+- Tests with simulation also included the fix for electron energy cut ("Issue #2")
+
+  - See Gene's [blog entry](https://drupal.star.bnl.gov/STAR/blog/genevb/digging-production-changes-after-sl16d) for details on reverting the value of `mCutEle` in `StTpcRSMaker.cxx` from 1e-5 back to 1e-4
+
+</textarea>
+</section>
+
+
+
+<section> <h1>Data vs Simulation</h1>
+<img src="graphics/data_vs_sim/plot_pt.png"  class="plain"    style="width: 48%" />
+<img src="graphics/data_vs_sim/plot_eta.png" class="plain"    style="width: 48%" />
+<img src="graphics/data_vs_sim/plot_nhits.png"  class="plain" style="width: 48%" />
+<img src="graphics/data_vs_sim/plot_chi2.png" class="plain"   style="width: 48%" />
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Issues with Recent Code Changes</h1>
+
+- Some new issues found with "dE/dx" changes for iTPC
+
+  - Introduced on 2018-10-17 and still on the MAIN branch
+  - Significant changes in the number of reconstructed tracks from simulation but not real data
   - Impacted both `TpcRS` and old `TRS` simulations, e.g. Run 7 and Run 10
-  - See open ticket 3371 https://www.star.bnl.gov/rt3/Ticket/Display.html?id=3371
+  - See open [ticket 3371](https://www.star.bnl.gov/rt3/Ticket/Display.html?id=3371)
+
+- In general no major issues identified with iTPC integration
+
+  - Ready and integraded during the summer 2018 for Run 18 and 19 real data reconstruction
+
+  - iTPC geometry is being finalized for full detector simulation
+
+  - Many thanks to Irakli for collaborating on that with the S&C
 
 </textarea>
 </section>
 
 
 
-<section data-markdown> <textarea data-template> <h1>Summary</h1>
+<section data-markdown style="font-size: smaller"> <textarea data-template> <h1>List of Affected Data Samples</h1>
 
-- We identified changes causing change in global tracks between `SL16d` and `SL17d` releases
+The following datasets reconstructed with `SL17d` and later releases are affected by "Issue #1"
 
-  - **`SL16d`** &lt; `SL16g` &lt; "bug #1" &lt; `SL16h` &lt; `SL17a` &lt; "bug #2" &lt; `SL17b` &lt; **`SL17d`**
+- From official list of producation jobs (https://www.star.bnl.gov/devcgi/dbProdOptionRetrv.pl)
+ 
+   - pAu & pAl 200 GeV Run 2015 st_ssdmb stream data production
+   - Cosmic data Run 2017 production for MTD calibrations
+   
+   - AuAu 200 GeV Run 2014 st_physics data reproduction with selected trigger and w/o HFT tracking by request of JetCorr PWG
+   - AuAu 200 GeV Run 2014 st_zerobias stream data production
+   
+   - pp 200 GeV Run 2015 st_rp stream data reproduction with TOF matching tracks and VFStore:100 options
+   - pp 500 GeV Run 2009 low luminosity data rerun with fixed TPC calibrations
+   
+   - AuAu 62 GeV Run 2005 data reproduction with Sti and without SVT & SSD tracking
+   - CuCu 22 GeV Run 2005 data reproduction with Sti and without SVT & SSD tracking 
 
-  - "Bug #1" affects both real and simulated data
+- In addition, embedding produced with 'SL17b` will be affected by "Issue #2"
 
-     - Only productions using `Sti` are affected, later productions using `StiCA` are not sensitive
+</textarea>
+</section>
 
-  - "Bug #2" affects simulation only
 
-  - The found changes were **not justified** and have been **reverted**
 
-- Our tests with pure simulation contain very different sets of tracks than in data
+<section data-markdown style="font-size: 0.92em"> <textarea data-template> <h1>Summary</h1>
 
-  - For this reason, the effect on physics from reverted changes should be tested with embedding by PWG
+- We identified code modifications causing the change in global tracks between `SL16d` and `SL17d` releases
 
-- The patched code is availalble in ...
+  - **Issue #1** affects both real and simulated data
+
+     - Primarily productions using `Sti`, productions using `StiCA` are much less affected
+
+  - **Issue #2** affects simulation only
+
+  - The found changes **were not properly vetted** and have been **reverted**
+
+- Tests with pure simulation are not entirely conclusive due to a very different set of tracks than in data
+
+  - Impact on physics may depend on specific PWF analysis and should be tested with embedding
+
+- The patched code will be availalble in `SL18h`, a release candidate for Run 18
+Isobar production
+
+  - Will be based on `SL18f` to avoid recent issues introduced after that release
 
 </textarea>
 </section>
