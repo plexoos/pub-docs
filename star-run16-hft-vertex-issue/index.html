@@ -1,0 +1,270 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+   <title>Investigating Issues with Vertex Reconstruction in Run 16 dAu 200 GeV</title>
+
+   <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+   <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
+
+   <!-- Theme used for syntax highlighting of code -->
+   <link rel="stylesheet" href="../reveal.js/lib/css/github-gist.css">
+
+   <script src='/assets/plotly.min.js'></script>
+
+   <style>
+
+   c {
+     white-space: pre;
+     font-family: Courier New, monospace;
+   }
+
+   </style>
+
+   <script>
+     var link = document.createElement( 'link' );
+     link.rel = 'stylesheet';
+     link.type = 'text/css';
+     link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+     document.getElementsByTagName( 'head' )[0].appendChild( link );
+   </script>
+
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Investigating Issues with Vertex Reconstruction in Run 16<br>dAu 200 GeV</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+<h4 class="title">
+<script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+</h4>
+
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>The Problem</h1>
+
+- Observations reported by Shengli Huang
+
+  - [S&C meeting, June 13, 2018](https://drupal.star.bnl.gov/STAR/event/2018/06/13/software-and-computing-meeting)
+    - https://drupal.star.bnl.gov/STAR/system/files/dAuHFTTrack.pdf
+
+<img style="display: block; margin: 0em auto;" src="graphics/shengli_issue.png" width="70%" />
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>The Problem</h1>
+
+- Gene confirmed the issue by identifying tracks with nonsensical pseudorapidity
+
+  - https://drupal.star.bnl.gov/STAR/node/43075/
+
+- Define metric z position of the last point on the track vs. track angle
+
+  - Correlation for globals (left) and outliers for primaries (right)
+
+<div style="margin: 0em auto;">
+<img src="graphics/LastZ_vs_cosTheta_EvtsAll_HFT_globals.png" width="40%" />
+<img src="graphics/LastZ_vs_cosTheta_EvtsAll_HFT.png" width="40%" />
+</div>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Reminder: Vertex Position Fit</h1>
+
+- The following is true for both STAR vertex finding algorithms, VFMinuit and PPV
+
+  - VFMinuit and PPV primarily differ in how vertex seeds are found, plus some track/vertex QA seletion cuts
+
+- Vertex position is found by minimizing $\chi^2$ for a set of selected tracks 
+
+  - Important: Actuall $\chi^2$ terms are modified as $s \bigg( 1 - \exp\Big(- \frac{\chi^2}{s} \Big) \bigg)$
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Modified $\chi^2$</h1>
+<iframe width="90%" height="70%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_robust_chi2.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Modified $\chi^2$</h1>
+<iframe width="90%" height="70%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_robust_chi2_frac.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track "Angle" vs "Exit point" Corr.:<br>s=100 vs s=250</h1>
+<iframe width="90%" height="70%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_angle_vs_lpz_s0250.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track "Angle" vs "Exit point" Corr.:<br>s=100 vs s=500</h1>
+<iframe width="90%" height="70%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_angle_vs_lpz_s0500.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track "Angle" vs "Exit point" Corr.:<br>s=100 vs s=1000</h1>
+<iframe width="90%" height="70%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_angle_vs_lpz_s1000.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Tracks with Unwanted "Angle" vs "Exit point" Corr.:<br>s=100 vs s=250</h1>
+<iframe width="90%" height="70%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_angle_bad_s0100_s0250.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Tracks with Unwanted "Angle" vs "Exit point" Corr.:<br>s=100 vs s=500</h1>
+<iframe width="90%" height="70%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_angle_bad_s0100_s0500.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Tracks with Unwanted "Angle" vs "Exit point" Corr.:<br>s=100 vs s=1000</h1>
+<iframe width="90%" height="70%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_angle_bad_s0100_s1000.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Tracks with Expected "Angle" vs "Exit point" Corr.:<br>s=100 vs s=250</h1>
+<iframe width="90%" height="70%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_angle_good_s0100_s0250.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Tracks with Expected "Angle" vs "Exit point" Corr.:<br>s=100 vs s=500</h1>
+<iframe width="90%" height="70%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_angle_good_s0100_s0500.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Tracks with Expected "Angle" vs "Exit point" Corr.:<br>s=100 vs s=1000</h1>
+<iframe width="90%" height="70%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_angle_good_s0100_s1000.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Change in Vertex Position: s=100 vs s=250</h1>
+<iframe width="45%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_vx_s0100_s0250.html"></iframe>
+<iframe width="45%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_vy_s0100_s0250.html"></iframe>
+<iframe width="45%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_vz_s0100_s0250.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Change in Vertex Position: s=100 vs s=500</h1>
+<iframe width="45%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_vx_s0100_s0500.html"></iframe>
+<iframe width="45%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_vy_s0100_s0500.html"></iframe>
+<iframe width="45%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_vz_s0100_s0500.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Change in Vertex Position: s=100 vs s=1000</h1>
+<iframe width="45%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_vx_s0100_s1000.html"></iframe>
+<iframe width="45%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_vy_s0100_s1000.html"></iframe>
+<iframe width="45%" height="40%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="graphics/plot_vz_s0100_s1000.html"></iframe>
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Summary</h1>
+
+- Investigating the effect of highly curved tracks in Run 14 dAu 200 GeV dataset
+
+- Increasing the scale in "robust potential" does reduce the effect
+
+  - May lead to statistical fluctuations in otherwise unaffected vertices
+
+  - 1% loss in primary tracks and vertices is observed with higher scale values<br>
+    But `SL18d` does not include the fixes for ~10% of tracks restored in `SL18h`
+
+- Will may need to support different scale values with DB entries
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // R = 0.8 WXGA
+   //width: 1024, height: 640,
+   // R = 0.875 WXGA
+   width: 1120, height: 700,
+   // R = 0.6 HD
+   //width: 1152, height: 648,
+   // R = 0.5 HD
+   //width: 960, height: 540,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../reveal.js/plugin/markdown/marked.js' },
+      { src: '../reveal.js/plugin/markdown/markdown.js' },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>

@@ -1,5 +1,9 @@
 https://plexoos.github.io/pub-docs/
 
+# 2019
+
+[Investigating Issues with Vertex Reconstruction in Run 16 dAu 200 GeV](star-run16-vertex-issue), January
+
 
 # 2018
 
