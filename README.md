@@ -2,7 +2,10 @@ https://plexoos.github.io/pub-docs/
 
 # 2019
 
-[Investigating Issues with Vertex Reconstruction in Run 16 dAu 200 GeV](star-run16-vertex-issue), January
+[Investigating Issues with Vertex Reconstruction in Run 16 dAu 200 GeV](star-run16-hft-vertex-issue), January<br>
+Support notebooks
+  - ["Robust potential"](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-run16-hft-vertex-issue/nb_robust_chi2.ipynb)
+  - [Change in veretex position for different robust potential scale factors](https://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run16-hft-vertex-issue/nb_vertex_diff.ipynb)
 
 
 # 2018
