@@ -36,3 +36,9 @@ Support notebooks
 [Vertex Reconstruction Status](star-ana-vertex-reco-2017-11-03), November 3, STAR Collaboration Meeting
 
 [Vertex Finder Options](star-snc-vertex-options), September 27, S&amp;C Meeting
+
+
+# 2012
+
+[Inaugural Young Researcher Symposium 2012](yrs-2012-11-30-poster), November 30, BNL
+  - [poster](yrs-2012-11-30-poster/poster.pdf)

@@ -1,0 +1,311 @@
+% Option "a4resizeable" makes it possible ot resize the poster by the command:
+% psresize -pa4 poster.ps poster-a4.ps For final printing, please remove option
+% "a4resizeable"
+
+\ifdefined\isdraft
+   \documentclass[landscape, a0b, draft]{a0poster}
+\else
+   \documentclass[landscape, a0b, final]{a0poster}
+\fi
+
+
+\makeatletter
+\def\mypsframebox{\pst@object{mypsframebox}}
+\def\mypsframebox@i#1#2#3{{%
+	\use@par                        % Local parameters
+	\if@star\solid@star\fi          % Stared version
+	\pssetlength{\pst@dimc}{-\psframesep}
+	\psaddtolength{\pst@dimc}{-\psframesep}
+	\psaddtolength{\pst@dimc}{-\pslinewidth}
+	\psaddtolength{\pst@dimc}{-\pslinewidth}
+	\pssetlength{\pst@dima}{#1}
+	\psaddtolength{\pst@dima}{\pst@dimc}
+	\pssetlength{\pst@dimb}{#2}
+	\psaddtolength{\pst@dimb}{\pst@dimc}
+	\setbox\z@\vbox to\pst@dimb{\hsize\pst@dima\sloppy\vfil#3\vfil}%
+	\psframebox{\box\z@}%
+}}
+\makeatother
+
+
+\usepackage{mathtools}
+\usepackage{pst-node}
+\usepackage{pst-slpe}
+\usepackage[dvips]{geometry}
+\usepackage{texdraw}
+\usepackage{amsfonts}
+\usepackage[colorlinks=true,bookmarks=false,pageanchor=false]{hyperref}
+
+\geometry{a0paper,landscape,includeall=true,centering=true,
+          nomarginpar, headsep=0mm, headheight=0mm,
+          tmargin=10mm, bmargin=10mm, lmargin=10mm, rmargin=10mm}
+
+\definecolor{FrameColor}{rgb}{0.8, 0.8, 1.0}
+\definecolor{myTitleColor}{rgb}{0.9, 0.9, 1.0}
+\definecolor{myBlueLight1}{rgb}{0.8, 0.8, 1.0}
+\definecolor{myBlueLight2}{rgb}{0.8, .9, 1.0}
+\definecolor{myBlue}{rgb}{0.6, .6, 1.0}
+\definecolor{myBlue2}{rgb}{0.80, .7, .95}
+\definecolor{myGreenLight1}{rgb}{0.9, 1.0, .9}
+\definecolor{myGreenLight2}{rgb}{0.8, 1.0, .8}
+\definecolor{myGreen}{rgb}{0.8, 1.0, .6}
+\definecolor{myRedLight1}{rgb}{1.0, 0.8, 0.8}
+\definecolor{myRed1}{rgb}{1.0, 0.9, 0.75}
+\definecolor{myRed2}{rgb}{1.0, 0.75, 0.75}
+\definecolor{myYellowLight1}{rgb}{.9, .80, .55}
+\definecolor{myCyan}{rgb}{1, .75, 1}
+\definecolor{myGrey}{rgb}{.9, .88, .9}
+
+%===============================================================================
+\definecolor{redDark}{rgb}{0.8,0,0}
+\definecolor{blueDark}{rgb}{0,0,0.5}
+\definecolor{blueLight}{rgb}{0.5, 0.4, 1.0}
+\definecolor{blue1}{rgb}{0.8, 0.8, 1.0}
+\definecolor{greenDark}{rgb}{0, .5, 0}
+\definecolor{greenLight}{rgb}{.8, 1.0, .8}
+\definecolor{black}{rgb}{0, 0, 0}
+\definecolor{yellow}{rgb}{1.0, 1.0, 0.0}
+\definecolor{bgColor}{rgb}{1,1,1}
+\definecolor{pink}{rgb}{1.0,0.9,0.9}
+\definecolor{greyLight}{rgb}{0.8,0.8,0.8}
+
+
+\newpsstyle{TransparencyRed}{fillstyle=vlines,hatchcolor=myRedLight1, hatchwidth=0.5\pslinewidth,hatchsep=3\pslinewidth}
+
+\setlength{\columnsep}{3cm}
+\setlength{\columnseprule}{2mm}
+\setlength{\parindent}{0.0cm}
+
+\newlength{\theheight}
+\newlength{\thewidth}
+\newlength{\titleWidth}
+\newlength{\tmpPicWidth}
+\newlength{\tmpPicHeight}
+\newlength{\frameWidth}
+\newlength{\frameHeight}
+\newlength{\myPsPictureWidth}
+\newlength{\myPsPictureHeight}
+\newlength{\myPsPictureHalfWidthLocal}
+\newlength{\myPsPictureWidthLocal}
+\newlength{\myPsPictureHeightLocal}
+
+
+\makeatletter
+
+\def\mygetpos(#1,#2)#3#4{\g@etargxy #1 #2 {} \\#3#4}
+
+% Arguments:
+% #1:
+% #2: Position coordinates of the frame's bottom left corner
+% #3: Width and height of the frame
+% #4: Frame's title
+% #5: Frame's content
+%
+\def \myPsTitledPicture {\pst@object{myPsTitledPicture}}
+\def \myPsTitledPicture [#1](#2)(#3)#4#5{ {%
+\mygetpos(#3)\mx\my
+
+\settoheight{\theheight}{\textbf{\LARGE #4}}
+\settoheight{\thewidth}{\textbf{\LARGE #4}}
+
+\setlength{\myPsPictureHalfWidthLocal}{\unitlength*\mx*\real{0.5}}
+\setlength{\myPsPictureWidthLocal}{\unitlength*\mx}
+\setlength{\myPsPictureHeightLocal}{\unitlength*\my+\theheight}
+
+\rput[bl]{0}(#2){
+   \psframebox[#1, linewidth=0.5\unitlength, framesep=0.5\unitlength, framearc=0.2,
+               border=.1, bordercolor=black!30] {
+      \begin{pspicture}(#3)
+         #5
+           % Define the frame's title
+         \rput{0}(\myPsPictureHalfWidthLocal,\myPsPictureHeightLocal) {
+         \psframebox[#1,linewidth=0.2\unitlength,
+                     fillstyle=solid, fillcolor=white,
+                     framesep=0.3\unitlength, framearc=0.5,
+                     border=.1, bordercolor=black!30] {
+            \textbf{\LARGE #4}%
+         } }
+         %\psgrid[gridlabels=0.5,subgriddiv=0]%(0,0)(#2)%(\myPsPictureHalfWidthLocal,\myPsPictureHeightLocal)%(#1)(#2)
+      \end{pspicture}
+   }
+}
+} }
+\makeatother
+
+
+\newcommand{\mysection}[1]{
+\vspace{2cm}\begin{center}\pbox{0.8\columnwidth}{}{linewidth=2mm,framearc=0.1,linecolor=lightblue,fillstyle=gradient,gradangle=0,gradbegin=white,gradend=whiteblue,gradmidpoint=1.0,framesep=1em}{\begin{center}\LARGE \bf #1\end{center}}\end{center}\vspace{1.25cm}
+}
+
+\newcommand{\mysubsection}[1]{
+\vspace{2cm}\begin{center}\pbox{0.8\columnwidth}{}{linewidth=2mm,framearc=0.1,linecolor=lightblue,fillstyle=gradient,gradangle=0,gradbegin=white,gradend=green,gradmidpoint=1.0,framesep=1em}{\begin{center}#1\end{center}}\end{center}\vspace{1.25cm}
+}
+
+\input{posterRhic.tex}
+\input{posterPolarization.tex}
+\input{posterProtonSpin.tex}
+\input{posterAsymmetry.tex}
+\input{posterAccelerator.tex}
+\input{posterPolarimeters.tex}
+\input{posterPolarPrinciples.tex}
+\input{posterBeamProfile.tex}
+\input{posterPolarLosses.tex}
+\input{posterNumbers.tex}
+\input{posterSummary.tex}
+\input{posterAcknowledgments.tex}
+
+\color{blueDark}
+
+\begin{document}
+
+\sffamily
+
+\renewcommand\labelitemi{\textcolor{redDark}{$\bullet$}}
+\renewcommand\labelitemii{\textcolor{greenDark}{$\bullet$}}
+\renewcommand\labelitemiii{\textcolor{blueDark}{$\bullet$}}
+
+\setlength{\unitlength}{10mm}
+\psset{unit=\unitlength}
+\psset{framearc=.3,fillcolor=blueDark!10,linecolor=blueDark,linewidth=0.1,fillstyle=solid,arrowscale=3}
+
+
+\begin{pspicture}(0,0)(\textwidth,\textheight)
+
+
+\rput[t]{0}(58,81){
+\psframebox[linecolor=myTitleColor, linewidth=0.5\unitlength, fillstyle=solid,
+            fillcolor=white, framesep=0.5\unitlength, framearc=0.5]
+{
+\parbox{40\unitlength}{
+   \centering
+   \textbf{\Huge Measuring Proton Beam Polarization\\at\\[\unitlength] \underline{R}elativistic \underline{H}eavy \underline{I}on \underline{C}ollider}\\[0.5\unitlength]
+   \Large Dmtri~Smirnov, Brookhaven National Laboratory\\
+    \large November 30, 2012
+} } }
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](-1,50)(28,18)
+   {Relativistic Heavy Ion Collider}
+{
+   \rput[bl](0,0.3){ \posterRhic{28\unitlength} }
+}
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](29,45)(28,18)
+   {Polarized Protons}
+{
+   \rput[bl](0,0.3){ \posterPolarization{28\unitlength} }
+}
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](58,45)(28,18)
+   {\rnode{node_d0_detector_from}{Internal Proton Structure}}
+{
+   \rput[bl](0,0.3){ \posterProtonSpin{28\unitlength}{18\unitlength} }
+}
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](87,50)(28,18)
+   {\rnode{node_d0_detector_from}{Extracting Knowledge}}
+{
+   \posterAsymmetry{28\unitlength}{18\unitlength}
+}
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](-1,27)(28,18)
+   {Accelerator Complex and Polarimeters}
+{
+   \rput[bl](0,0.3){ \posterAccelerator{28\unitlength} }
+}
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](29,22)(28,18)
+   {RHIC Polarimeters}
+{
+   \rput[bl](0,0.8){ \posterPolarimeters{28\unitlength} }
+}
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](58,22)(28,18)
+   {Measurement Principles}
+{
+   \rput[bl](0,0.8){ \posterPolarPrinciples{28\unitlength} }
+}
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](87,27)(28,18)
+   {Beam Profile}
+{
+   \rput[bl](0,0.8){ \posterBeamProfile{28\unitlength} }
+}
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](0,3)(28,18)
+   {Polarization Losses}
+{
+   \rput[bl](0,0.8){ \posterPolarLosses{28\unitlength} }
+}
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](29,-1)(28,18)
+   {Numbers to Remember}
+{
+   \rput[bl](0,0.8){ \posterNumbers{28\unitlength} }
+}
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](58,-1)(28,18)
+   {Summary and Outlook}
+{
+   \rput[bl](0,0.8){ \posterSummary{28\unitlength} }
+}
+
+
+%
+% Poster frame:
+%
+\myPsTitledPicture[linecolor=myTitleColor,fillstyle=solid,fillcolor=white](87,3)(28,18)
+   {Acknowledgments}
+{
+   \rput[bl](0,0.8){ \posterAcknowledgments{28\unitlength} }
+}
+
+
+%\psgrid[gridlabels=0.5, subgriddiv=0, griddots=10](1,-1)(0,-3)(\textwidth,\textheight)
+
+\end{pspicture}
+
+\end{document}
