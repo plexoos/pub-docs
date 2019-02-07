@@ -5,6 +5,7 @@ https://plexoos.github.io/pub-docs/
 [Tracking with iTPC Inner Sector in Run 18](star-run18-itpc-tracking-issue), January<br>
 Support notebooks
   - [Track and hit distributions](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-run18-itpc-tracking-issue/nb_fastoffline_picodst.ipynb)
+  - [Tracks with and without sector 14](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-run18-itpc-tracking-issue/nb_sector_20_vs_14.ipynb)
 
 
 [Investigating Issues with Vertex Reconstruction in Run 16 dAu 200 GeV](star-run16-hft-vertex-issue), January<br>
