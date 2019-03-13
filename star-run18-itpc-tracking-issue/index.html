@@ -1,0 +1,416 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+   <title>Track Reconstruction with iTPC Sector in Run 18</title>
+
+   <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+   <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
+
+   <!-- Theme used for syntax highlighting of code -->
+   <link rel="stylesheet" href="../reveal.js/lib/css/github-gist.css">
+
+   <script src='/assets/plotly.min.js'></script>
+
+   <style>
+
+   c {
+     white-space: pre;
+     font-family: Courier New, monospace;
+   }
+
+   </style>
+
+   <script>
+     var link = document.createElement( 'link' );
+     link.rel = 'stylesheet';
+     link.type = 'text/css';
+     link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+     document.getElementsByTagName( 'head' )[0].appendChild( link );
+   </script>
+
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Track Reconstruction with iTPC Sector in Run 18</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+<h4 class="title">
+<script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+</h4>
+
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>TPC in Run 18</h1>
+
+- In Run 18 the inner section of TPC sector 20 trippled the number of layers
+  - 13 TPC layers to 40 iTPC layers resulting in change from 45 to 72 total layers in the sector
+
+- It was decided not to use iTPC hits in Run 18 tracking
+
+- We would like to know how tracks are affected by missing hits in sector 20
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>First Observations</h1>
+
+- <a href="https://drupal.star.bnl.gov/STAR/blog/lisa/phi-distributions-not-understood-isobar-runs">Early observations reported by Mike Lisa and Xiaoyu Liu</a>
+
+  - The data was reconstructed by fast offline during the Run, i.e. early feedback, no fixed release
+
+  <img style="display: block; margin: 0em auto;" src="graphics/phi_high_pt_xiaoyu.png" width="70%" />
+
+- Claimed: $\sim 75\%$ of tracks lost at hight $P_T$
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>First Observations</h1>
+
+- Asked Xiaoyu to analyze recently reconstructed data
+
+  - The effect is much smaller
+
+  <img style="display: block; margin: 0em auto;" src="graphics/phi_high_pt_xiaoyu_2.png" width="70%" />
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Our Investigation</h1>
+
+- Look at the data reconstructed with SL18h with vetted calibrations
+
+- Model the situation in sector 20 by excluding hits in the inner sector 14
+
+  - Reconstructed same sample twice: With and without hits in sector 14
+  - Labeled samples as YES14 and NO14 respectively
+
+- We confirm the expected loss of track efficiency around sector 14 for global and primary tracks
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi vs Eta Distribution</h1>
+<img style="display: block; margin: 3em auto;" src="graphics/phi_vs_eta_pt_bin_9.png" width="70%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi vs Eta Distribution</h1>
+<img style="display: block; margin: 3em auto;" src="graphics/phi_vs_eta_pt_bin_5.png" width="70%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi vs Eta Distribution</h1>
+<img style="display: block; margin: 3em auto;" src="graphics/phi_vs_eta_pt_bin_4.png" width="70%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi Distribution</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/phi_pt_bin_9.png" width="80%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi Distribution</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/phi_pt_bin_8.png" width="80%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi Distribution</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/phi_pt_bin_7.png" width="80%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi Distribution</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/phi_pt_bin_6.png" width="80%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi Distribution</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/phi_pt_bin_5.png" width="80%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi Distribution</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/phi_pt_bin_4.png" width="80%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi Distribution</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/phi_pt_bin_3.png" width="80%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi Distribution</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/phi_pt_bin_2.png" width="80%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi Distribution</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/phi_pt_bin_1.png" width="80%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Track Phi Distribution</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/phi_pt_bin_0.png" width="80%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Estimated Track Efficiency</h1>
+<img style="display: block; margin: 3em auto;" src="graphics/eff_by_pt_bin.png" width="70%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Hits on Track</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/nhits_pt_bin_9.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Hits on Track</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/nhits_pt_bin_8.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Hits on Track</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/nhits_pt_bin_7.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Hits on Track</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/nhits_pt_bin_6.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Hits on Track</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/nhits_pt_bin_5.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Hits on Track</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/nhits_pt_bin_4.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Hits on Track</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/nhits_pt_bin_3.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Hits on Track</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/nhits_pt_bin_2.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Hits on Track</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/nhits_pt_bin_1.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Hits on Track</h1>
+<img style="display: block; margin: 5em auto;" src="graphics/nhits_pt_bin_0.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Impact Parameter</h1>
+<img style="display: block; margin: 0em auto;" src="graphics/imp_pt_bin_9.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Impact Parameter</h1>
+<img style="display: block; margin: 0em auto;" src="graphics/imp_pt_bin_8.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Impact Parameter</h1>
+<img style="display: block; margin: 0em auto;" src="graphics/imp_pt_bin_7.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Impact Parameter</h1>
+<img style="display: block; margin: 0em auto;" src="graphics/imp_pt_bin_6.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Impact Parameter</h1>
+<img style="display: block; margin: 0em auto;" src="graphics/imp_pt_bin_5.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Impact Parameter</h1>
+<img style="display: block; margin: 0em auto;" src="graphics/imp_pt_bin_4.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Impact Parameter</h1>
+<img style="display: block; margin: 0em auto;" src="graphics/imp_pt_bin_3.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Impact Parameter</h1>
+<img style="display: block; margin: 0em auto;" src="graphics/imp_pt_bin_2.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Impact Parameter</h1>
+<img style="display: block; margin: 0em auto;" src="graphics/imp_pt_bin_1.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Impact Parameter</h1>
+<img style="display: block; margin: 0em auto;" src="graphics/imp_pt_bin_0.png" width="90%" />
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Summary</h1>
+
+- We do not confirm the initially claimed $\sim 75\%$ loss in efficiency in iTPC sector
+
+  - The effect is much less in properly calibrated data
+
+- We modeled the missing inner hits in sector 14
+
+  - The average expected loss due to missing hits is $\sim 20\%$ for global
+  tracks with high $P_T$ and an additional $\sim 8\%$ loss for primary tracks
+
+  - Currently, $\sim 5\%$ out of the $\sim 8\%$ loss in primaries can be explained by
+  the widening of the 2D impact parameter distribution.<br>
+  Due to this effect the tracks do not pass the cut and are not assigned to vertex
+
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // R = 0.8 WXGA
+   //width: 1024, height: 640,
+   // R = 0.875 WXGA
+   width: 1120, height: 700,
+   // R = 0.6 HD
+   //width: 1152, height: 648,
+   // R = 0.5 HD
+   //width: 960, height: 540,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../reveal.js/plugin/markdown/marked.js' },
+      { src: '../reveal.js/plugin/markdown/markdown.js' },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
