@@ -355,16 +355,19 @@
 
 - We do not confirm the initially claimed $\sim 75\%$ loss in efficiency in iTPC sector
 
-  - The effect is much less in properly calibrated data
+  - The effect is much less visible in properly calibrated data
 
-- We modeled the missing inner hits in sector 14
+- We modeled reconstruction without inner hits with sector 14
 
-  - The average expected loss due to missing hits is $\sim 20\%$ for global
-  tracks with high $P_T$ and an additional $\sim 8\%$ loss for primary tracks
+  - The average expected loss due to missing hits is $\sim 20\%$ for global tracks with higher $P_T$
+  ($\gtrsim 0.4$ GeV) and an additional $\sim 7\%$ loss for primary tracks
 
-  - Currently, $\sim 5\%$ out of the $\sim 8\%$ loss in primaries can be explained by
-  the widening of the 2D impact parameter distribution.<br>
-  Due to this effect the tracks do not pass the cut and are not assigned to vertex
+  - The $\sim 7\%$ loss in primaries is consistent with the widening of the track impact parameter
+  distribution.<br> As a result the tracks do not pass the 3 cm cut and are not assigned to the
+  vertex
+
+  - For lower $P_T$ ($\lesssim 0.4$ GeV) tracks we observe an increase in the number of short tracks
+  in the adjacent sectors. The exact reason for such behavior is under investigation.
 
 
 </textarea>
@@ -409,7 +412,7 @@ Reveal.initialize({
    viewDistance: 100
 });
 
-Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+Reveal.configure( { slideNumber: 'c' }, { showSlideNumber: 'all' } );
 </script>
 
 </body>
