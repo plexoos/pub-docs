@@ -1,0 +1,361 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>EIC Detector Simulation: An Overview of the Software Stack</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">EIC Detector Simulation:<br>An Overview of the Software Stack</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+<h4 class="title">July 17, 2019</h4>
+
+<h5 class="title">
+Updated <script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+</h5>
+
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Introduction</h1>
+
+- An Electron-Ion Collider (EIC) Software Meeting on Detector and Physics
+  Simulations was held on July 10, 2019<br>
+  See agenda at https://indico.bnl.gov/event/6336/
+
+  - Organized by the EIC User Group
+
+  - Focus on current and near term simulation needs in support of users doing
+  physics performance and detector design studies
+
+  - Progress reports on current full and fast simulation software efforts
+
+  - Discussion on how to improve commonality and to allow users to work with
+  multiple detector concepts easily without learning different systems
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Historic Background</h1>
+
+<div style="font-size: smaller">
+
+- Three years ago (June 2016) a **"computing" proposal was submitted** for
+
+  "Developing Analysis Tools and Techniques for the EIC"
+
+- Committee report in June 2016
+
+  "[...] The consortium also proposes to work towards a common geometry and
+   detector interface and a unified track reconstruction. [...] All tools would be
+   organized within a software repositories dedicated to the EIC that would be
+   embedded in an EIC-wide community website."
+
+   - **The proposal was funded**
+   &ensp; <span id="checkmark-inline">&#10003;</span>
+
+- Committee report in January 2019
+
+  "The feedback from the user community indicates that **there is a keen desire to
+  have access to reliable and easy simulation and reconstruction frameworks**. It
+  seems that there remains a threshold for users to quickly engage in Monte Carlo
+  simulations to carry out an end-to-end evaluation of various detector designs
+  and study the EIC physics performance for different detector
+  configurations. [...] The effort on providing common interfaces is strongly
+  supported"
+
+  - **It is clear that we are not there yet**
+  &ensp; <span id="crossmark-inline">&#10007;</span>
+
+<div>
+
+</textarea>
+</section>
+
+
+<section data-markdown> <textarea data-template> <h1>Goals and Expected Features</h1>
+
+- Detector R&D groups working on certain sub-detectors would like to see how
+their systems fit and perform in the common setup
+
+- **If the EIC User Group finds a workable solution now, chances are high that it
+will be picked up by the actual collaboration later**
+
+- Practical requirements on what a fresh EIC user would like to have:
+
+  - Start with an existing EIC detector geometry proposal
+    - Or bring his/her own detector in TGeo, xml, or Geant4 formats
+
+  - Have an ability to (easily) add/remove/modify subdetectors and/or their
+  parameters
+
+  - With a given detector geometry run a simulation for events generated with
+  one of the popular generators
+  
+  - The output should contain digitized hits with reconstructed tracks
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>What's Available</h1>
+
+- EIC detector proposals
+  - BeAST (BNL), ePhenix (BNL), JLEIC (JLAB), TOPSiDE (ANL)
+
+- Frameworks
+  - EicROOT, Fun4All, eJANA, (ANL?)
+
+- Geometry description
+  - TGeo, Geant4, xml, DD4hep
+
+- Simulation
+  - Geant4, eic-smear
+
+- Reconstruction
+  - GenFit, ...
+
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>EicRoot</h1>
+
+- Public repository
+&ensp; <span id="questionmark-inline">?</span>
+
+- Requires detector geometry in TGeo format
+
+- Support full and fast simulation with Geant4 (Geant3 via VMC) and eic-smear respectively
+
+- Supports digitization of simulated hits
+
+- Track reconstruction is based on a known hit-to-track association followed by
+a Kalman filter fit via GenFit
+  - Acceptable for resolution studies, not for efficiency studies
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>eic-smear</h1>
+
+
+- Public repository
+&ensp; <span id="checkmark-inline">&#10003;</span>
+  - https://gitlab.com/eic/eic-smear
+
+- Documentation needs more work, already challenged by users
+
+- Does not require any geometry
+
+- Optional dependency on various generator
+
+- Can be used for quick efficiency studies
+
+- Delphes was not mentioned as an alternative to eic-smear
+  - A framework for fast simulation of a generic collider experiment. Examples
+  for CMS, ATLAS, LHCb, ...
+  - Similar features
+  - Active public repository with multiple forks, LICENSE, documentation
+  &ensp; <span id="checkmark-inline">&#10003;</span>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Fun4all</h1>
+
+- Public repository
+&ensp; <span id="checkmark-inline">&#10003;</span>
+
+- CI
+&ensp; <span id="checkmark-inline">&#10003;</span>
+
+- The code is validated with real data. Trivially adopted for ePhenix
+
+- The package organization and the code is too sPhenix oriented
+&ensp; <span id="crossmark-inline">&#10007;</span>
+  - Naming convention will be hardly welcomed by EIC users...
+  - It is questionable if making the framework standalone will be supported by
+  the authors
+
+- No clear simple way for a new user to start using the framework
+  - Links point to protected wiki pages
+
+</textarea>
+</section>
+
+
+<section data-markdown> <textarea data-template> <h1>eJANA, g4e</h1>
+
+- Based on JANA framework used for existing JLab experiments
+
+- Not clear if source code for JANA is available
+&ensp; <span id="questionmark-inline">?</span>
+
+- Jupyter lab/notebook based front-end
+&ensp; <span id="checkmark-inline">&#10003;</span>
+
+- Claimed to be compatible with eic-smear (to be verified...) and Geant4
+
+- g4e: JLab EIC detector concept is implemented in Geant4
+
+  - Many parameters hard coded but an effort is ongoing to disentangle
+  configuration with a DB in mind
+
+<!--
+- So far, could not identify a new user to start using the 
+-->
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>ANL EIC Software Initiative</h1>
+
+- Was not covered extensively in the meeting...
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>DD4hep</h1>
+
+A software framework for providing a complete solution for full detector
+description (geometry, materials, visualization, readout, alignment,
+calibration, etc.)
+
+- Public repository, LICENSE, documentation
+&ensp; <span id="checkmark-inline">&#10003;</span>
+  - https://github.com/AIDASoft/DD4hep
+
+- Surprisingly, hard to find a single entry point for a new user to start building a detector and run simulation
+&ensp; <span id="crossmark-inline">&#10007;</span>
+  - Massive manuals start with explanation of the architecture instead of a simplest example that just works
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Summary</h1>
+
+- Convergence to a common software stack has not happened after three years
+
+- The <a href=https://en.wikipedia.org/wiki/Not_invented_here>NIH</a> syndrome is hard to overcome
+
+- Packaging all existing software into Docker containers considered as a near term path forward
+
+  - The real reason for this choice is not clear...
+
+  - Containers are appropriate for running. It is hard to develop within a container
+
+  - Should not be a replacement for a standalone development
+ 
+- For now agree on Geant4 C++ as the basis of detector description
+
+  - 3 of the 4 approaches (excluding EicRoot) can work with C++ Geant4 detector descriptions
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>General Recommendations</h1>
+
+- README documentation close to the code
+
+  - Clear installation instructions listing all external dependencies
+
+  - A quick start documentation with half a dozen commands to copy and paste in
+  the terminal command line
+
+  - Should just work and produce an expected result
+
+  - Each unexpected behavior will significantly demotivate the average user
+
+  - At this stage an up-to-date README is more important then a separate website
+  with the architectural design
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>General Recommendations</h1>
+
+- The source code should be in a public repository (github, gitlab)
+  - A straightforward interface for issues, code browsing, static web hosting,
+  ...
+  - Automated builds and tests for continuous integration
+
+- LICENSE
+  - An open source license is an invitation for others to contribute
+  - Without a license not clear if the authors want to share the source
+  - Savvy developers won't contribute to a project without it
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
