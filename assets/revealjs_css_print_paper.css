@@ -20,9 +20,6 @@
 	}
 	body {
 		background: #fff;
-		font-size: 20pt;
-		width: auto;
-		height: auto;
 		border: 0;
 		margin: 0;
 		padding: 0;
@@ -45,15 +42,15 @@
 
 
 	/* SECTION 6: more reveal.js specific additions by @skypanther */
-	ul, ol, div, p {
+	.reveal ul, ol, div, p {
 		visibility: visible;
 		position: static;
 		width: auto;
 		height: auto;
 		display: block;
 		overflow: visible;
-		margin: 0;
 		text-align: left !important;
+		margin: 0em;
 	}
 	.reveal pre,
 	.reveal table {
@@ -61,7 +58,7 @@
 		margin-right: 0;
 	}
 	.reveal pre code {
-		padding: 20px;
+		padding: 0px;
 		border: 1px solid #ddd;
 	}
 	.reveal blockquote {
@@ -105,7 +102,7 @@
 		top: 0 !important;
 		margin-left: 0 !important;
 		margin-top: 0 !important;
-		padding: 60px 20px !important;
+		padding: 0px 0px !important;
 		z-index: auto !important;
 
 		opacity: 1 !important;
