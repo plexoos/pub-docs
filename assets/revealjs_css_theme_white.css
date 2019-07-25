@@ -109,7 +109,23 @@ body {
   margin: 0 0 0 1em; }
 
 .reveal ol {
-  list-style-type: decimal; }
+  list-style: none;
+  counter-reset: li}
+
+.reveal ol li::before {
+  content: counter(li)'.';
+  font-weight: bold;
+  color: rgb(180, 0, 0);
+  display: inline-block;
+  width: 1em;
+  margin-left: -1em}
+
+.reveal ol li {counter-increment: li}
+
+.reveal ol ol li::before { color: rgb(0, 127, 0); }
+.reveal ul ol li::before { color: rgb(0, 127, 0); }
+.reveal ul ol ol li::before { color: rgb(0, 0, 180); }
+.reveal ul ul ol li::before { color: rgb(0, 0, 180); }
 
 .reveal ul {
   list-style-type: disc;
