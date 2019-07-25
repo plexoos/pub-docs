@@ -1,0 +1,56 @@
+.my-dark-red {
+  color: rgb(180, 0, 0);
+}
+
+span.my-border-red {
+  border: 3px solid rgb(255, 180, 180);
+}
+
+span.my-border-grn {
+  border: 3px solid rgb(180, 255, 180);
+}
+
+span.my-border-blu {
+  border: 3px solid rgb(180, 180, 255);
+}
+.my-bg-red {
+  background-color: rgb(255, 220, 220);
+}
+
+.my-bg-grn {
+  background-color: rgb(220, 255, 220);
+}
+
+.my-bg-blu {
+  background-color: rgb(220, 220, 255);
+}
+
+.my-bg-gry {
+  background-color: rgb(220, 220, 220);
+}
+
+#checkmark,
+#checkmark-inline {
+  font-size: 200%;
+  color: rgb(0, 128, 0);
+}
+
+#crossmark,
+#crossmark-inline,
+#questionmark-inline {
+  font-size: 200%;
+  color: rgb(180, 0, 0);
+}
+
+#questionmark,
+#questionmark-inline {
+  font-size: 200%;
+  color: rgb(180, 180, 0);
+}
+
+#crossmark-inline,
+#checkmark-inline,
+#questionmark-inline {
+  line-height: 0;
+  vertical-align: sub;
+}
