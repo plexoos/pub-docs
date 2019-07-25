@@ -2,6 +2,10 @@ https://plexoos.github.io/pub-docs/
 
 # 2019
 
+- [EIC Detector Simulation: An Overview of the Software Stack](eic-software-stack), July 17, STAR S&C Meeting
+
+  A quick review of the software for the Electron-Ion Collider detector simulation
+
 - [STAR Software Library: Switching from 32-bit to 64-bit Builds](star-32-vs-64-build), April
 
   - [Memory Usage by Reconstruction Chain](star-32-vs-64-build/memory.html)
