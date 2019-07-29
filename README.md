@@ -2,6 +2,12 @@ https://plexoos.github.io/pub-docs/
 
 # 2019
 
+- [STAR Software Library: Switching from 32-bit to 64-bit Builds](star-32-vs-64-build), April
+
+  - [Memory Usage by Reconstruction Chain](star-32-vs-64-build/memory.html)
+
+  - [![Binder](https://mybinder.org/badge_logo.svg) Identifying Small Changes in Algorithm Output](https://mybinder.org/v2/gh/plexoos/pub-docs/master?filepath=star-32-vs-64-build%2Fstat_dist.ipynb)
+
 [Tracking with iTPC Inner Sector in Run 18](star-run18-itpc-tracking-issue), January<br>
 Support notebooks
   - [Track and hit distributions](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-run18-itpc-tracking-issue/nb_fastoffline_picodst.ipynb)
