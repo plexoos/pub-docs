@@ -1,0 +1,961 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+   <title>iTPC</title>
+
+   <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+   <link rel="stylesheet" href="../reveal.js/css/theme/my_white.css">
+
+   <!-- Theme used for syntax highlighting of code -->
+   <link rel="stylesheet" href="../reveal.js/lib/css/github-gist.css">
+
+   <script src='../plotly.js/plotly.min.js'></script>
+
+   <style>
+
+   c {
+     white-space: pre;
+     font-family: Courier New, monospace;
+   }
+
+   </style>
+
+   <script>
+     var link = document.createElement( 'link' );
+     link.rel = 'stylesheet';
+     link.type = 'text/css';
+     link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+     document.getElementsByTagName( 'head' )[0].appendChild( link );
+   </script>
+
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Status of iTPC Integration</h1>
+
+<h2 class="title">into STAR Software Libraries</h2>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+</section>
+
+
+
+<section> <h1>Intro</h1>
+
+
+<ul style="margin-top: 3em;">
+
+   <li> In 2018 the number of tracking layers in TPC is tripled in a single inner sector 20
+
+   <li> In 2019 all inner sectors of TPC are expected to be upgraded
+
+   <li> TPC group provided the code written by Yuri F., Irakli C., ...
+
+   <li> Irakli passed the changes to the S&C tracking experts for review and
+   integration in the STAR library
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Goals</h1>
+
+<ul style="margin-top: 3em;">
+
+   <li> Focus on real data reconstruction first and simulation later
+
+   <li> New code should produce the same results when run over old data and geometry models
+
+   <li> Make sure effects on track reconstruction is minimized when iTPC data
+   not used in 2018 samples
+
+   <li> Quantify the effect (if any) from the new geometry
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Summary</h1>
+
+<ul style="margin-top: 1em;">
+
+   <li> In 2018 tracking layers in sectors 20 (East) and 4 (West) are at
+   different radii and do not span the full length of TPC
+
+   <ul>
+      <li> STAR tracking was not optimized for such configuration so, some
+      degradation in efficiency is expected near the membrane ($z = 0$)
+   </ul>
+
+   <li> The new additions are fully backward compatible. Identical results observed when
+   running new code on old data
+
+   <li> iTPC hits can be used in track reconstruction
+
+   <ul>
+      <li> By default iTPC hits are not used in tracking
+      <br>
+      Use <c>iTpcIT</c> option to enable iTPC tracking
+      <br>
+      This is similar to <c>PxlIT</c>, <c>IstIT</c>, and <c>SstIT</c> options for
+      tracking with HFT detectors
+   </ul>
+
+   <li> Full iTPC support is introduced in release <c>SL18e</c>
+
+   <ul>
+      <li> The tracking code is able to accomodate any configuration of installed iTPC sectors
+
+      <li> The following results are based on <c>SL18e</c> release
+   </ul>
+
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Expected Inefficiency in Run 18 Data</h1>
+
+<ul>
+   <li> We studied the effect of half-length layers in TPC by reconstructing
+   tracks with split Sti layers in non-iTPC data
+
+   <li> The effect shown below is exaggerated due to all layers being split
+   whereas in Run 18 only layers in sectors 4 and 20 will span half length of
+   TPC
+
+   <li> Red: Standard reconstruction (StiCA) with full-length TPC layers<br>
+        Blue and Green: TPC layers split at $z = 0$ with StiCA and Sti respectively
+</ul>
+
+<iframe width="70%" height="45%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="root_plot_18060107.html"></iframe>
+
+</section>
+
+
+
+<section> <h1>2017 Sti TPC geometry</h1>
+
+<ul style="margin-top: 0em;">
+
+   <li>In 2017 (and earlier) none of the Sti layers is split
+
+   <li>Full-length Sti layers shown with grey color
+
+   <li>Half-length layers with an edge at $z = 0$ shown with magenta and purple colors
+
+</ul>
+
+<img src="graphics/tpc_2017_ds.png" width="70%" />
+
+</section>
+
+
+
+<section> <h1>2018 Sti TPC geometry</h1>
+
+<ul style="margin-top: 0em;">
+
+   <li>In 2018 only inner layers in sectors 4 and 20 are split
+
+   <li>Full-length Sti layers shown with grey color
+
+   <li>Half-length layers with an edge at $z = 0$ shown with magenta and purple colors
+
+</ul>
+
+<img src="graphics/tpc_2018_ds.png" width="70%" />
+
+</section>
+
+
+
+<section> <h1>2019 Sti TPC geometry</h1>
+
+<ul style="margin-top: 0em;">
+
+   <li>In 2019 all inner sectors instrumented with iTPC, none of the Sti layers is split
+
+   <li>Full-length Sti layers shown with grey color
+
+   <li>Half-length layers with an edge at $z = 0$ shown with magenta and purple colors
+
+</ul>
+
+<img src="graphics/tpc_2019_ds.png" width="70%" />
+
+</section>
+
+
+
+<section> <h1>Further Notes</h1>
+
+<ul style="margin-top: 3em;">
+
+   <li> TPC tracking layers extend from $-400$ to $+400$ cm in $z$ to accomodate
+   prompt hits. We plan to reduce the length without loosing the prompt hits in
+   tracking
+
+   <li> Simulation with iTPC is work in progress and not yet available in the
+   STAR library
+
+   <li> The event display pictures were produced with the <c>star-travex</c> package
+   available at <br>
+   <a href="https://github.com/star-bnl/star-travex">https://github.com/star-bnl/star-travex</a>
+
+   <ul>
+      <li> It can accept events in <c>StEvent</c> format from STAR <c>event.root</c> files
+   </ul>
+
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Number of Hits on Tracks</h1>
+
+<img src="graphics/num_hits_on_track_iTpcIT.png" width="70%" />
+
+<ul style="margin-top: 1em;">
+   <li> iTPC hits can be used in tracking when <c>iTpcIT</c> option is enabled
+
+   <li> Some fraction of tracks in 2018 data has upto 72 assigned hits as expected
+</ul>
+
+</section>
+
+
+
+<section> <h1>Event Display</h1>
+
+<ul>
+   <li> TPC geometry in 2018
+</ul>
+
+<img src="graphics/eve_3d.png" width="80%" />
+
+</section>
+
+
+
+<section> <h1>Event Display</h1>
+
+<ul>
+   <li> TPC geometry in 2018
+</ul>
+
+<img src="graphics/eve_rphi.png" width="80%" />
+
+</section>
+
+
+
+<section> <h1>Event Display</h1>
+
+<ul>
+   <li> TPC geometry in 2018 with real data hits
+</ul>
+
+<img src="graphics/eve_rphi_hits.png" width="80%" />
+
+</section>
+
+
+
+<section> <h1>Event Display</h1>
+
+<ul>
+   <li> TPC geometry in 2018 with several reconstructed tracks and their associated hits
+</ul>
+
+<img src="graphics/eve_rphi_tracks.png" width="80%" />
+
+</section>
+
+
+
+<section> <h1>Event Display</h1>
+
+<ul>
+   <li> TPC geometry in 2018
+</ul>
+
+<img src="graphics/eve_rhoz.png" width="80%" />
+
+</section>
+
+
+
+<section> <h1>Event Display</h1>
+
+<ul>
+   <li> TPC geometry in 2018 with real data hits
+</ul>
+
+<img src="graphics/eve_rhoz_hits.png" width="80%" />
+
+</section>
+
+
+
+<section> <h1>Event Display</h1>
+
+<ul>
+   <li> TPC geometry in 2018 with several reconstructed tracks and their associated hits
+</ul>
+
+<img src="graphics/eve_rhoz_tracks.png" width="80%" />
+
+</section>
+
+
+
+<section> <h1>Possibility to Split Arbitrary Sti TPC Layer</h1>
+
+<ul style="margin-top: 3em;">
+
+   <li> We added a new feature allowing to split arbitrary TPC layer in the Sti
+   geometry
+
+   <li> It is intended mainly for debugging and evaluating the effect of split
+   layers on tracking with Sti/StiCA
+
+   <li> The feature is activated by placing a text file in certain format in the
+   current directory
+
+   <li> The next slides illustrate split layers in three different geometries of
+   2017, 2018, and 2019. For example, we split the following:
+
+   <ul>
+      <li> Layers 9 and 12 through 42 in sectors 3 and 21
+      <li> Layers 6 through 10 in sectors 12 and 24
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Split Arbitrary Sti TPC Layers: 2017</h1>
+
+<img src="graphics/sti_tpc_random_split_2017.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1>Split Arbitrary Sti TPC Layers: 2018</h1>
+
+<img src="graphics/sti_tpc_random_split_2018.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1>Split Arbitrary Sti TPC Layers: 2019</h1>
+
+<img src="graphics/sti_tpc_random_split_2019.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1 style="margin-top: 5em;">Historic Updates and Status Reports</h1> </section>
+
+
+<section> <h1 style="margin-top: 5em;">Update February 22, 2018</h1> </section>
+
+
+<section> <h1>Testing New Code: pre-2018 Case</h1>
+
+<ul style="margin-top: 2em;">
+
+   <li> New code is expected to be backward compatible with pre-2018 data
+
+   <!--
+   <ul>
+      <li> TPC Sti geometry is defined by DB parameters, TGeo implementation is not used for sensitive layers
+   </ul>
+   -->
+
+   <li> We test it by running the code over old data
+
+   <ul>
+
+      <li> Use data from Runs 15 (pp 100 GeV), 16 (AuAu 100 Gev), and<br>
+      17 (pp 250 GeV and AuAu 27 GeV), standard BFC options, 100 events
+
+      <li> Observed differences in number of tracks when comparing <c>iTPC_IRAK_20180216b</c> vs <c>SL18b</c>
+
+      <li> Small difference in the number of tracks (~10 tracks per event (1000s of tracks))
+
+      <li> Small difference in the vertex position (~100s microns) and number of vertices
+
+   </ul>
+
+   <li> Investigated the problem and identified the change in <c>StiTpc/StiTpcDetectorBuilder.cxx</c> causing the difference:
+
+   <ul>
+      <li> The length of TPC layers in Sti geometry was changed
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>TPC Geometry in SL18b and earlier</h1>
+
+<img src="graphics/itpc_2017_SL18b.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1>TPC Geometry for pre-2018 data on iTPC branch</h1>
+
+<img src="graphics/itpc_2017.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1>TPC Geometry for pre-2018 data on iTPC branch</h1>
+
+<img src="graphics/itpc_2017_proj.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1 style="margin-top: 5em;">Update February 29, 2018</h1> </section>
+
+
+
+<section> <h1>Testing and Solving Remaining Issues</h1>
+
+<ul style="margin-top: 3em;">
+
+   <li> Pre-2018 geometry
+
+   <ul>
+      <li> The difference in track counts disappears when we keep the double length
+      for TPC layers
+
+      <li> Gene identified the hits on tracks causing change in track counts as prompt hits
+
+      <li> It is suggested to keep the length of the TPC layers unchanged
+   </ul>
+
+   <li> 2018 geometry
+
+   <ul>
+      <li> We test the case when all TPC layers are split in half in the middle
+      to accomodate the increased number of layers in inner iTPC sectors 4 and
+      20
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>TPC Geometry 2018</h1>
+
+<img src="graphics/itpc_2018.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1>TPC Geometry 2018</h1>
+
+<img src="graphics/itpc_2018_proj.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1>Revert Change on iTPC_IRAK_20180216b</h1>
+
+
+<pre style="max-width: 100%; max-height: 80%; overflow: auto;">
+<code data-trim class="diff" style="font-size: 0.1em;">
+--- a/StRoot/StiTpc/StiTpcDetectorBuilder.cxx
++++ b/StRoot/StiTpc/StiTpcDetectorBuilder.cxx
+@@ -115,23 +115,19 @@ void StiTpcDetectorBuilder::useVMCGeometry() {
+       }
+       else {
+        pShape->setThickness(St_tpcPadConfigC::instance()->outerSectorPadLength(sector));
+        dZ = St_tpcPadConfigC::instance()->outerSectorPadPlaneZ(sector);
+       }
+-      if (NoStiSectors == 24) {
+-       pShape->setHalfDepth(dZ/2);
+-      } else {
+-       pShape->setHalfDepth(dZ);
+-      }
++      pShape->setHalfDepth(dZ*24/NoStiSectors);
+       pShape->setHalfWidth(St_tpcPadConfigC::instance()->PadPitchAtRow(sector,row) * St_tpcPadConfigC::instance()->numberOfPadsAtRow(sector,row) / 2.);
+       pShape->setName(name.Data()); if (debug>1) cout << *pShape << endl;
+       //Retrieve position and orientation of the TPC pad rows from the database.
+       StTpcLocalSectorDirection  dirLS[3];
+</code>
+</pre>
+
+
+</section>
+
+
+
+<section> <h1 style="margin-top: 5em;">Update March 14, 2018</h1> </section>
+
+
+
+<section> <h1>Testing New Code: 2018 Case</h1>
+
+<ul style="margin-top: 3em;">
+
+   <li> To estimate the effect of TPC layer splitting we implement the same in SL18b
+
+   <li> Test using old TPC data
+   <ul>
+      <li> Use data from Runs 15 (pp 100 GeV), 16 (AuAu 100 Gev), and<br>
+      17 (pp 250 GeV and AuAu 27 GeV), standard BFC options, 100 events
+   </ul>
+
+   <li> We observe track inefficiency in all data sets (see next slides)
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>TPC Geometry pre-2018</h1>
+
+<img src="graphics/tpc_split.png" width="80%" />
+
+</section>
+
+
+
+<section> <h1>TPC Geometry pre-2018</h1>
+
+<img src="graphics/tpc_split_proj.png" width="80%" />
+
+</section>
+
+
+
+<section> <h1>Inefficiency in Run 18168046</h1>
+
+<iframe width="90%" height="75%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="root_plot_18168046.html"></iframe>
+
+<ul>
+   <li> Red: Non-split TPC layers, Blue: TPC layers split at z=0, Green: Sti only
+</ul>
+
+</section>
+
+
+
+<section> <h1>Inefficiency in Run 18060107</h1>
+
+<iframe width="90%" height="75%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="root_plot_18060107.html"></iframe>
+
+<ul>
+   <li> Red: Non-split TPC layers, Blue: TPC layers split at z=0, Green: Sti only
+</ul>
+
+</section>
+
+
+
+<section> <h1>Inefficiency in Run 17072001</h1>
+
+<iframe width="90%" height="75%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="root_plot_17072001.html"></iframe>
+
+<ul>
+   <li> Red: Non-split TPC layers, Blue: TPC layers split at z=0, Green: Sti only
+</ul>
+
+</section>
+
+
+
+<section> <h1>Inefficiency in Run 16067017</h1>
+
+<iframe width="90%" height="75%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="root_plot_16067017.html"></iframe>
+
+<ul>
+   <li> Red: Non-split TPC layers, Blue: TPC layers split at z=0, Green: Sti only
+</ul>
+
+</section>
+
+
+
+<section> <h1>Proposals for Solving Issue with Tracking in 2018</h1>
+
+<ul style="margin-top: 1em;">
+
+   <li> The tracks crossing TPC layers near the boundary will never see hits in
+   the other half at the same radial layer
+
+   <li> Two solutions proposed:
+
+   <li> <strong>Solution 1:</strong> Re-assign hits close to volume boundary to the neighboring volume
+   <ul>
+      <li> This is a good direct way of addressing the issue
+      <li> Victor is working on this solution
+      <li> Dmitri will test when available
+   </ul>
+
+   <li> <strong>Solution 2:</strong> Don't split TPC layers except inner sectors
+   4 and 20
+   <ul>
+      <li> Can be quickly implemented
+      <li> Will not solve the problem in the iTPC sector
+      <li> May be considered as a back-up plan to Solution 1
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Summary</h1>
+
+<ul style="margin-top: 0em;">
+
+   <li> The new code appears to be ready for reconstruction of pre-2018 data
+   without iTPC
+
+   <li> Tested 2018 case with split TPC layers and compared to default non-split case
+   using old data
+
+   <ul>
+      <li> A significant loss in track efficiency is observed
+
+      <li> Victor is working on the code to eliminate boundary effects in split
+      Sti Layers
+   </ul>
+
+   <li> Gene has working code for <c>StEvent</c> topology map extended for
+   iTPC by Thomas and the code to fill it
+
+   <li> Also...
+
+   <ul>
+      <li> xml implementation of iTPC geometry (essential for iTPC simulation)
+   is work in progress by Irakli and Jason
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1 style="margin-top: 5em;">Update March 22, 2018</h1> </section>
+
+
+
+<section> <h1>Run 18168046: With Victor's suggestion</h1>
+
+<iframe width="90%" height="75%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="root_plot_18168046_vfix.html"></iframe>
+
+<ul>
+   <li> Red: Non-split TPC layers, Blue: TPC layers split at z=0, Green: Victor's fix
+</ul>
+
+</section>
+
+
+
+<section> <h1>Run 18060107: With Victor's suggestion</h1>
+
+<iframe width="90%" height="75%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="root_plot_18060107_vfix.html"></iframe>
+
+<ul>
+   <li> Red: Non-split TPC layers, Blue: TPC layers split at z=0, Green: Victor's fix
+</ul>
+
+</section>
+
+
+
+<section> <h1>Run 16067017: With Victor's suggestion</h1>
+
+<iframe width="90%" height="75%" style="margin: 0em; border: 1px solid #ccc;" scrolling="auto" src="root_plot_16067017_vfix.html"></iframe>
+
+<ul>
+   <li> Red: Non-split TPC layers, Blue: TPC layers split at z=0, Green: Victor's fix
+</ul>
+
+</section>
+
+
+
+<section> <h1>Summary</h1>
+
+<ul style="margin-top: 3em;">
+
+   <li> Tested code to eliminate boundary effects provided by Victor
+   <li> The loss in efficiency is not recovered
+
+</ul>
+
+</section>
+
+
+
+<section id="update-2018-05-12"> <h1 style="margin-top: 5em;">Update April 12, 2018</h1> </section>
+
+
+
+<section> <h1>Observations from Additional Tests</h1>
+
+<ul style="margin-top: 3em;">
+
+   <li> Set Sti TPC padrow layers to 5% thickness
+
+   <li> Observe a non-critical difference in track numbers and parameters
+
+   <li> Seems 5%, 10%, and 50% thickness produce almost identical tracks (i.e. the difference is small)
+
+</ul>
+
+</section>
+
+
+<section> <h1>Summary</h1>
+
+
+<ul style="margin-top: 0em;">
+
+   <li> Option to exclude iTPC hits implemented: "NoiTpcIT"
+
+   <li> TPC hit double counting resolved in pre-2018 data
+   <ul>
+      <li> When different DAQ reader types are tried sequentially in <c>StTpcHitMaker</c> legacy TPC DAQ records could
+      be found. This caused an extra call to the routine filling TPC hits.
+
+      <li> May need further adjustments for data with iTPC records
+   </ul>
+
+   <li> Yuri and Irakli provided an update for Sti TPC geometry with all Sti
+   layers being long except for sectors 4 and 20 (see next pages)
+
+   <ul>
+      <li> There is still an issue with the 2018 geometry. iTPC layers in West
+      half?
+
+      <li> There is still an issue with total length in 2019 geometry causing
+      loss of prompt hits
+   </ul>
+
+   <li> Most of support files for iTPC are on the main branch, <c>StTpcHitMaker</c>, ...
+   <ul>
+      <li> All tests for pre-2018 data pass OK
+   </ul>
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>Sti TPC Geometry 2018, East Half</h1>
+
+<img src="graphics/itpc_2018_east_v2.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1>Sti TPC Geometry 2018, West Half</h1>
+
+<img src="graphics/itpc_2018_west_v2.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1>TPC Geometry 2019</h1>
+
+<img src="graphics/itpc_2019.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1>TPC Geometry 2019</h1>
+
+<img src="graphics/itpc_2019_proj.png" width="90%" />
+
+</section>
+
+
+
+<section> <h1 style="margin-top: 5em;">Update June 14, 2018</h1> </section>
+
+
+
+<section> <h1>[Solved] Issue with T0 for iTPC tracks</h1>
+
+<img src="graphics/evedispl_iTpc_split_inner_outer.png" width="45%" style="float: right;"/>
+
+<ul style="margin-top: 0em;">
+
+   <li>T0 offset for iTPC innner/outter sectors is not properly applied
+   effectively doubling the number of tracks
+
+   <li> <a href="https://star-bnl.github.io/star-travex/fast-offline-qa/">Fast offline QA with iTpcIT</a>
+
+</ul>
+
+</section>
+
+
+
+<section id="update-2018-06-29"> <h1 style="margin-top: 5em;">Update June 29, 2018</h1> </section>
+
+
+
+<section> <h1>2017 Sti TPC geometry</h1>
+
+<ul style="margin-top: 0em;">
+
+   <li>Compare two implementations: by TPC group (left) and by S&C group (right)
+
+   <li>Full-length Sti layers shown with grey color
+
+   <li>Half-length layers with an edge at $z = 0$ shown with magenta and purple colors
+   <br>
+   <img src="graphics/tpc_2017_vp.png" width="48%" />
+   <img src="graphics/tpc_2017_ds.png" width="48%" />
+
+   <li>None of the Sti layers should be split
+   <li> Problems with implementation by TPC group: Short layers exclude prompt
+   hits; unexpectedly split layers in two sectors
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>2018 Sti TPC geometry</h1>
+
+<ul style="margin-top: 0em;">
+
+   <li>Compare two implementations: by TPC group (left) and by S&C group (right)
+
+   <li>Full-length Sti layers shown with grey color
+
+   <li>Half-length layers with an edge at $z = 0$ shown with magenta and purple colors
+   <br>
+   <img src="graphics/tpc_2018_vp.png" width="48%" />
+   <img src="graphics/tpc_2018_ds.png" width="48%" />
+
+   <li>Only inner layers in sectors 4 and 20 should be split
+   <li> Problems with implementation by TPC group: Short layers exclude prompt
+   hits; outside layers split in sectors 4 and 20 and split layers in sector 7
+
+</ul>
+
+</section>
+
+
+
+<section> <h1>2019 Sti TPC geometry</h1>
+
+<ul style="margin-top: 0em;">
+
+   <li>Compare two implementations: by TPC group (left) and by S&C group (right)
+
+   <li>Full-length Sti layers shown with grey color
+
+   <li>Half-length layers with an edge at $z = 0$ shown with magenta and purple colors
+   <br>
+   <img src="graphics/tpc_2019_vp.png" width="48%" />
+   <img src="graphics/tpc_2019_ds.png" width="48%" />
+
+   <li>None of the Sti layers should be split
+   <li> Problems with implementation by TPC group: Short layers exclude prompt
+   hits; inner layers split in sectors 4 and 20; split layers in sector 7
+
+</ul>
+
+</section>
+
+
+</div>
+</div>
+
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // R = 0.8 WXGA
+   //width: 1024, height: 640,
+   // R = 0.875 WXGA
+   width: 1120, height: 700,
+   // R = 0.6 HD
+   //width: 1152, height: 648,
+   // R = 0.5 HD
+   //width: 960, height: 540,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_HTML-full'
+   },
+   dependencies: [
+      { src: 'https://root.cern.ch/js/notebook//scripts/JSRootCore' },
+      { src: '../reveal.js/plugin/markdown/marked.js' },
+      { src: '../reveal.js/plugin/markdown/markdown.js' },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
