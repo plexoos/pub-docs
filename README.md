@@ -17,13 +17,17 @@ https://plexoos.gitlab.io/pub-docs/
 
 - [Track Reconstruction with iTPC Sector in Run 18](star-run18-itpc-tracking-issue), March 13
 
-  - [Track and hit distributions](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-run18-itpc-tracking-issue/nb_fastoffline_picodst.ipynb)
-  - [Tracks with and without sector 14](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-run18-itpc-tracking-issue/nb_sector_20_vs_14.ipynb)
+  - [![nbviewer](https://img.shields.io/badge/render-nbviewer-f37626?logo=jupyter) Track and Hit Distributions](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-run18-itpc-tracking-issue/nb_fastoffline_picodst.ipynb)
+
+  - [![nbviewer](https://img.shields.io/badge/render-nbviewer-f37626?logo=jupyter) Tracking with and without iTPC Sector 14](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-run18-itpc-tracking-issue/nb_sector_20_vs_14.ipynb)
+
 - [Investigating Issues with Vertex Reconstruction in Run 16](star-run16-hft-vertex-issue), January
 
-  - [Fitting vertex with "robust potential"](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-run16-hft-vertex-issue/nb_robust_chi2.ipynb)
-  - [Change in vertex position for different robust potential scale factors](https://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run16-hft-vertex-issue/nb_vertex_diff.ipynb)
-  - [Change in vertex position w.r.t. simulation](https://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run16-hft-vertex-issue/nb_reco_vs_mc.ipynb)
+  - [![nbviewer](https://img.shields.io/badge/render-nbviewer-f37626?logo=jupyter) Fitting vertex with "robust potential"](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-run16-hft-vertex-issue/nb_robust_chi2.ipynb)
+
+  - [![nbviewer](https://img.shields.io/badge/render-nbviewer-f37626?logo=jupyter) Change in vertex position for different robust potential scale factors](https://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run16-hft-vertex-issue/nb_vertex_diff.ipynb)
+
+  - [![nbviewer](https://img.shields.io/badge/render-nbviewer-f37626?logo=jupyter) Change in vertex position w.r.t. simulation](https://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run16-hft-vertex-issue/nb_reco_vs_mc.ipynb)
 
 
 ## 2018
@@ -34,9 +38,9 @@ https://plexoos.gitlab.io/pub-docs/
 
 - [Investigating Issues with Track Reconstruction and Simulation in Run 14 Data](star-run14-jetcorr-issue), September
 
-  - [Global tracks](http://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run14-jetcorr-issue/notebook_global_tracks.ipynb)
+  - [![nbviewer](https://img.shields.io/badge/render-nbviewer-f37626?logo=jupyter) Global tracks](http://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run14-jetcorr-issue/notebook_global_tracks.ipynb)
 
-  - [Primary tracks](http://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run14-jetcorr-issue/notebook_primary_tracks.ipynb)
+  - [![nbviewer](https://img.shields.io/badge/render-nbviewer-f37626?logo=jupyter) Primary tracks](http://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run14-jetcorr-issue/notebook_primary_tracks.ipynb)
 
 - [iTPC Software Integration](star-itpc-software), July
 
