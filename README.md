@@ -51,7 +51,7 @@ https://plexoos.gitlab.io/pub-docs/
 
 - [STAR Tracking Optimization](star-tracking-optimization)
 
-- [Vertex Reconstruction Status](star-ana-vertex-reco-2017-11-03), November 3, STAR Anlysis Meeting
+- [Vertex Reconstruction Status](star-ana-vertex-reco), November 3, STAR Analysis Meeting
 
 - [Vertex Finder Options](star-vertex-options), September 27, STAR S&C Meeting
 
