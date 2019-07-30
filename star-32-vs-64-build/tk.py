@@ -4,6 +4,25 @@ import matplotlib.pyplot as plt
 
 import star.utils as stu
 
+_prefix = '.'
+
+def get_libpath(build):
+    star_host_sys = '.sl74_gcc485' if build.bits == 32 else '.sl74_x8664_gcc485'
+    path = f'{_prefix}/install-star-cvs-master-gcc485-root5_def-{build.name}/{star_host_sys}/lib/'
+    return path
+
+
+def get_log(build):
+    star_host_sys = '.sl74_gcc485' if build.bits == 32 else '.sl74_x8664_gcc485'
+    path = f'{_prefix}/install-star-cvs-master-gcc485-root5_def-{build.name}/bfc_19114030.log'
+    return path
+
+
+def get_proc(build):
+    star_host_sys = '.sl74_gcc485' if build.bits == 32 else '.sl74_x8664_gcc485'
+    path = f'{_prefix}/install-star-cvs-master-gcc485-root5_def-{build.name}/proc_status.csv'
+    return path
+
 
 def ks_simple(d1, d2):
     data1 = np.sort(d1)
