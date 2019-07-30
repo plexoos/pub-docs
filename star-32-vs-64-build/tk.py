@@ -237,11 +237,15 @@ def plot_match(data1, data2):
     plt.show()
 
 
+pltsavefig = False
+
+
 def plot_compare(df_pairs, colname, figsize, **hist_kwargs):
-    for df_pair in df_pairs:
+    for df_index, df_pair in enumerate(df_pairs):
         fig = plt.figure(figsize=figsize)
         df1, df2 = df_pair
         plot_compare_pair(fig, df1, df2, colname, **hist_kwargs)
+        plt.savefig(f'graphics/{colname}_{df_index}.png', bbox_inches='tight', pad_inches=0.1) if pltsavefig else None
 
 
 def plot_compare_pair(fig, df1, df2, colname, **hist_kwargs):
