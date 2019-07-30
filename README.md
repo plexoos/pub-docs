@@ -55,6 +55,8 @@ https://plexoos.gitlab.io/pub-docs/
 
 - [Vertex Finder Options](star-snc-vertex-options), September 27, STAR S&C Meeting
 
+- [Vertex Reconstruction at STAR with muDST Data Format](star-vertex-reco-mudst), February 22, STAR S&C Meeting
+
 
 ## 2012
 
