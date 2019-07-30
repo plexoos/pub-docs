@@ -53,7 +53,7 @@ https://plexoos.gitlab.io/pub-docs/
 
 - [Vertex Reconstruction Status](star-ana-vertex-reco-2017-11-03), November 3, STAR Anlysis Meeting
 
-- [Vertex Finder Options](star-snc-vertex-options), September 27, STAR S&C Meeting
+- [Vertex Finder Options](star-vertex-options), September 27, STAR S&C Meeting
 
 - [Vertex Reconstruction at STAR with muDST Data Format](star-vertex-reco-mudst), February 22, STAR S&C Meeting
 
