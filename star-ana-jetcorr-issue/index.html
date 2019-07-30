@@ -59,7 +59,7 @@
 </div>
 
 - **Issue #1**: Changes in track reconstruction code were found to cause a loss
-of ~10% of global tracks ($N_\text{hits} \ge 15$)
+of $\sim 10\\%$ of global tracks $(N_\text{hits} \ge 15)$
 
   - Introduced on 2016-06-29 between `SL16f` and `SL16g`
 
@@ -78,7 +78,7 @@ of ~10% of global tracks ($N_\text{hits} \ge 15$)
 </div>
 
 - **Issue #2**: A change in `StTpcRSMaker` increased the number of global tracks
-  ($N_\text{hits} \ge 15$) by ~5%. This modification impacts only **simulation** jobs
+  $(N_\text{hits} \ge 15)$ by $\sim 5\\%$. This modification impacts only **simulation** jobs
 
   - Introduced on 2017-02-14 between `SL17a` and `SL17b`
 
@@ -95,7 +95,7 @@ of ~10% of global tracks ($N_\text{hits} \ge 15$)
 reconstructed tracks as with `SL16f`
 
 - With the same patch applied onto recent code (after `SL18f`) we see the
-expected 10% gain in global tracks in Run 14 and Run 18 data
+expected $10\\%$ gain in global tracks in Run 14 and Run 18 data
 
 - We use the following observables to monitor the effect on global tracks:
 
@@ -114,14 +114,14 @@ expected 10% gain in global tracks in Run 14 and Run 18 data
 
 
 
-<section> <h1>Recover ~10% of Global Tracks in Run 14 Data</h1>
+<section> <h1>Recover $\sim 10\%$ of Global Tracks in Run 14 Data</h1>
 <img src="graphics/run_15086051-ds-jc-fix/plot_pt.png"  class="plain" style="width: 48%" />
 <img src="graphics/run_15086051-ds-jc-fix/plot_eta.png" class="plain" style="width: 48%" />
 </section>
 
 
 
-<section> <h1>Recover ~10% of Global Tracks in Run 14 Data</h1>
+<section> <h1>Recover $\sim 10\%$ of Global Tracks in Run 14 Data</h1>
 <img src="graphics/run_15086051-ds-jc-fix/plot_nhits.png"  class="plain" style="width: 48%" />
 <img src="graphics/run_15086051-ds-jc-fix/plot_chi2.png" class="plain" style="width:   48%" />
 </section>
@@ -134,7 +134,7 @@ expected 10% gain in global tracks in Run 14 and Run 18 data
 
   - As with the data we expect the same behavior from the same reconstruction code
 
-  - The effect of track recovery in simulation is less than in the data, at the level of ~4%
+  - The effect of track recovery in simulation is less than in the data, at the level of $\sim 4\\%$
 
   - We use a sample from nightly tests (Run 14, AuAu Hijing) that contains a quite different track distribution (it is not embedding)
 
@@ -199,7 +199,7 @@ The following datasets reconstructed with `SL17d` and later releases are affecte
    - AuAu 62 GeV Run 2005 data reproduction with Sti and without SVT & SSD tracking
    - CuCu 22 GeV Run 2005 data reproduction with Sti and without SVT & SSD tracking 
 
-- In addition, embedding produced with 'SL17b` will be affected by "Issue #2"
+- In addition, embedding produced with `SL17b` will be affected by "Issue #2"
 
 </textarea>
 </section>
@@ -283,7 +283,7 @@ bbcSim btofsim vpdSim mtdSim tags emcY2 EEfs evout geantout -dstout IdTruth big
 MiniMcMk <span style="color: #f00;">cl</span>
 </pre>
 
-   <li> For the test of "baseline" code remove <span style="color: #f00;"><c>cl</c></span> option
+   <li> For the test of "baseline" code remove <code style="color: #f00;">cl</code> option
 
 </section>
 
@@ -318,7 +318,7 @@ Reveal.initialize({
    viewDistance: 100
 });
 
-Reveal.configure( { slideNumber: 'c/t' }, { showSlideNumber: 'all' } );
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
 </script>
 
 </body>
