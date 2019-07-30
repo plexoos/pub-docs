@@ -190,7 +190,7 @@ def plot_R_vs_S(R, S, spacing, label, axes):
     ax.grid()
 
 
-def plot_cumpdf(d1, d2, ax, axdiff=None):
+def plot_cumpdf(d1, d2, ax, axdiff):
     data1 = np.sort(d1)
     data2 = np.sort(d2)
 
@@ -213,20 +213,19 @@ def plot_cumpdf(d1, d2, ax, axdiff=None):
     ax2.plot(data1, np.full_like(data1,  0.06), 'v')
     ax2.plot(data2, np.full_like(data2, -0.06), '^')
 
-    if axdiff:
-        from matplotlib.ticker import MaxNLocator
+    from matplotlib.ticker import MaxNLocator
 
-        cddiffs = cdf1[sorter] - cdf2[sorter]
-        #axdiff.step(data_all, np.abs(cddiffs), where='post', color='r')
-        #axdiff.plot(data_all, np.abs(cddiffs), 'rs', ms=5)
+    cddiffs = cdf1[sorter] - cdf2[sorter]
+    #axdiff.step(data_all, np.abs(cddiffs), where='post', color='r')
+    #axdiff.plot(data_all, np.abs(cddiffs), 'rs', ms=5)
 
-        axdiff.step(data_all[sorter], cddiffs, where='post', color='g')
-        axdiff.plot(data_all[sorter], cddiffs, 'gs', ms=5)
-        axdiff.plot([np.min(data_all), np.max(data_all)], [0, 0], 'k-')
+    axdiff.step(data_all[sorter], cddiffs, where='post', color='g')
+    axdiff.plot(data_all[sorter], cddiffs, 'gs', ms=5)
+    axdiff.plot([np.min(data_all), np.max(data_all)], [0, 0], 'k-')
 
-        axdiff.yaxis.set_major_locator(MaxNLocator(integer=True))
-        axdiff.set_ylabel('CDF1 - CDF2')
-        axdiff.grid()
+    axdiff.yaxis.set_major_locator(MaxNLocator(integer=True))
+    axdiff.set_ylabel('CDF1 - CDF2')
+    axdiff.grid()
 
 
 def plot_match(data1, data2):
