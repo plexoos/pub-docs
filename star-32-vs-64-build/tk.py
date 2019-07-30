@@ -67,6 +67,38 @@ def wasserstein_simple(data1, data2):
     return d, c, s, all_values, u_cdf, v_cdf
 
 
+def contseq(data1, data2):
+    """
+    Returns counts of continous sequencies of data1 and data2 values
+    """
+    data1_s = np.sort(data1)
+    data2_s = np.sort(data2)
+
+    data_all = np.concatenate([data1_s, data2_s])
+
+    cdf1 = np.searchsorted(data1_s, data_all, side='right') / data1_s.size
+    cdf2 = np.searchsorted(data2_s, data_all, side='right') / data2_s.size
+
+    sorter = data_all.argsort()
+
+    cddiffs = cdf1[sorter] - cdf2[sorter]
+
+    # return counts of continous sequencies from same sample
+    diffs = np.diff(cddiffs)
+    # convert to array of bits
+    diff_bits = (diffs < 0).astype(int)
+
+    n = len(diff_bits)
+    if n != 0:
+        y = np.array(diff_bits[1:] != diff_bits[:-1]) # pairwise unequal
+        i = np.append(np.where(y), n - 1)         # append last element position
+        z = np.diff(np.append(-1, i))             # continous sequencies
+        #p = np.cumsum(np.append(0, z))[:-1]       # positions
+        return z
+
+    return 0
+
+
 def match_closest(data1, data2):
 
     data_all = np.concatenate([data1, data2])
