@@ -1,0 +1,139 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>STAR Software Library: Switching from 32-bit to 64-bit Builds</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">STAR Software Library:<br>Switching from 32-bit to 64-bit Builds</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+<h5 class="title">
+Updated <script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+</h5>
+
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Introduction and Motivation</h1>
+
+- Main concerns for switching from 32- to 64-bit library build
+
+  - Reproducibility of results
+  - Verification of performance
+    - Speedup
+    - Memory footprint
+
+- Our prior knowledge includes the fact that calculations in 32 and 64 builds
+are carried out with different precision in FPU and XMM registers respectively
+
+- Our expectation is to see small difference in final results with the 32 and 64
+libraries unless our algorithms are unstable 
+
+- Although not expected, we would like to make sure there is no new
+"systematics" introduced
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Test Setup Definition</h1>
+
+- Environment for test builds is a x86_64 platform with Linux, ROOT v5-34-30,
+and gcc 4.8.5 
+
+- Investigate predefined build types in CMake
+
+  - `CMAKE_BUILD_TYPE=Release` (i.e. `-O2 -DNDEBUG`)
+  - `CMAKE_BUILD_TYPE=RelWithDebInfo` (i.e. `-O2 -g -DNDEBUG`)
+  - `CMAKE_BUILD_TYPE=MinSizeRel` (i.e. `-Os -DNDEBUG`)
+
+- We perform both 32- and 64-bit builds
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Assembly code for a test program<br>compiled in 32-bit and 64-bit modes</h1>
+
+- Comparing 32-bit and 64-bit assembly code
+
+  https://gcc.godbolt.org/z/Diy0T8
+
+- Compiling our large code base in 64-bit environment without SSE instructions
+(i.e. 387) is not feasible due to differences in ABI of common standard
+libraries (e.g. `cmath`)
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Memory Footprint Dignostics</h1>
+
+- We monitor changes in memory used by reconstruction chains. This is done by means of
+  1. Calls to `stlib`'s `mallinfo()` to obtain allocated memory in the heap
+  2. Queries to `/proc/status` to obtain the total virtual memory used by the
+  process
+
+- <span style="font-size: 70%">Specific to STAR soft: Set environment variable `StarEndMakerShell`</span>
+
+- See slides <a href=memory.html>Memory Usage by Reconstruction Chain</a>
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
