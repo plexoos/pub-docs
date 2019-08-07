@@ -159,6 +159,7 @@ body {
   font-style: italic; }
 
 .reveal iframe {
+  border: 1px solid #ccc;
   z-index: 1; }
 
 /** Prevents layering issues in certain browser/transition combinations */
