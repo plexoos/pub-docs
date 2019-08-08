@@ -1,0 +1,704 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>Building STAR Software Libraries</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Building STAR Software Libraries</h1>
+
+<h2 class="title">from Git Repository with CMake</h2>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+<h5 class="title">
+Updated <script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+</h5>
+
+</section>
+
+
+<section data-markdown> <textarea data-template> <h1>Overview</h1>
+
+- Similar to other big experiments STAR software can be split into two large
+parts&mdash;**offline** and **online**
+
+  - **Offline** code is responsible for event reconstruction, geometry, simulation, calibration, database, ...
+
+  - **Online** code is responsible for reading out detectors, creating raw data DAQ files, detector monitoring, ...
+
+    - Lives in a parallel universe... Its existence is evident by sparse updates of DAQ data structures into **offline**
+
+- Our focus is on the **offline** part
+
+
+</textarea>
+</section>
+
+
+<section data-markdown> <textarea data-template> <h1>Source Code Repository</h1>
+
+- STAR code is located in a CVS repository
+  <pre class="code"><code data-trim style="font-size: 0.7em;" class="shell">
+  $echo $CVSROOT
+  /afs/rhic.bnl.gov/star/packages/repository
+  </code></pre>
+ 
+- Total size is 26GB (N.B. **Offline** code has nothing to do with `offline/` subdirectory)
+  <pre class="code"><code data-trim style="font-size: 0.7em;" class="shell">
+  $du -h -d1 --exclude .backup | sort -h
+  [...]
+  53M     ./asps
+  67M     ./HISTORY
+  126M    ./StarVMC
+  134M    ./pams
+  151M    ./CVSROOT
+  546M    ./obsolete
+  603M    ./StarDb
+  606M    ./online
+  684M    ./StRoot
+  23G     ./offline
+  26G     .
+  </code></pre>
+
+  - Includes unpached MC generators in `StRoot/`, patched Geant3,
+    paper drafts, and user analysis code in `offline/` (23GB &#9757;)
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Fun Statistics</h1>
+
+<div class="my-bg-gry" style="font-size: 70%; position: absolute; top: 5%; right: 5%;">Based on Git repo as of August 2019</div>
+
+- Overall **5M lines of code** in the most popular languages<br>
+  <pre><code data-trim style="font-size: 0.7em;" class="shell">
+  $tokei --sort=code --type="FORTRAN Legacy,C,C Header,C++,C++ Header,Python,Perl" star-cvs/
+  </code></pre>
+
+<pre class="hcenter" style="font-size: 0.7em; margin-left: 2em; border: 0;">
+--------------------------------------------<b>---------</b>
+ Language            Files        Lines     <b>    Code </b>
+--------------------------------------------<b>---------</b>
+ FORTRAN Legacy       3673      2400728     <b> 1944928 </b>
+ C Header             3657      2165256     <b> 1869860 </b>
+ C++                  3630      1357126     <b>  895478 </b>
+ C                   10405       475461     <b>  329001 </b>
+ Perl                  340       120573     <b>   81639 </b>
+ C++ Header            974        76729     <b>   40200 </b>
+ Python                176        38364     <b>   29307 </b>
+--------------------------------------------<b>---------</b>
+ Total               22855      6634237     <b> 5190413 </b>
+--------------------------------------------<b>---------</b>
+</pre>
+
+- About **3.7M lines of code** when exclude multiple versions of MC generators and Geant3<br>
+  <pre><code data-trim style="font-size: 0.7em;" class="shell">
+  $tokei --exclude "StRoot/StarGenerator" --exclude "*geant3*" ...
+  </code></pre>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Fun Statistics</h1>
+
+<div class="my-bg-gry" style="font-size: 70%; position: absolute; top: 5%; right: 5%;">Based on Git repo as of August 2019</div>
+
+<div style="width: 50%; float: left; height: 85%;">
+<!--{{{-->
+<pre class="hcenter" style="font-size: 0.5em; max-height: 100%; overflow-x: hidden; border: 1;">
+<b>             commits     files/c    lines++    lines--</b>
+    fisyak      4844         8.2    5711940    1614370
+   didenko      4595         3.1     475511     128456
+<span class="my-bg-red">     perev      3842         3.2    2733529    1433259</span>
+   jeromel      3424         2.6    2098468      60738
+      fine      2880         2.6     617199     106234
+     jwebb      1457         4.2    5481898      41585
+<span class="my-bg-red">    genevb      1210         2.3     283911      37494</span>
+     kathy       988         2.3      63332      33938
+   ullrich       945         2.9     190422      32948
+<span class="my-bg-red">  smirnovd       812         2.5      42806      26669</span>
+  balewski       745         3.4     164257      31887
+     tonko       710         2.2      66361      16473
+<span class="my-bg-red">  potekhin       578         6.6    1607303       6615</span>
+       jcs       558         1.9     251117      16502
+       tai       550         7.0     303363      59626
+    caines       512         2.3      72928      18276
+    nevski       493         2.3     222354     120066
+    lasiuk       488         2.1      65275      18604
+       jml       477         3.0     104915      16943
+    pibero       472         2.7      52648      37253
+   mmiller       459         7.5     341599      36296
+      akio       448         4.6     347134      18082
+   pruneau       446         4.9      74694      58822
+      tull       440         4.9     162712      26052
+  calderon       431         3.0      56566      14644
+  sakrejda       373         1.6      31555       7118
+    suaide       339         3.1     109206      27500
+      ward       317         2.4      37787       6898
+   rfatemi       299         1.4     477356       6937
+      posk       291         3.6      59492      27624
+      laue       286         3.6      39720      10031
+  kocolosk       270         3.1     149353      20530
+    porter       255         8.1      71702      17809
+<span class="my-bg-red">    dmitry       244         1.9      10679       1053</span>
+  andrewar       243         1.3      17096       2498
+   avossen       230         2.5      43680       5147
+    geurts       221         1.8      28456       6281
+      oldi       219         2.5      32010      11972
+      zhux       218         1.2       7358       1296
+     yepes       204         5.1      76010      16497
+   prindle       198         6.0     124399      35711
+     dongx       180         1.8      25669       4280
+       bum       180         3.1      11013       6635
+      hack       179         6.3      73366       8660
+<span class="my-bg-red">    wenaus       177         2.5      13133       2404</span>
+<!--
+           hardtke       175         2.6      13751       2036
+              deph       170         1.7      11538       2016
+          snelling       162         2.3      23091       8682
+           bouchet       157         2.7      19534      15169
+            hmasui       151         1.5      14435       4363
+           sgliske       148         2.9      29986       3226
+          ogrebeny       141        15.0     173282      24894
+              lisa       139         3.8      31165       9586
+           bnorman       138         2.9       9308       4079
+            jacobs       136         2.6      29364       4543
+          margetis       121         2.6      13265       5096
+               mvl       120         2.0       6241       2168
+            aihong       120         4.4      38100       5636
+          lansdell       118         2.3       9495       6067
+          subhasis       116         2.6      21530       4886
+           lmartin       116         2.9      38821       4213
+            evpops       114         3.2      14883       6989
+            zolnie       113         2.9      12144       6087
+          stevens4       103         3.8      24369       5390
+            flierl        99         2.3      23811       5439
+              marr        98         1.5      10051       6555
+           lbarnby        98         1.5       5194       1406
+          pavlinov        97         2.4       9414       2698
+            ypwang        95         2.5       9140       3440
+            levine        88         2.1      41200       1207
+          longacre        83         3.9     311471       3987
+              dave        82         1.4       9195       2227
+              gans        81         5.5      23991      10529
+            thenry        78         2.6      10456       3103
+             wdeng        76         1.4       3652       1179
+           spencer        75         1.1       2812        813
+              long        71         1.2       4174       1102
+             betan        71         1.5       7432       3909
+          jhthomas        69         1.2     271832       2322
+            dunlop        68         1.8      12181        399
+          mattheww        62         2.6      13096       2205
+          dkettler        60         2.9       6362       1680
+           ogilvie        57         3.5       8218       1897
+              love        56         1.7       3236        703
+          jkadkins        56         1.0       4696       4399
+               jdb        54         2.9       8845       2768
+           hummler        54         2.4       7324       2450
+          hippolyt        54         4.9      15788       1506
+            yipkin        53         2.1       4397        922
+            munhoz        52         4.3      23496       1340
+               msd        52         2.6      34778       1238
+            rashmi        51         1.5      15820      10864
+          ikulakov        51         8.3      41587       9284
+          pfachini        50         2.3       4839       1553
+          ramdebbe        49         1.5       3715       1290
+             llope        48         2.3       6041       1787
+             fseck        48         1.4       6272       2883
+           horsley        47         6.0      18831       8573
+           tone421        42         3.2       3326        564
+          magestro        41         2.3       1028        440
+            struck        40         2.9       5005       1834
+             jones        39         2.5       4941       1416
+           wwitzke        37         2.0       6436       1171
+           starlib        36         2.4       3432        292
+           gnigmat        36         9.6      13625       6621
+               liq        35         2.1       3180        897
+            faivre        35         1.4       5875       1242
+            zchang        34         1.8       1323        702
+            starqa        34         3.9       4178        953
+           rcwells        34         2.6       2046        269
+            wzhang        33         2.1       9039        864
+            rmorse        33         1.7       4335       1312
+             jklay        32         5.8      24096       1251
+           wleight        31         1.4       1904       1271
+            jgreid        31         1.9       4067        533
+            fsimon        31         1.5       1950        336
+          nystrand        30         1.3       1942        554
+            evpdaq        30         2.4        670        232
+          starembd        26         1.2        850        194
+            kisiel        26         5.7      12012        924
+           huangbc        26         1.4       4099       2365
+              qiuh        25         6.4       5677       3269
+           cpowell        25         1.2        996        215
+             druss        24         1.6       1111        443
+           willson        23         2.7       4501        741
+            nelson        23         1.5       1788        192
+           mstftsm        23         1.7        519        267
+          zhoulong        22         1.5       1831        392
+              qiao        22         1.5       7542       6348
+             olson        21         3.7      11097        158
+          videbaks        20         1.2       2934        475
+              croy        20         3.0       2498       1560
+          baumgart        20         1.1        114         62
+          chunhuih        19         1.2       1409        183
+              toan        18         1.9        726        128
+            relyea        18         3.5       4065        793
+          ahoffman        17         1.8       4696         55
+            seelej        16         1.4       1910        226
+            qattan        16         1.6       1084        148
+          vanyashi        15         1.1        688        239
+           renault        15         1.8       3920        377
+           staszak        14         2.8        786        364
+            mzyzak        14         4.1       1908       1041
+              leun        14         1.9       2503        512
+           aohlson        14         1.2       2923        142
+          putschke        13         1.9        768        460
+             liuzx        13         1.2        605        264
+           kopytin        13         1.2       1427         32
+             vlmrz        12         2.2       1543        588
+           shester        12         1.7        735        823
+            mmoura        12         1.9       1076        285
+             lcarr        12         3.3        871        296
+            gdwebb        12         4.6       2505        258
+          dhammika        12         3.0       1279        798
+              kehw        11         1.6        210        131
+            jseger        11         8.9       7583        216
+          cmironov        11         1.6        941        136
+          mercedes        10         1.9       1087         32
+          sprastar         9         1.6        858        222
+          meissner         9         4.6       1927        456
+              jecc         9         1.0        280        127
+          chajecki         9         1.4        670         16
+            yqwang         8         1.0        396        110
+          rcorliss         8         2.4       1184        110
+            dietel         8         9.6      12627        448
+            saulys         7         1.7        152         79
+          reinnart         7         4.1        772        706
+           martinc         7         1.7       2424        864
+              kxin         7         1.9        703        527
+             hjort         7         1.4       1996         16
+          fretiere         7         6.9       3050        246
+             dilks         7         1.7       6070         76
+            cadman         7         1.7        271         49
+            alexst         7         1.0        229        194
+          mheffner         6         2.5       1180         23
+             lyons         6         1.2        376         90
+          jschamba         6         2.2       1002       1308
+             yyang         5         2.2       1852          9
+           tnonaka         5         2.6       1818        137
+             suire         5        23.2      17460        245
+          seluzhen         5         2.6       1454        397
+          sangalin         5         4.2        907        127
+             salur         5         1.2         39         47
+            rjreed         5         3.0       1151         42
+               ray         5         1.8       1095        438
+            nevsky         5         2.2        281        136
+            messer         5         1.0        249          4
+              macl         5         1.8        166        121
+              jgma         5         3.2       2389         76
+           cvs2git         5      5472.6    3754475          0
+           ckriley         5         1.4         50         15
+             yuxip         4         5.5        784        264
+                tb         4         1.8       1550       1413
+            sabita         4         1.8        734        265
+            qyshou         4         1.5       3823       1055
+            mlsvch         4         1.0         72          3
+              huck         4         1.2       1151          6
+            fqwang         4         1.2        127         56
+             finch         4         2.8       1386          2
+           ezarndt         4         1.5        973        307
+          cristina         4         1.0       1504          0
+            xuanli         3         1.0         19          5
+            psoren         3         2.7        225        106
+              oleg         3         1.0        365          2
+          nieuwhzs         3         1.0        242        145
+              liuj         3         1.0         69          5
+          kollegge         3         1.0         35         19
+          khodinov         3         2.0        279         79
+           jlzhang         3         5.7       1444       1347
+          bossingh         3         2.0       1906       1120
+             zye20         2         1.0         60         16
+             ychen         2         1.5        332          0
+               xzb         2         2.5        746         31
+              witt         2         1.5         16         12
+               tpb         2         1.5        242          2
+          tikhomir         2         1.0          2          0
+             stone         2         1.0        172          4
+          starreco         2         1.0         22         22
+             skoby         2         1.0          6          3
+          nluttrel         2         1.0         31         17
+            msimko         2         1.0         56         29
+              mora         2         1.5         56          3
+             markp         2         1.0          4          4
+           macross         2         2.0        244          9
+            kirill         2         3.5        675         19
+          gaudiche         2         9.0       3437        478
+            dthein         2         1.5       1409          0
+             betya         2         1.5        166         88
+            bekele         2         7.0       1389        327
+               aya         2         2.5        120        100
+          amischke         2         3.5       2159          2
+              yuri         1         1.0          2          1
+             yiguo         1         1.0         37         16
+          xueliang         1         4.0       1169          0
+          voloshin         1         4.0        455         13
+             v3240         1         1.0         47          3
+           uid3118         1         1.0         10          6
+           uid2992         1         1.0          4          4
+           uid2764         1         1.0        137          0
+           uid2620         1        28.0       3597          0
+            rogach         1         1.0        279        233
+              pope         1         5.0         40         36
+             pnord         1         2.0        610          0
+-->...
+<span class="my-bg-red">  panitkin         1         2.0        151          0</span>
+<!--
+               nav         1         1.0          8          2
+          masayuki         1         3.0        351        325
+         lkramarik         1         1.0         17         15
+             leite         1         1.0          4          4
+             kunsu         1         1.0         42         30
+             kotov         1         9.0       2209          0
+           iraklic         1         1.0          6          3
+           greiman         1        27.0        901        663
+          ckimstar         1         6.0       1268          0
+            canson         1         1.0          6          3
+-->...
+</pre>
+<!--}}}-->
+</div>
+<div style="width: 50%; float: right;">
+
+- Legend
+
+  **`commits`** : Total number of commits<br>
+  **`files/c`** : Files changed per commit<br>
+  **`lines++`** : Lines added<br>
+  **`lines--`** : Lines removed<br>
+  <span class="my-bg-red">name</span> : NPPS group members
+
+- First commit
+
+ `Author: starlib  &lt;&gt;  1993-02-09`
+
+- 44,300 total commits by 250 authors
+
+- 4.6 commits per day
+
+- No activity during 35% of the time
+
+<div class="hcenter">
+<span class="my-bg-gry" style="font-size: 70%;">Statistics by <a href="http://gitstats.sourceforge.net/">GitStats</a></span>
+</div>
+
+</div>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Building Libraries with <code>cons</code></h1>
+
+- `cons` is the default build system for STAR
+
+  - Implemented in Perl. `cons` <a href="https://www.gnu.org/software/cons/">home page</a> last updated in 2001<br>
+    "cons has been decommissioned [...] scons has effectively replaced it"
+
+  - Often claimed advantage of `cons` and CVS is the ability to checkout and compile individual files/subdirectories
+
+  - No explicit "installation" step. In STAR libraries installed in checked out source directory &#128530;
+
+- Default STAR toolchain is: `gcc` 4.8.5 with C++11 support, `gfortran`
+
+- Incomplete list of "external" dependencies
+
+  - **Packages:** ROOT v5.34/30 (libraries, rootcint), MC generators, Geant3
+  - **Libraries:** CERNLIB, xml2, log4cxx, mysql, ...
+  - **Tools:** python2, perl, bison/yacc, flex
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>A Few Points about Typical Workflow</h1>
+
+- Offline work is nearly impossible. Any development on STAR software heavily
+assumes work on RACF interactive nodes and access to database servers
+
+  - Installing and running on a user desktop/laptop is not straight forward
+
+- There are no branches in the STAR CVS-based development workflow. The changes
+committed on the MAIN trunk and tested nightly
+
+  - Without branches hard to test your changes in an isolated environment
+
+  - Little chance to review or comment on changes. Peer reviews are done only for
+  completely new code
+
+- There is no common test suite for developers to get a quick feedback on their
+changes
+
+  - Technically, the nightly tests are long integration tests requiring access
+  to massive raw data files
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>A Few Points about Typical Workflow</h1>
+
+- A few annoying CVS features
+  
+  - Commits can be made by a person unrelated to actual work. This makes it
+  hard to track down the actual developer or give credits
+
+  - Keyword substitution in CVS, e.g. <span>$</span>Log<span>$</span> for log
+  messages inserted at the beginning of the file make patching inefficient
+
+  - It is not uncommon for CVS administrators to forcefully change the history
+  in CVS repository; quite often by re-tagging file revisions
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Event Processing Framework</h1>
+
+- STAR event processing framework is heavily based on now deprecated ROOT class
+`TDataSet` from `libTable` module
+
+  - `TDataSet` provides a basic hierarchical structure:<br>
+  A pointer to the parent and a list of daughter `TDataSet` objects
+
+  - `libTable` removed from ROOT since v6.18
+
+- Framework provides event data with `TDataSet` $\rightarrow$ `StMaker`
+
+- Users required to implement virtual methods of the base `StMaker`
+
+  - Dependencies between Makers are not defined by the framework
+  - It is responsibility of the user to make sure input data is available for their Makers
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Git Repository</h1>
+
+<div class="my-bg-gry" style="font-size: 70%; position: absolute; top: 5%; right: 5%;"><a href="github.com/star-bnl/star-cvs">github.com/star-bnl/star-cvs</a></div>
+
+- We use `cvs2git` to convert selected CVS subdirectories to a Git repository
+
+  - Several subdirectories excluded, e.g. `offline/`, `online/`, old ROOT source
+
+    - Size of selected CVS files is 1.7GB
+
+  - We run <a href="https://rtyley.github.io/bfg-repo-cleaner/">BFG repo cleaner</a> to correct imported history
+
+    - E.g. CVS history contains a commit of a `.git` folder &#128512; (Must be removed)
+
+  - Size of bare `.git` with full history is about 500MB and the full checkout is 900MB
+    <pre style="margin-top: 0;"><code data-trim style="font-size: 0.7em;" class="shell">
+    $git clone ...
+    $git checkout master
+    $du --exclude .git -h -d1 star-cvs/ | sort -h
+    ...
+    17M     star-cvs/asps
+    55M     star-cvs/StarVMC
+    100M    star-cvs/pams
+    168M    star-cvs/StarDb
+    526M    star-cvs/StRoot
+    878M    star-cvs/
+    </code></pre>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Motivation for CMake</h1>
+
+- The existing workflow does not easily support installation of STAR libraries
+and auxiliary files into multiple directories from same source
+
+  - E.g. needed for comparison of different compiler options
+
+  - Adaptation of different compilers and/or versions is not easy
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>CMake</h1>
+
+- CMake is an open-source, cross-platform family of tools designed to build, test and package software
+
+- Extensive online documentation
+
+  - Compiler and linker flags can be changed easily and the package installed in isolated paths
+
+- CMake generates a dependency tree which can be examined or used in an IDE
+
+- Better support for cross platform builds
+
+- Where to start with CMake for STAR
+
+  - <a href="https://github.com/star-bnl/star-sw">https://github.com/star-bnl/star-sw</a>
+  - Currently minimum required CMake version is 3.6
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Building with CMake</h1>
+
+- Number of libraries built with `cons` (from official release) and CMake
+
+  <pre class="code"><code data-trim style="font-size: 0.8em;" class="shell">
+  $find .sl74_gcc485/lib/ -name lib*.so | wc -l
+  368
+
+  $find .sl74_gcc485/lib/ -name lib*.so | wc -l
+  232
+  </code></pre>
+
+- The differences are to be understood but selected jobs from the nightly tests can run
+
+  - E.g. `StRoot/StarGenerator` with MC generators is not built
+
+- CMake installs all components in an isolated location (below example is for 32-bit build)
+
+    <pre class="code"><code data-trim style="font-size: 0.8em;" class="shell">
+    19M     star-install/.sl74_gcc485/bin
+    152M    star-install/.sl74_gcc485/lib
+    70M     star-install/.sl74_gcc485/include
+    86M     star-install/StarDb
+    6.6M    star-install/StRoot
+    361M    star-install/
+    </code></pre>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Building with CMake</h1>
+
+- STAR libraries can be built from source in about 20 minutes on a four-core
+  Intel Xeon E5 @ 3.00GHz with magnetic hard drive
+
+  - For example, timing for 64-bit builds with<br>
+    `CMAKE_BUILD_TYPE=RelWithDebInfo`
+    <pre class="code"><code data-trim class="shell">
+    $time make -j4
+    real    20m17.685s
+    </code></pre>
+    `CMAKE_BUILD_TYPE=MinSizeRel`
+    <pre class="code"><code data-trim class="shell">
+    $time make -j4
+    real    16m44.444s
+    </code></pre>
+
+  - 32-bit builds are slightly slower (~5&ndash;10%)
+  - Static library builds are slightly faster (~15%)
+
+</textarea>
+</section>
+
+
+<!--
+<section data-markdown> <textarea data-template> <h1>STAR Software in Docker Container</h1>
+
+- 
+
+</textarea>
+</section>
+-->
+
+
+
+<section data-markdown> <textarea data-template> <h1>Summary</h1>
+
+- Build times of STAR code base can be significantly reduced due to
+multi-threading in `make`
+
+  - Most of STAR software can be built from source in about 20 minutes
+
+  - Comparable nightly builds with single-threaded `cons` take about 2 hours to build
+
+- Slow nightly builds may not be the main problem of STAR software approaching its EOL
+
+  - A practical use of multi-threaded builds may be applied to quick
+  (incremental) builds of a reduced set of targets/libraries to allow for
+  a quick feedback (under 5 minutes) from automatically triggered
+  CI tests
+
+  - Such workflow would assume extensive use of branches which is not clear (to
+  me) if can/should be implemented with CVS
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
