@@ -42,6 +42,8 @@ https://plexoos.gitlab.io/pub-docs/
 
   - [![nbviewer](https://img.shields.io/badge/render-nbviewer-f37626?logo=jupyter) Primary tracks](http://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run14-jetcorr-issue/notebook_primary_tracks.ipynb)
 
+- [ROOT Branch Compression](root-branch-compress), August
+
 - [iTPC Software Integration](star-itpc-software), July
 
 - [Refactoring of Barrel Time-of-Flight (BTOF) Detector Geometry](star-tof-geo), February 28
