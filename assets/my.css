@@ -54,3 +54,8 @@ span.my-border-blu {
   line-height: 0;
   vertical-align: sub;
 }
+
+pre.code {
+  margin-top: -0.1em;
+  margin-bottom: -0.1em;
+}
