@@ -36,7 +36,7 @@ https://plexoos.gitlab.io/pub-docs/
 
 - [Exploration of Optimization Techniques](fitna-robust-fitter)
 
-- [Investigating Issues with Track Reconstruction and Simulation in Run 14 Data](star-run14-jetcorr-issue), September
+- [Investigating Issues with Track Reconstruction and Simulation in Run 14 Data](star-run14-jetcorr-issue), September&mdash;October
 
   - [![nbviewer](https://img.shields.io/badge/render-nbviewer-f37626?logo=jupyter) Global tracks](http://nbviewer.jupyter.org/github/plexoos/pub-docs/blob/master/star-run14-jetcorr-issue/notebook_global_tracks.ipynb)
 
