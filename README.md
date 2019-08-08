@@ -5,6 +5,8 @@ https://plexoos.gitlab.io/pub-docs/
 
 ## 2019
 
+- [Building STAR Software Libraries from Git Repository with CMake](star-build-cmake-git), August
+
 - [EIC Detector Simulation: An Overview of the Software Stack](eic-software-stack), July 17, STAR S&C Meeting
 
   A quick review of the software for the Electron-Ion Collider detector simulation
