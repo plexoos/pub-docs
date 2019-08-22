@@ -632,14 +632,31 @@ and auxiliary files into multiple directories from same source
 </section>
 
 
-<!--
-<section data-markdown> <textarea data-template> <h1>STAR Software in Docker Container</h1>
 
-- 
+<section data-markdown> <textarea data-template> <h1>Building in a Docker Container</h1>
+
+- Building STAR software inside a docker container can be used to speedup test
+builds followed up by test jobs. A possible general scenario:
+
+  <ol>
+    <li> A docker image is created with all STAR software dependencies, i.e. ROOT, CERNLIB, and other libraries
+
+    <li> A container with STAR code is built on top of that image and tests are executed
+
+    <li> On success the newly created image with STAR libraries is tagged "latest" in the docker repository
+
+    <li> Subsequent builds can use the "latest" image as cache resulting in faster incremental build
+  </ol>
+
+- For example, see <a href="https://blog.callr.tech/building-docker-images-with-gitlab-ci-best-practices/">Best practices for building docker images with GitLab CI</a>
+
+- A couple measurements with incremental builds:
+
+  - When `touch` all files in `StRoot/StEvent` incremental build takes ~6m
+  - When `touch` all files  in `StRoot/Sti*` incremental build takes ~1m 30s
 
 </textarea>
 </section>
--->
 
 
 
