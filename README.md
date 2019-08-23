@@ -15,6 +15,10 @@ https://plexoos.gitlab.io/pub-docs/
 
 - [STAR Software Library: Switching from 32-bit to 64-bit Builds](star-32-vs-64-build), April
 
+  - [![nbviewer](https://img.shields.io/badge/render-nbviewer-f37626?logo=jupyter) Comparison of Event Reconstruction Results](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-32-vs-64-build/comparison.ipynb)
+
+  - [![nbviewer](https://img.shields.io/badge/render-nbviewer-f37626?logo=jupyter) Memory Usage Analysis](https://nbviewer.ipython.org/github/plexoos/pub-docs/blob/master/star-32-vs-64-build/memory_usage.ipynb)
+
   - [Memory Usage by Reconstruction Chain](star-32-vs-64-build/memory.html)
 
   - [![Binder](https://mybinder.org/badge_logo.svg) Identifying Small Changes in Algorithm Output](https://mybinder.org/v2/gh/plexoos/pub-docs/master?filepath=star-32-vs-64-build%2Fstat_dist.ipynb)
