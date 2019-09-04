@@ -1,0 +1,794 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>Summary of Select Activities</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Summary of Select Activities</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+<h5 class="title">
+Updated <script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+</h5>
+
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Inroduction</h1>
+
+- **2014: Member of the STAR group**
+  - Event reconstruction: Tracking, vertexing, geometry
+  - Software peer reviews, general support
+
+- **2010: Member of the RHIC Spin group**
+  - Online support and operations for RHIC CNI polarimeters
+  - Offline analysis for regular measurements of proton beam polarization
+
+- **2006: D0 experiment at Fermilab**
+  - Tracking detector expert support: Hardware, online controls, offline calibrations
+  - Detector performance monitoring
+  - Integration with event reconstruction software
+
+- **2005: PhD on top quark properties at Femilab's CDF experiment**
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Overview of STAR Software</h1>
+
+- Similar to other big experiments STAR software can be split into two large
+parts&mdash;**offline** and **online**
+
+  - **Offline** code is responsible for event reconstruction, geometry, simulation, calibration, database, ...
+
+  - **Online** code is responsible for reading out detectors, creating raw data DAQ files, detector monitoring, ...
+
+- My focus is on the **offline** part
+
+- STAR code is located in a CVS repository. Total size is 26GB
+  <pre class="code"><code data-trim style="font-size: 0.7em;" class="shell">
+  $echo $CVSROOT
+  /afs/rhic.bnl.gov/star/packages/repository
+  </code></pre>
+
+  - Includes unpatched MC generators, patched Geant3, paper drafts, and user analysis code with binary data (23GB &#9757;)
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Fun Facts and Statistics</h1>
+
+<div class="my-bg-gry" style="font-size: 70%; position: absolute; top: 10%; right: 5%;">Based on Git repo as of August 2019</div>
+
+- Overall **5M lines of code** in the most popular languages<br>
+  <pre><code data-trim style="font-size: 0.7em;" class="shell">
+  $tokei --sort=code --type="FORTRAN Legacy,C,C Header,C++,C++ Header,Python,Perl" star-cvs/
+  </code></pre>
+
+<pre class="hcenter" style="font-size: 0.7em; margin-left: 2em; border: 0;">
+--------------------------------------------<b>---------</b>
+ Language            Files        Lines     <b>    Code </b>
+--------------------------------------------<b>---------</b>
+ FORTRAN Legacy       3673      2400728     <b> 1944928 </b>
+ C Header             3657      2165256     <b> 1869860 </b>
+ C++                  3630      1357126     <b>  895478 </b>
+ C                   10405       475461     <b>  329001 </b>
+ Perl                  340       120573     <b>   81639 </b>
+ C++ Header            974        76729     <b>   40200 </b>
+ Python                176        38364     <b>   29307 </b>
+--------------------------------------------<b>---------</b>
+ Total               22855      6634237     <b> 5190413 </b>
+--------------------------------------------<b>---------</b>
+</pre>
+
+- About **3.7M lines of code** when exclude multiple versions of MC generators and Geant3<br>
+  <pre><code data-trim style="font-size: 0.7em;" class="shell">
+  $tokei --exclude "StRoot/StarGenerator" --exclude "*geant3*" ...
+  </code></pre>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Fun Facts and Statistics</h1>
+
+<div class="my-bg-gry" style="font-size: 70%; position: absolute; top: 10%; right: 5%;">Based on Git repo as of August 2019</div>
+
+<div style="width: 50%; float: left; height: 85%;">
+<!--{{{-->
+<pre class="hcenter" style="font-size: 0.5em; max-height: 100%; overflow-x: hidden; border: 1;">
+<b>             commits     files/c    lines++    lines--</b>
+    fisyak      4844         8.2    5711940    1614370
+   didenko      4595         3.1     475511     128456
+<span class="my-bg-red">     perev      3842         3.2    2733529    1433259</span>
+   jeromel      3424         2.6    2098468      60738
+      fine      2880         2.6     617199     106234
+     jwebb      1457         4.2    5481898      41585
+<span class="my-bg-red">    genevb      1210         2.3     283911      37494</span>
+     kathy       988         2.3      63332      33938
+   ullrich       945         2.9     190422      32948
+<span class="my-bg-red">  smirnovd       812         2.5      42806      26669</span>
+  balewski       745         3.4     164257      31887
+     tonko       710         2.2      66361      16473
+<span class="my-bg-red">  potekhin       578         6.6    1607303       6615</span>
+       jcs       558         1.9     251117      16502
+       tai       550         7.0     303363      59626
+    caines       512         2.3      72928      18276
+    nevski       493         2.3     222354     120066
+    lasiuk       488         2.1      65275      18604
+       jml       477         3.0     104915      16943
+    pibero       472         2.7      52648      37253
+   mmiller       459         7.5     341599      36296
+      akio       448         4.6     347134      18082
+   pruneau       446         4.9      74694      58822
+      tull       440         4.9     162712      26052
+  calderon       431         3.0      56566      14644
+  sakrejda       373         1.6      31555       7118
+    suaide       339         3.1     109206      27500
+      ward       317         2.4      37787       6898
+   rfatemi       299         1.4     477356       6937
+      posk       291         3.6      59492      27624
+      laue       286         3.6      39720      10031
+  kocolosk       270         3.1     149353      20530
+    porter       255         8.1      71702      17809
+<span class="my-bg-red">    dmitry       244         1.9      10679       1053</span>
+  andrewar       243         1.3      17096       2498
+   avossen       230         2.5      43680       5147
+    geurts       221         1.8      28456       6281
+      oldi       219         2.5      32010      11972
+      zhux       218         1.2       7358       1296
+     yepes       204         5.1      76010      16497
+   prindle       198         6.0     124399      35711
+     dongx       180         1.8      25669       4280
+       bum       180         3.1      11013       6635
+      hack       179         6.3      73366       8660
+<span class="my-bg-red">    wenaus       177         2.5      13133       2404</span>
+...
+<span class="my-bg-red">  panitkin         1         2.0        151          0</span>
+...
+</pre>
+<!--}}}-->
+</div>
+<div style="width: 50%; float: right;">
+
+- Legend
+
+  **`commits`** : Total number of commits<br>
+  **`files/c`** : Files changed per commit<br>
+  **`lines++`** : Lines added<br>
+  **`lines--`** : Lines removed<br>
+  <span class="my-bg-red">name</span> : NPPS group members
+
+- First commit
+
+ `Author: starlib  &lt;&gt;  1993-02-09`
+
+- 44,300 total commits by 250 authors
+
+- 4.6 commits per day
+
+- No activity during 35% of the time
+
+<div class="hcenter">
+<span class="my-bg-gry" style="font-size: 70%;">Statistics by <a href="http://gitstats.sourceforge.net/">GitStats</a></span>
+</div>
+
+</div>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Git Repository</h1>
+
+<div class="my-bg-gry" style="font-size: 70%; position: absolute; top: 5%; right: 5%;"><a href="github.com/star-bnl/star-cvs">github.com/star-bnl/star-cvs</a></div>
+
+- After joining STAR realised that developing with CVS is not very efficient
+
+  - There are no branches in the STAR CVS-based development workflow. The
+  changes committed on the MAIN trunk and tested nightly
+
+  - Without branches hard to test your changes in an isolated environment
+
+  - Little chance to review or comment on changes. Peer reviews are done only for
+  completely new code
+
+- Decided to convert to a Git repository
+
+  - Unfortunately, this activity is not widely accepted or supported in STAR
+
+  - As a result the Git repository is read only and synced with CVS by a cron job a few times a day
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Git Repository</h1>
+
+<div class="my-bg-gry" style="font-size: 70%; position: absolute; top: 8%; right: 5%;"><a href="github.com/star-bnl/star-cvs">github.com/star-bnl/star-cvs</a></div>
+
+- The import script is based on `cvs2git` converting selected CVS subdirectories to a Git repository
+
+  - Several CVS subdirectories excluded resulting in the size of selected files of 1.7GB
+
+  - We run <a href="https://rtyley.github.io/bfg-repo-cleaner/">BFG repo cleaner</a> to correct imported history
+
+    - E.g. CVS history contains a commit of a `.git` folder &#128512; (Must be removed)
+
+- Size of bare `.git` with full history is about 500MB and the full checkout is 900MB
+    <pre style="margin-top: 0;"><code data-trim style="font-size: 0.7em;" class="shell">
+    $git clone ...
+    $git checkout master
+    $du --exclude .git -h -d1 star-cvs/ | sort -h
+    ...
+    878M    star-cvs/
+    </code></pre>
+
+  - Compare to ROOT repository sizes of 700MB and 1.7GB respectively
+
+  - The code of external packages (e.g. MC generators) still can be removed from the DVCS making the STAR software more compact and attractive
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Building STAR Libraries</h1>
+
+- Default STAR toolchain is based on Scientific Linux 7.4 (i.e. Red Hat 7) with upgraded gcc 4.8.5 with C++11 support
+
+- Incomplete list of major external dependencies includes the following
+
+  - **Packages:** ROOT v5.34/30 (libraries, rootcint), MC generators, Geant3
+  - **Libraries:** CERNLIB, xml2, log4cxx, mysql
+  - **Tools:** python2, perl, bison/yacc, flex
+
+- `cons` is used to build the STAR libraries
+
+  - Often claimed advantage of `cons` and CVS is the ability to checkout and
+  compile individual files/subdirectories
+  
+  - In my opinion, this breaks the isolation of your local builds as you don't
+  have control over the remote one
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Motivation for CMake</h1>
+
+- `cons` is the default build system for STAR
+
+  - Implemented in Perl. `cons` <a href="https://www.gnu.org/software/cons/">home page</a> last updated in 2001<br>
+    "cons has been decommissioned [...] scons has effectively replaced it"
+
+- Building with `cons` does not easily support installation of STAR libraries
+and auxiliary files into multiple directories from same source
+
+  - E.g. this is useful for comparison of different compiler options
+
+  - No explicit "installation" step, libraries installed in checked out
+  source directory &#128530;
+
+- CMake has extensive online documentation, regular releases, reasonable
+defaults
+
+  - Easy switch between different compilers, their versions, or generators<br>
+  (e.g. make vs ninja)
+
+  - Generation of dependency trees which can be examined or used in an IDE
+
+  - Close to becoming a "standard" for C++ projects
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Building STAR Libraries with CMake</h1>
+
+- Implementation of CMake builds is quite mature and close to a first public release
+
+  - Minimum required version is 3.6
+
+  - Development takes place at https://github.com/star-bnl/star-sw
+
+- There are known differences in the final libraries produced with `cons` and
+CMake but most test jobs can run without a problem
+
+- CMake installs all components in an isolated location (below example is for 32-bit build)
+
+    <pre class="code"><code data-trim style="font-size: 0.8em;" class="shell">
+    19M     star-install/.sl74_gcc485/bin
+    152M    star-install/.sl74_gcc485/lib
+    70M     star-install/.sl74_gcc485/include
+    86M     star-install/StarDb
+    6.6M    star-install/StRoot
+    361M    star-install/
+    </code></pre>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Building STAR Libraries with CMake</h1>
+
+- STAR libraries can be built from source in about 20 minutes on a four-core
+  Intel Xeon E5 @ 3.00GHz with magnetic hard drive
+
+  - For example, timing for 64-bit builds with<br>
+    `CMAKE_BUILD_TYPE=RelWithDebInfo`
+    <pre class="code"><code data-trim class="shell">
+    $time make -j4
+    real    20m17.685s
+    </code></pre>
+    `CMAKE_BUILD_TYPE=MinSizeRel`
+    <pre class="code"><code data-trim class="shell">
+    $time make -j4
+    real    16m44.444s
+    </code></pre>
+
+  - 32-bit builds are slightly slower (~5&ndash;10%)
+  - Static library builds are slightly faster (~15%)
+
+</textarea>
+</section>
+
+
+
+<section data-markdown style="font-size: 0.9em;"> <textarea data-template> <h1>Building in a Docker Container</h1>
+
+- Building STAR software inside a docker container can be used for quick test builds followed by test jobs. A possible general scenario:
+
+  <ol>
+    <li> A docker image is created with all STAR software dependencies, i.e. ROOT, CERNLIB, and other libraries.
+         <strong>Based on Ubuntu 16 the image size is 2GB</strong>
+
+    <li> A container with STAR code is built on top of that image and tests are executed.<br>
+         <strong>Image size increases to 2.3GB</strong>
+
+    <li> On success the newly created image with STAR libraries is tagged "latest" in the docker repository
+
+    <li> Subsequent builds can use the "latest" image as cache resulting in faster incremental build
+  </ol>
+
+- For example, see <a href="https://blog.callr.tech/building-docker-images-with-gitlab-ci-best-practices/">Best practices for building docker images with GitLab CI</a>
+
+- Dockerfiles are available in https://github.com/star-bnl/star-sw/docker
+
+- A couple measurements with incremental builds:
+
+  - When `touch` all files in `StRoot/StEvent` incremental build takes ~6m
+  - When `touch` all files in `StRoot/Sti*` incremental build takes ~1m 30s
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Additional Thoughts</h1>
+
+- CMake can significantly reduce build times of STAR code base by utilizing multi-threading in `make`
+
+  - Most of STAR software can be built from source in about 20 minutes
+
+  - Comparable nightly builds with single-threaded `cons` take about 2 hours to build
+
+- Slow nightly builds may not be the main problem of STAR software approaching its EOL
+
+  - A practical use of multi-threaded builds may be applied to fast
+  (incremental) builds to allow for a quick feedback (under 5 minutes) from
+  automatically triggered CI tests
+
+  - Such workflow would assume extensive use of branches which is not clear (to
+  me) if can/should be implemented with CVS
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Reconstruction Code Optimization</h1>
+
+- Using callgrind identified a couple of routines where tracking spends
+a significant fraction of time
+
+- Not surprisingly the functions deal with matrix calculations. E.g.
+
+  - Error propagation. A matrix product $B = ASA^T$ where $A$ and $S$ are $6 \times 6$ matrices, $S$ is a symmetric covariance matrix
+
+  - Weighted average and its covariance matrix of two multi-dimensional vectors
+
+  $$
+   M = \bigl( W_1 + W_2 \bigr)^{-1} \bigl(W_1 X_1 + W_2 X_2 \bigr), \quad
+   W = \bigl( W_1 + W_2 \bigr)^{-1}
+  $$
+
+  - Benchmarked various implementations including vectorized `Eigen`, `ROOT::Math::SMatrix`, `TCL::trasat`
+
+  - Tested different precisions and packing of input values, compiler flags -O2, -O3, -m32, -m64, sse, avx, auto vectorization
+
+</textarea>
+</section>
+
+
+
+<section> <h1>Alternative Implementations: $ASA^T$</h1>
+
+<iframe class=hcenter width="90%" height="80%" style="border: 1px solid #ccc;" scrolling="auto" src="plot_results_errPropag6.html"></iframe>
+
+</section>
+
+
+
+<section> <h1>Alternative Implementations: Weighted Average</h1>
+
+<iframe class=hcenter width="90%" height="80%" style="border: 1px solid #ccc;" scrolling="auto" src="plot_results_joinTwo.html"></iframe>
+
+</section>
+
+
+
+<section> <h1>Comparison of Options: Weighted Average</h1>
+
+<iframe class=hcenter width="90%" height="50%" style="border: 1px solid #ccc;" scrolling="auto" src="plot_results_joinTwo_NxN_5.html"></iframe>
+
+<pre class=hcenter style="width: 90%; max-height: 33%; overflow: auto;">
+<code data-trim style="font-size: 0.7em; text-align: left;">
+    set1  = "-O2 -m32 -msse -mno-avx -ftree-vectorize"
+    set2  = "-O2 -m32 -msse -mno-avx -fno-tree-vectorize"
+    set3  = "-O2 -m32 -msse -mno-avx -ftree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set4  = "-O2 -m32 -msse -mno-avx -fno-tree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set5  = "-O3 -m32 -msse -mno-avx -ftree-vectorize"
+    set6  = "-O3 -m32 -msse -mno-avx -fno-tree-vectorize"
+    set7  = "-O3 -m32 -msse -mno-avx -ftree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set8  = "-O3 -m32 -msse -mno-avx -fno-tree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set9  = "-O2 -m64 -msse -mno-avx -ftree-vectorize"
+    set10 = "-O2 -m64 -msse -mno-avx -fno-tree-vectorize"
+    set11 = "-O2 -m64 -msse -mno-avx -ftree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set12 = "-O2 -m64 -msse -mno-avx -fno-tree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set13 = "-O3 -m64 -msse -mno-avx -ftree-vectorize"
+    set14 = "-O3 -m64 -msse -mno-avx -fno-tree-vectorize"
+    set15 = "-O3 -m64 -msse -mno-avx -ftree-vectorize -D EIGEN_DONT_VECTORIZE"
+    set16 = "-O3 -m64 -msse -mno-avx -fno-tree-vectorize -D EIGEN_DONT_VECTORIZE"
+</code>
+</pre>
+
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>A Take Away from Optimization Studies</h1>
+
+- The test are standalone, i.e. work with extracted individual routines
+
+  - Made sure the input is realistic, in fact, sampled from real data
+
+- Tests with Eigen implementation of matrix operations give up to 40%
+  
+  - This translates into at least 10% speed-up of the full reconstruction jobs  
+
+- Significant gain in speed going from 32-bit to 64-bit compilation with at least -O2 optimization flags
+
+  - STAR has not switched to 64-bit builds yet
+
+  - A 64-bit STAR libraries are build centrally with `cons` but in non-optimized mode
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Switching from 32-bit to 64-bit Builds</h1>
+
+- An extensive study has been performed to evaluate divergences in
+reconstruction chain output under assumption of only "technical" modifications
+
+  - A change that does not affect the logic of the algorithm. E.g. change in
+  precision of some internal calculations or compilation flags affecting certain
+  CPU instructions
+
+- In statistics and information theory, a **statistical distance** can quantify
+ the difference between two samples
+
+ - We considered the **Kolmogorov-Smirnov** (KS) and **Wasserstein** metrics (aka the earth mover's distance (EMD))
+ $$ D = \sup_x |F(x) - G(x)|, \quad W = \int |F(x) - G(x)| dx $$
+
+- More details available in the notebook [![Binder](https://mybinder.org/badge_logo.svg) Identifying Small Changes in Algorithm Output](https://mybinder.org/v2/gh/plexoos/pub-docs/master?filepath=star-32-vs-64-build%2Fstat_dist.ipynb)
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Comparison of Cumulative PDFs of Two Samples</h1>
+
+<img class="hcenter" src="graphics/stat_dist_cumpdf_example.png" width="70%" />
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Additional Checks and Use Cases</h1>
+
+- In addition to KS and EMD metrics we directly count the maximum number of consecutive values from same data set
+
+- All the KS, EMD, and direct count give similar correlated results
+
+- An additional effort can be made to formalize the requirements and limitations of the method
+
+  - Improve documentation
+
+  - Use in quick tests for refactoring and similar changes
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Switching from 32-bit to 64-bit Builds</h1>
+
+- Some differences were confirmed by analyzing the assembly code
+
+  - One example: https://gcc.godbolt.org/z/Diy0T8
+
+  - Such rounding differences include cases where result of a calculation is cast to a single precision and then passed to other routines
+
+- As a result all the differences between 32 and 64-bit results are well understood
+
+- In fact, we confirmed that identical results can be produced
+
+  - By fixing the above conversions in the code
+
+  - By forcing SSE instruction set in 32-bit builds
+
+  - Vice versa, switching to FPU in 64-bit is not feasible as it also requires a rebuild of
+  the standard libraries
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Switching from 32-bit to 64-bit Builds</h1>
+
+<img class="hcenter" src="graphics/pt_0.png" width="80%" />
+<img class="hcenter" src="graphics/pt_1.png" width="80%" />
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Switching from 32-bit to 64-bit Builds</h1>
+
+<img class="hcenter" src="graphics/eta_0.png" width="80%" />
+<img class="hcenter" src="graphics/eta_1.png" width="80%" />
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Upgrade of STAR TPC Detector</h1>
+
+<div style="width: 50%; float:left">
+
+- The Time Projection Chamber (TPC) is the primary tracking device of the STAR detector
+
+  - Located inside a large solenoidal magnet that operates at 0.5 T
+  - The TPC is 4 m long and 4 m in diameter
+  - The paths of primary ionizing particles passing through the gas volume are
+  reconstructed from the released secondary electrons which
+  drift to the readout end caps at the ends of the chamber
+  - 13 inner and 32 outer pad rows
+
+</div>
+
+<div style="width: 50%; float:right">
+
+- Below image represent TPC geometry as seen by the track reconstruction
+software
+
+<img class="hcenter" src="graphics/tpc_2017_ds.png" width="100%" />
+
+<p>
+<div style="font-size: 0.7em;">
+<b>Note</b>: Tracking layers extend beyond the nominal dimension from -200 to +200 cm to accommodate prompt hits
+</div>
+
+- TPC has undergone major upgrades in 2017 and 2018
+
+</div>
+</textarea>
+</section>
+
+
+
+<section data-markdown style="font-size: 0.9em;"> <textarea data-template> <h1>Software Updates for TPC Upgrade</h1>
+
+- In 2018 the number of tracking layers in TPC was tripled in a single inner sector
+
+- In 2019 all inner sectors of TPC were upgraded
+
+<div class="hcenter">
+<img src="graphics/eve_3d.png" width="48%" />
+<img src="graphics/tpc_2019_ds.png" width="48%" />
+</div>
+
+- Full-length layers shown in grey, half-length layers shown in magenta and purple
+
+- Increased number of tracking layers required significant changes in
+reconstruction software 
+
+- We made sure the past results are fully reproducible after introduction of
+modifications
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Reconstruction of Tracks in 2018 Instrumental Run</h1>
+
+<div class="hcenter">
+<img src="graphics/eve_rphi_hits.png" width="48%" />
+<img src="graphics/eve_rphi_tracks.png" width="48%" />
+<img src="graphics/eve_rhoz_hits.png" width="48%" />
+<img src="graphics/eve_rhoz_tracks.png" width="48%" />
+</div>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown style="font-size: 0.8em;"> <textarea data-template> <h1>STAR <code>picoDST</code> Data Format</h1>
+
+- In STAR `muDST` (aka `$\mu$DST`, micro DST) is the primary output format used
+by all physics analyses
+
+  - The format is based on objects of same type packed in ROOT's `TCloneArray`s
+  attached to a common `TTree` as `TBranches`
+
+  - Cross references between entities within event are implemented with raw
+  indices
+
+- With increasing luminosity the need for a more compact format for user
+analyses become apparent. The `picoDST` was proposed
+
+   - In the initial version some observables were packed/unpacked in 16-bit
+   integer with preset ranges and scale factors
+
+   - There was lots of confusion on how `Double32_t` and `Float16_t` work so, [a
+   study with various packing
+   options](https://plexoos.github.io/my-tests/root-branch-compress/) was
+   carried out to verify the performance and confirm the usage benefits
+
+   - Later a non-S&C maintainer was assigned. Missed opportunities due to no
+   interest (or knowledge?)
+   
+     - Step away from `muDST` design by providing a more generic interface to
+     add, activate/deactivate branches (i.e. by hiding raw pointers, utilizing
+     template functions, std::tuples of branches)
+   
+     - Support backward compatible schema evolution (IMO, one of the powerful
+     but underused features of IO in ROOT)
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>uproot</h1>
+
+- Using Python visualization and data analysis libraries one quickly realizes
+the need for a Python reader for files in ROOT format
+
+  - Among the available options `uproot` stands out because it does not depend
+  on C++ ROOT, unlike `PyROOT` and `root_numpy`
+
+- `uproot` is well supported and has become one of the most widely used Python
+packages made for particle physics with users from LHC experiments, theory,
+neutrino experiments, XENON-nT, MAGIC, and IceCube
+
+- To be used with STAR files the package was missing the functionality to read
+`TTree` branches with truncated floating point numbers such as `Float16_t` and
+`Double32_t`
+
+  - This functionality has been implemented along with the corresponding unit
+  tests so, now STAR users can read files in both `muDST` and `picoDST` formats
+  with `uproot`
+
+  - https://github.com/scikit-hep/uproot
+
+</textarea>
+</section>
+
+
+<!--
+<section data-markdown> <textarea data-template> <h1>cnipol: Measuring Polarization of Proton Beams in RHIC</h1>
+
+- Precise knowledge of polarization $P \pm \Delta P$ is essential for all spin analyses at RHIC
+
+- Developed a complete 
+
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>cnipol: Measuring Polarization of Proton Beams in RHIC</h1>
+
+<img src="graphics/profile_m.gif" height="250">
+<img src="graphics/intens_m.gif" height="250">
+<img src="graphics/polar_m.gif" height="250">
+
+</textarea>
+</section>
+-->
+
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
