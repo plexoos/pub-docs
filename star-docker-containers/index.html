@@ -1,0 +1,318 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>Containerization of STAR Software</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+<h1 class="title">Containerization of STAR Software</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+
+<h5 class="title">
+January 17, 2020
+<!--
+Updated <script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+-->
+</h5>
+
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>A Quick Recap on STAR Software</h1>
+
+- STAR code is located in a CVS repository. Useful code is a small fraction of total 26GB
+  <pre class="code"><code data-trim style="font-size: 0.7em;" class="shell">
+  $echo $CVSROOT
+  /afs/rhic.bnl.gov/star/packages/repository
+  </code></pre>
+
+- Notable external dependencies include: ROOT 5.34.38, CERNLIB 2006 (2005?), MySQL
+
+- Build with `cons`, a perl-based legacy build system
+
+- Only 32-bit libraries used in production. Installed on AFS 
+
+- Users expected to use the framework by running a common steering ROOT macro `bfc.C`, e.g.:
+
+      root4star -b 'bfc.C(n_events, "options, ...", "input file")'
+
+  - `root4star` is basically the usual `root` executable with statically linked simulation
+  support based on Geant3 and MySQL client library
+
+  - "options, ..." control which libraries to load and which "Makers" to call
+
+</textarea>
+</section>
+
+
+
+<section data-markdown style="font-size: 0.98em;"> <textarea data-template> <h1>Alternative Workflow Available</h1>
+
+- A read-only Git repository `star-cvs` is available. It mirrors the CVS repository on a daily basis
+
+  <a href="github.com/star-bnl/star-cvs">github.com/star-bnl/star-cvs</a>
+
+- A separate repository `star-sw` contains support for CMake-based builds and
+container based development (and tests)
+
+  <a href="github.com/star-bnl/star-sw">github.com/star-bnl/star-sw</a>
+
+- Thanks to Git and CMake this alternative workflow solves a number of problems with AFS releases
+
+  - Much faster builds of the entire code base (20 mins vs 2 hours)
+  - Transparent out-of-source installation according to common Linux practices
+  - RACF environment is not required; No dependency on remote AFS volumes; Great potential for
+  further improvements in portability offered by CMake 
+
+- In addition, recent versions of `star-sw` (e.g. v0.4.1) focus on containerization support
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Motivation for Containers</h1>
+
+- We would like to switch to 64-bit builds in order to fully benefit from SSE/AVX instruction sets
+
+  - The problem is that jobs using 64-bit libraries produced with `cons` in RACF environment run
+  slower than with 32-bit libraries. Not expected with enabled optimization!
+
+  - CMake-based builds do not exhibit such problem (in supposedly the same RACF environment but hard
+  to guarantee...)
+
+- The environment/dependencies must be fixed and understood, in order to compare the performance of
+32- vs 64-bit libraries and CMake vs `cons` builds under various optimization conditions
+
+  - Containers seem to be the right tool for that
+
+  - The main idea is to build the environment from scratch
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Docker Containers</h1>
+
+- Dockerfiles have been developed (`star-sw/docker`) to build following images
+
+  <ol>
+	 <li> <b>star-base</b><br>
+          The base image with minimal set of packages from the official repository + ROOT v5.34.38
+          + CERNLIB 2006 built from source
+
+     <li> <b>star-sw:build</b><br>
+          Full image containing the CMake build and install directories (ccache, appropriate for development)
+
+     <li> <b>star-sw</b><br>
+          Reduced size image with only STAR libraries installed (appropriate for running fixed
+          releases)
+
+     <li> <b>star-sw:cons</b><br>
+          Full image containing `cons` build
+  </ol>
+
+- Dockerfiles are parameterized with all the variables of interest discussed above
+
+- Build images available for download from https://hub.docker.com/u/starbnl
+
+</textarea>
+</section>
+
+
+
+<section data-markdown style="font-size: 0.70em;"> <textarea data-template> <h1>Building Images</h1>
+
+- To simplify production of images one can use the following script with reasonable default values
+
+      $ build_star-sw.sh -h
+      Usage: build_star-sw.sh [<star-cvs_ref>] [OPTIONS]
+      Options:
+       <star-cvs_ref> [=master]               Any commit reference in star-cvs repo (branch, tag, or hash)
+       -t Debug|Release|RelWithDebInfo [=Release]
+                                              A valid value for CMAKE_BUILD_TYPE
+       -m                                     Force 32-bit builds on a 64-bit platform
+       -b <star_base_os> [=centos7]           For available bases see docker files in star-sw/docker
+       -p <path_to_star-sw> [=/home/smirnovd/sb/star-sw]
+                                              Defaults to this script location but can be set to anything
+       -s <star-sw_ref> [=master]             Any commit reference in star-sw repo (branch, tag, or hash)
+       -d                                     Print commands but do not execute them
+       -h                                     Print this help message
+
+</textarea>
+</section>
+
+
+
+<section data-markdown style="font-size: 0.90em;"> <textarea data-template> <h1>Build Matrix</h1>
+
+- Base OS: **CentOS 7.4.1708** (gcc 4.8.5), Ubuntu 16.04    (gcc 5.4.0), Ubuntu 18.04    (gcc 7.4.0)
+
+- Cross compilation: **-m64**, -m32
+
+- Optimization and debug: **Release (-O2)**, Debug (-O0 -g), RelWithDebInfo (-O2 -g)
+  
+- Examples of proposed image tagging schema with default and specific options
+
+      $ build_star-sw.sh
+      starbnl/star-base:centos7
+      starbnl/star-sw:latest
+
+      $ build_star-sw.sh SL19e -t RelWithDebInfo -m -b centos7 -s v0.4.1
+      starbnl/star-base:centos7-m32-v0.4.1
+      starbnl/star-sw:SL19e-RelWithDebInfo-m32-v0.4.1-build
+      starbnl/star-sw:SL19d_2-Debug-m32-cons
+
+- Images can be uploaded to Docker Hub, e.g. under the `starbnl` namespace https://hub.docker.com/u/starbnl
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Using the Images as User (wip)</h1>
+
+<ol>
+   <li> Install Docker (Linux, Mac OS, Windows)
+
+   <li> Pull an image, e.g.</li>
+
+    docker pull starbnl/star-sw
+    docker pull starbnl/star-sw:SL19d_2
+    docker pull starbnl/star-sw:SL16a-m32-cons
+
+   <li> Run single command</li>
+
+    docker run \
+      -v /path/to/input/data \
+      -v /path/to/output/data \
+      -it starbnl/star-sw:SL20a \
+      root4star -b 'bfc.C(10, "options", "/path/to/input/data/file")'
+
+</ol>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Using the Images as Developer (wip)</h1>
+
+<ol>
+   <li> same
+
+   <li> same
+
+   <li> Pull and run an image with test data</li>
+
+    docker pull starbnl/star-test-data
+    docker run --name star-test-data --volume /star-test-data starbnl/star-test-data
+
+   <li> Build and test local modifications with single command
+
+    docker run -v /path/to/local/star-cvs:/tmp/star-cvs \
+               -v /path/to/local/star-sw:/tmp/star-sw \
+               -v /path/to/star/test/data:/tmp/data \
+               star-sw:latest make -j4
+</ol>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Summary of Results</h1>
+
+- The following result observed for a test job executed in the containers with well understood
+environment:
+
+  - Libraries built with `cons` and CMake produce **identical numerical results** for both 32-bit and
+  64-bit **as expected**
+
+  - The relative timing of the optimized and non-optimized 32-bit and 64-bit jobs **as expected**,
+  i.e. roughly
+
+    $ T(\text{-m64 -O2}) &lt; T(\text{-m32 -O2}), \quad T(\text{-m64 -O0}) \lesssim T(\text{-m32 -O0}) $
+    $ T(\text{-m64 -O2}) \sim \frac12 T(\text{-m64 -O0}) $
+
+  - Numerical results for 32-bit vs 64-bit (CMake) are close but not identical. This is also
+  expected from our previous studies we know how to make 64-bit calculations produce the same
+  results. Turn off SSE and avoid single precision conversions in the code
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Final Remarks</h1>
+
+- Overall great experience with Docker containers
+
+  - This work paves the way to an initial container-based CI for STAR
+
+  - First automatic tests on travis-ci triggered by changes in `star-cvs` are expected in next release of `star-sw`
+
+- All suggests that something is broken in the 64-bit RACF environment...
+
+- With Docker can easily run a STAR reconstruction job on a MacBook!
+
+  - Great speed (despite the overhead of a real VM used by Docker on Mac)
+  - Identical behaviour and numerical results comparing to Linux without any additional effort
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
