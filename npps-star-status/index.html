@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>NPPS for STAR: Status and Plans</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section data-markdown style="font-size: 0.88em;"> <textarea data-template> <h1>NPPS for STAR: Current Status and Plans</h1>
+
+<!--
+Essentially two major tasks can be designated in the offline software corner
+-->
+
+- **Tracking.** Integration and comparison of two new tracking algorithms in the
+forward region where `Sti` cannot perform **(Victor, Dmitri)**
+
+  - `Stv` works with TGeo and non-uniform magnetic field
+
+  - `Stg` is based on a combination of
+  [KiTrack](https://github.com/iLCSoft/KiTrack) (a CA finder by iLC)
+  + [GenFit](https://github.com/GenFit/GenFit).  The choice is dictated by the
+  forward upgrade group and available manpower
+
+  - No fundamental problems with moving forward with the integration identified
+  at this time but people involved balance time between this and other work. (We
+  are collaborating in [star-sw](https://github.com/star-bnl/star-sw) and using
+  containers featured previously for testing. A big thank you to Daniel
+  Brandenburg for valuable feedback!)
+
+  - **The plan** is to save `Stg`'s tracks into the STAR microDST format (ROOT
+  trees) and produce comparison plots based on existing STAR QA, i.e.
+  reconstruction efficiency, statistical difference between simulated and
+  reco'ed tracks
+
+  - **The plan** is to make sure we do an apple-to-apple comparison by utilizing
+  containers. This may require us to learn/use singularity to run on RACF
+
+  - Currently there seems to be little connection to the next task...
+
+</textarea>
+</section>
+
+
+
+<section data-markdown style="font-size: 0.88em;"> <textarea data-template> <h1>NPPS for STAR: Current Status and Plans</h1>
+
+- **Performance and regression tests** of STAR software builds (in general)
+  **(Amol, Dmitri)**
+
+  - [BirdView](https://birdview.sdcc.bnl.gov/) is a tool to monitor changes in
+  basic test jobs parameters (e.g.  memory usage, CPU time, some per event
+  quantities such as the average number of tracks). Currently works by parsing
+  jobs log files. Now available on github: https://github.com/BNLNPPS/BirdView
+
+  - The saga with the switch to 64-bit releases is ongoing
+
+    - As reported last time there appears to be no fundamental problem with
+    64-bit builds when tested in a CentOS7/SL7 container. Jobs timing is as
+    expected, no difference between the CMake and cons builds
+
+    - This is not the case when running in the centralized setup directly on
+    RACF
+
+  - **The plan** is to confirm the above on a larger scale by running all of the
+  existing tests and display the results in BirdView
+
+    - Option 1 (easier). Someone with access to the central account builds STAR
+    soft by following the container recipe and runs test jobs
+
+    - Option 2 (slower). Dmitri provides log files by running the test jobs but
+    the procedure needs to be adopted for a regular user
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
