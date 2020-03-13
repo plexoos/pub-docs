@@ -1,0 +1,257 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>TPC Response Simulator</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section>
+
+    <h1 class="title">TPC<br>Response Simulator</h1>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+<h5 class="title">
+Updated <script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+</h5>
+
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Introduction</h1>
+
+- The **Time Projection Chamber** (TPC) is the primary tracking detector of
+choice for several current (ALICE, STAR) and future/proposed collider
+experiments (sPHENIX, ePHENIX/BeAST, JLEIC)
+
+- The purpose of the TPC Response Simulator (TPC RS) is to model the real
+detector (digitized) output signal as close as possible with the ability to
+adjust to time-dependent detector performance
+
+- The implementation of TPC RS for the STAR experiment can serve as a basis for
+a more generic library
+
+  - The STAR implementation is based on a few published works<br>
+    [Reference 1](Induced_charge_distributions_in_proportional_detectors,_E._Mathieson),
+    [Reference 2](Ionization_energy_loss_in_very_thin_absorbers,_V.M._Grishin_et_al.,_Nucl._Instr._Meth._A309:476-484,_1991), and
+    [Reference 3](A_method_to_improve_tracking_and_particle_identification_in_TPC's_and_silicon_detectors,_H._Bichsel,_Nucl._Inst._Meth._A562:154-197,_2006)
+
+  - Mostly coded by Yuri Fisyak who does not mind attaching an open source
+  license to the code (private communication)
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Overview of STAR TPC RS</h1>
+
+- The following lists essential properties of the STAR TPC RS:
+
+  - An adequate description of ionization in TPC gas, electron transport to anode wires, and gas amplification
+  - Accounting for distortions
+  - Simulation of analog signal and a proper digitization of the signal
+
+- The main TPC RS routine takes Geant hits as input and populates a container
+with ADC and TDC values indexed by sector, row, and pad ID just like real data
+
+- Simulated output ADC/TDC values are to be fed into the track reconstruction,
+i.e. the simulated data must be "uncalibrated" and packed in the same format as
+the raw data
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Overview of STAR TPC RS</h1>
+
+- The available implementation is strongly tied to the STAR detector and
+software framework
+
+- It depends on a multitude of parameters
+
+  - Model parameters, e.g. average pedestal width and position, pad gains, dE/dx
+  correction, ...
+
+  - Detector parameters, e.g. dimensions, magnetic field, pad row configuration,
+  wire spacing, anode high voltages (per sector and pad row), ...
+
+  - Electronics parameters, e.g. chip thresholds, T0 offsets, ...
+
+- Currently, the code requires approximately 50 data structures with various
+database values to be set and linked
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Standalone Implementation of TPC RS</h1>
+
+- The extraction of the relevant code from the STAR code base is done under
+continuous testing
+
+  - The main idea is to produce identical output by running the main TPC RS
+  conversion routine from the standalone library and in a fixed STAR release
+
+  - We dump input and output values into a data file by running an official
+  simulation test and use these values for testing the standalone implementation
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Current Status</h1>
+
+- Identified and extracted all the relevant code from the STAR repository
+
+- Observe identical numerical outputs (standalone lib vs STAR release) when
+testing on a single event with a couple dozens of tracks (equiv. 1k Geant hits
+equiv. 10k digi hits)
+
+- Currently develop under a personal repository on
+[github](https://github.com/plexoos/tpc-rs) 
+
+  - We use CMake to build the library
+
+  - So far defined a few compilable pre-minor releases (0.0.x) to mark essential
+  milestones. The first minor release (0.1.0) should include extended tests on
+  larger statistics
+
+- Keep minimally required external dependencies. Currently depends only on ROOT.
+Dependency on MySQL has been factored out
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Plans</h1>
+
+- Perform tests on larger samples and include more simulation jobs from the STAR
+test suite
+
+- Understand which configuration parameters vary from experiment to experiment
+
+- Come up with a public API for Geant hits, ADC/TDC container, and
+configuration structures. The conversion routine signature may look similar to
+std algorithms
+  <pre><code data-trim style="font-size: 0.7em;" class="cpluscplus">
+  namespace tpcrs {
+    template&lt; class InputIt, class OutputIt, class Configurator &gt;
+    OutputIt transform(InputIt first1, InputIt last1, OutputIt d_first, Configurator conf);
+  }
+  </code></pre>
+
+- Implement a proper installation procedure with CMake and formalize tests
+(likely with CTest and pytest)
+
+- Establish a build matrix with different compilers and ROOT versions
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Future Improvements</h1>
+
+- STAR TPC RS has been reported to be slow. A single HIJING event with 1000's
+tracks can take hours to simulate and reconstruct
+
+  - Not sure about the scaling yet (at least O(N)) but from my experience
+  simulating a few dozens of tracks takes a few minutes (10 tracks per minute?)
+  
+  - Timing to be confirmed in the both standalone and an official STAR release
+
+- In general STAR parametrization heavily depends on the ROOT's TTable/TChair
+classes from deprecated Table module. In fact, Table was completely removed in
+ROOT 6.18
+
+  - Templated containers seem like a possible replacement for TTable/TChair
+
+- The code can be moved to BNLNPPS organization
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Status of STAR Activities</h1>
+
+- Integration of a new forward tracking `Stg` based on `KiTracks` and `GenFit`
+
+  - `Sti` cannot reconstruct tracks in the forward region whereas `Stv` can and
+  is being integrated in the code base
+
+  - At this time `Stg` can produce tracks in the output format similar to the
+  standard `Sti` and `Stv` algorithms
+
+  - `Stg` is being tested on larger samples of more realistic Pythia and HIJING
+  events
+
+  - The plan is to comparison `Stg` and `Stv` with forward  tracks once they are
+  deployed 
+
+- STAR migration to 64-bit releases
+
+  - The slowness of the 64-bit "optimized" release w.r.t. 32-bit one seems to be
+  due to overlooked optimization flags in a custom installation of ROOT5 on RACF
+  machines
+
+  - Pending confirmation (on my side) of an anticipated speedup due to
+  replacement of matrix calculations in `Sti` with Eigen routines
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
