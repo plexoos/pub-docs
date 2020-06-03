@@ -1,0 +1,147 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>Migrating CVS to Git</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+<!--
+<section>
+
+<h1 class="title">Building STAR Software Libraries</h1>
+
+<h2 class="title">from Git Repository with CMake</h2>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+<h5 class="title">
+Updated <script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+</h5>
+
+</section>
+-->
+
+
+<section> <h1>Repository Size</h1>
+
+<ul style="font-size: 0.85em;">
+<li> Current sizes: 436M bare, 1.3G master HEAD checkout
+
+<li> Removing generators reduces the bare size to under 200M (exact numbers will be
+provided shortly)</li>
+
+  <pre class="code"><code data-trim style="font-size: 0.7em;" class="shell">
+  927k    StRoot/StarGenerator/Hijing1_383             12M     StRoot/StarGenerator/HepMC2_06_09
+  1.2M    StRoot/StarGenerator/Pepsi                   18M     StRoot/StarGenerator/Tauola1_1_5
+  1.3M    StRoot/StarGenerator/Photos3_61              21M     StRoot/StarGenerator/Pythia8_1_62
+  2.2M    StRoot/StarGenerator/Pythia6_2_22            31M     StRoot/StarGenerator/Pythia8_1_86
+  2.6M    StRoot/StarGenerator/Herwig6_5_20            65M     StRoot/StarGenerator/Pythia8_2_35
+  2.9M    StRoot/StarGenerator/Pythia6_4_23            216M    StRoot/StarGenerator/UrQMD3_3_1
+  3.0M    StRoot/StarGenerator/Pythia6_4_28            385M    StRoot/StarGenerator/
+  11M     StRoot/StarGenerator/EvtGen1_06_00    
+  </code></pre>
+
+<li> A further investigation revealed many large binary files (~4M each) such as
+<code>StarDb/VmcGeometry/y2005c.rz</code> committed and deleted 15 years ago.
+These files are still in the history and contribute to the bare size
+
+<li> Large calibration files for TPC in `StarDb/` under investigation. Their
+content likely duplicates what is in the MySQL DB
+
+<li> The smaller the size the better. But a size under 100M seems feasible.
+Reminder: the quota for users home on RACF is 25G
+
+<li> Another option is to do a local clone to save space on a shared disk. It
+is a default builtin feature implemented by using hardlinks to a local
+<code>.git</code>. Hardlinking means no additional space is used
+
+</ul>
+
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Sparse Checkout, Partial Clone</h1>
+
+- Sparse checkout (i.e. checking out only some paths) is available since early
+versions and works reliably. UI improved in latest versions
+
+  - We'll provide a simple interface to help CVS users
+
+- Partial clone is a relatively new feature (documented only in latest
+versions) and does not have a stable UI
+
+- We are ready to install and support latest tools but need access to the
+`/opt/star/` area on RACF
+
+> "Updating git on the farm will require discussion/agreement with our experiment
+liaisons".
+
+  - Who is the current STAR liaison?
+
+</textarea>
+</section>
+
+
+<section data-markdown> <textarea data-template> <h1>Permissions</h1>
+
+- People outside of STAR can contribute to the code
+
+  - How other experiments (also ROOT team) deal with pull requests (PRs) coming
+    from outside?
+
+  - Is this an issue?
+
+  - Note, Dmitri S. and Dmitry A. names were removed from the STAR author list
+    (i.e. STAR collaboration) when they moved to the NPPS group
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
