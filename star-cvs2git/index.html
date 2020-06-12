@@ -32,6 +32,119 @@ Updated <script>document.write((new Date(document.lastModified)).toLocaleDateStr
 -->
 
 
+<section data-markdown> <textarea data-template> <h1>Improving Software Infrastructure in STAR</h1>
+
+- Phase 1: Migration from CVS to Git
+
+  - Most of the machinery is ready and available
+
+  - Primary concerns are: Repository size and unfamiliar workflow
+
+- Phase 2: Offer alternative build system based on CMake
+
+  - Current build system (Cons) can co-exist with CMake
+
+  - Principle requirement is transparency of integration (i.e. libraries build
+    with either tool need to produce equivalent results)
+
+- Phase 3: Better (quick feedback) test suite and automated CI
+
+  - Main purpose is to reject erroneous changes before they get into the history
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Cleaning up Git repository</h1>
+
+<div style="font-size: 95%;">
+
+- Clean up is performed in two steps
+
+  - Step 1: Exclude select directories from conversion with `cvs2git` (a.k.a. `svn2git`)
+  - Step 2: Remove individual files (large or unused blobs)
+
+- Main inconvenience is that one cannot expect identical equivalence between Git
+  and CVS tagged trees
+
+<table style="margin: -1.2em 0 0 -0.5em;">
+<tr><td style="vertical-align: top;">
+
+- Considered several sequentially increasing clean-up scenarios
+
+  - R5 excludes more directories than R4 than R3 than ... than R0
+  - Notably, in R3 we exclude all external generators (Pythin{6,8}, HIJING,
+    UrQMD, etc) present in CVS
+
+- Bare sizes under 200MB achievable
+
+<td style="width: 50%; vertical-align: bottom;">
+<img class="plain" src="graphics/cvs2git.png" />
+</table>
+
+</div>
+
+</textarea>
+</section>
+
+
+<section data-markdown> <textarea data-template> <h1>Partial Clone, Sparse Checkout</h1>
+
+<div style="font-size: 95%;">
+
+- Sparse checkout (i.e. checking out only some paths) is available since early
+versions and works reliably. UI improved in recent versions
+
+- Partial clone is a relatively new feature (documented in recent versions). UI
+does not appear very stable
+
+- We provide a simple interface to help CVS users with adoption of Git<br>
+  https://github.com/star-bnl/star-git-tools
+
+  <table style="margin: 0em 0 0 -0.5em;">
+  <tr>
+  <td style="vertical-align: top;">
+
+  CVS like checkout
+
+  <pre class="code"><code data-trim style="font-size: 0.75em;" class="shell">
+  $ git star-checkout StRoot/StMuDSTMaker StRoot/StPicoEvent
+  Cloning into 'star-cvs'...
+
+  $ tree -a -L 2 star-cvs/
+  star-cvs/
+  |-- .git
+  |   ...
+  `-- StRoot
+      |-- StMuDSTMaker
+      `-- StPicoEvent
+  </code></pre>
+
+  <td style="vertical-align: top;">
+
+  Manageable size
+
+  <pre class="code"><code data-trim style="font-size: 0.75em;" class="shell">
+  $ du -b --si -d1 star-cvs/
+  29M     star-cvs/.git
+  1.3M    star-cvs/StRoot
+  30M     star-cvs/
+  </code></pre>
+  </table>
+
+</div>
+
+</textarea>
+</section>
+
+
+
+<section>
+<h1 style="margin-top: 5em;">Backup Slides</h1>
+</section>
+
+
 <section> <h1>Repository Size</h1>
 
 <ul style="font-size: 0.85em;">
@@ -48,7 +161,7 @@ provided shortly)</li>
   2.6M    StRoot/StarGenerator/Herwig6_5_20            65M     StRoot/StarGenerator/Pythia8_2_35
   2.9M    StRoot/StarGenerator/Pythia6_4_23            216M    StRoot/StarGenerator/UrQMD3_3_1
   3.0M    StRoot/StarGenerator/Pythia6_4_28            385M    StRoot/StarGenerator/
-  11M     StRoot/StarGenerator/EvtGen1_06_00    
+  11M     StRoot/StarGenerator/EvtGen1_06_00
   </code></pre>
 
 <li> A further investigation revealed many large binary files (~4M each) such as
@@ -67,45 +180,6 @@ is a default builtin feature implemented by using hardlinks to a local
 
 </ul>
 
-</section>
-
-
-
-<section data-markdown> <textarea data-template> <h1>Sparse Checkout, Partial Clone</h1>
-
-- Sparse checkout (i.e. checking out only some paths) is available since early
-versions and works reliably. UI improved in latest versions
-
-  - We'll provide a simple interface to help CVS users
-
-- Partial clone is a relatively new feature (documented only in latest
-versions) and does not have a stable UI
-
-- We are ready to install and support latest tools but need access to the
-`/opt/star/` area on RACF
-
-> "Updating git on the farm will require discussion/agreement with our experiment
-liaisons".
-
-  - Who is the current STAR liaison?
-
-</textarea>
-</section>
-
-
-<section data-markdown> <textarea data-template> <h1>Permissions</h1>
-
-- People outside of STAR can contribute to the code
-
-  - How other experiments (also ROOT team) deal with pull requests (PRs) coming
-    from outside?
-
-  - Is this an issue?
-
-  - Note, Dmitri S. and Dmitry A. names were removed from the STAR author list
-    (i.e. STAR collaboration) when they moved to the NPPS group
-
-</textarea>
 </section>
 
 
