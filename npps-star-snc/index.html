@@ -1,0 +1,255 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>STAR Software Infrastructure</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+<!--
+<section>
+
+<h1 class="title">Building STAR Software Libraries</h1>
+
+<h2 class="title">from Git Repository with CMake</h2>
+
+<h3 class="title">Dmitri Smirnov</h3>
+
+<h5 class="title">
+Updated <script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
+</h5>
+
+</section>
+-->
+
+<section data-markdown> <textarea data-template> <h1>Software Infrastructure Status</h1>
+
+<div style="font-size: 90%;">
+
+- Git 2.26.2 installed on interactive nodes by SDCC admins
+
+  - Supports partial clones
+
+- ROOT6 is available at RACF from `/afs/rhic/star/ROOT`
+
+  - 6.16.00 with TTable support and latest 6.20.06
+  - 64-bit libraries with optimization and debug info
+
+- Various versions of GCC compiler available from<br>
+  `/cvmfs/sft.cern.ch/lcg/contrib/gcc/`
+
+  - To activate, e.g. gcc 8.3.0
+
+        source /cvmfs/sft.cern.ch/lcg/contrib/gcc/8.3.0/x86_64-centos7-gcc8-opt/setup.sh
+
+- Next update CMake, install python3, ...
+
+  - First attempt to rebuild RPMs from source with modified prefix
+  (`/afs/...`) not very successful
+
+</div>
+
+</textarea>
+</section>
+
+
+<section data-markdown> <textarea data-template> <h1>CVS to Git Migration</h1>
+
+- **Phase 1:** Migration from CVS to Git
+
+  - Most of the machinery is ready and available
+
+  - Primary concerns are: Repository size and unfamiliar workflow
+
+<hr style="width: 90%;">
+
+- **Phase 2:** Offer alternative build system based on CMake
+
+  - Current build system (cons) can co-exist with CMake
+
+  - Principle requirement is transparency of integration (i.e. libraries build
+    with either tool need to produce equivalent results)
+
+- **Phase 3:** Better (quick feedback) test suite and automated CI
+
+  - Main purpose is to reject erroneous changes before they get into the history
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Cleaning up Git repository</h1>
+
+<div style="font-size: 95%;">
+
+- Clean up is performed in two steps
+
+  - **Step 1:** Exclude select directories from conversion with `cvs2git` (a.k.a. `svn2git`)
+  - **Step 2:** Remove individual files (large or unused blobs)
+
+- Main inconvenience is that one cannot expect identical file structures for same
+tags in CVS and Git due to modified history
+
+<table style="margin: -1.2em 0 0 -0.5em;">
+<tr><td style="vertical-align: top;">
+
+- Considered several clean-up scenarios with increasing number of
+subdirectories removed
+
+  - R5 excludes more directories than R4 than R3 than ... than R0
+  - Notably, in R3 we exclude all external generators (Pythin{6,8}, HIJING,
+    UrQMD, etc) present in CVS
+
+- Bare sizes under 200MB achievable
+
+<td style="width: 50%; vertical-align: bottom;">
+<img class="plain" src="graphics/cvs2git.png" />
+</table>
+
+</div>
+
+</textarea>
+</section>
+
+
+<section data-markdown> <textarea data-template> <h1>Partial Clone, Sparse Checkout</h1>
+
+<div style="font-size: 95%;">
+
+- Sparse checkout (i.e. checking out only some paths) is available since early
+versions and works reliably. UI improved in recent versions
+
+- Partial clone is a relatively new feature (documented in recent versions). UI
+does not appear very stable
+
+- We provide a simple interface to help CVS users with adoption of Git<br>
+  https://github.com/star-bnl/star-git-tools
+
+  <table style="margin: 0em 0 0 -0.5em;">
+  <tr>
+  <td style="vertical-align: top;">
+
+  CVS like checkout
+
+  <pre class="code"><code data-trim style="font-size: 0.75em;" class="shell">
+  $ git star-checkout StRoot/StMuDSTMaker StRoot/StPicoEvent
+  Cloning into 'star-cvs'...
+
+  $ tree -a -L 2 star-cvs/
+  star-cvs/
+  |-- .git
+  |   ...
+  `-- StRoot
+      |-- StMuDSTMaker
+      `-- StPicoEvent
+  </code></pre>
+
+  <td style="vertical-align: top;">
+
+  Manageable size
+
+  <pre class="code"><code data-trim style="font-size: 0.75em;" class="shell">
+  $ du -b --si -d1 star-cvs/
+  29M     star-cvs/.git
+  1.3M    star-cvs/StRoot
+  30M     star-cvs/
+  </code></pre>
+  </table>
+
+</div>
+
+</textarea>
+</section>
+
+<!--
+
+<section>
+<h1 style="margin-top: 5em;">Backup Slides</h1>
+</section>
+
+
+<section> <h1>Repository Size</h1>
+
+<ul style="font-size: 0.85em;">
+<li> Current sizes: 436M bare, 1.3G master HEAD checkout
+
+<li> Removing generators reduces the bare size to under 200M (exact numbers will be
+provided shortly)</li>
+
+  <pre class="code"><code data-trim style="font-size: 0.7em;" class="shell">
+  927k    StRoot/StarGenerator/Hijing1_383             12M     StRoot/StarGenerator/HepMC2_06_09
+  1.2M    StRoot/StarGenerator/Pepsi                   18M     StRoot/StarGenerator/Tauola1_1_5
+  1.3M    StRoot/StarGenerator/Photos3_61              21M     StRoot/StarGenerator/Pythia8_1_62
+  2.2M    StRoot/StarGenerator/Pythia6_2_22            31M     StRoot/StarGenerator/Pythia8_1_86
+  2.6M    StRoot/StarGenerator/Herwig6_5_20            65M     StRoot/StarGenerator/Pythia8_2_35
+  2.9M    StRoot/StarGenerator/Pythia6_4_23            216M    StRoot/StarGenerator/UrQMD3_3_1
+  3.0M    StRoot/StarGenerator/Pythia6_4_28            385M    StRoot/StarGenerator/
+  11M     StRoot/StarGenerator/EvtGen1_06_00
+  </code></pre>
+
+<li> A further investigation revealed many large binary files (~4M each) such as
+<code>StarDb/VmcGeometry/y2005c.rz</code> committed and deleted 15 years ago.
+These files are still in the history and contribute to the bare size
+
+<li> Large calibration files for TPC in `StarDb/` under investigation. Their
+content likely duplicates what is in the MySQL DB
+
+<li> The smaller the size the better. But a size under 100M seems feasible.
+Reminder: the quota for users home on RACF is 25G
+
+<li> Another option is to do a local clone to save space on a shared disk. It
+is a default builtin feature implemented by using hardlinks to a local
+<code>.git</code>. Hardlinking means no additional space is used
+
+</ul>
+
+</section>
+
+-->
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
