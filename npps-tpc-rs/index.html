@@ -6,7 +6,7 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
    <link rel="stylesheet" href="../assets/common.css">
 
-   <title>TPC Response Simulator</title>
+   <title>TPC-RS:  Response Simulator</title>
 </head>
 
 <body>
@@ -18,7 +18,7 @@
 
 <section>
 
-    <h1 class="title">TPC<br>Response Simulator</h1>
+    <h1 class="title">tpc-rs:<br>The Time Projection Chamber Response Simulator</h1>
 
 <h3 class="title">Dmitri Smirnov</h3>
 
@@ -30,190 +30,421 @@ Updated <script>document.write((new Date(document.lastModified)).toLocaleDateStr
 
 
 
-<section data-markdown> <textarea data-template> <h1>Introduction</h1>
+<section data-markdown> <textarea data-template> <h1 style="margin-bottom: -0.2em">Introduction</h1>
 
 - The **Time Projection Chamber** (TPC) is the primary tracking detector of
-choice for several current (ALICE, STAR) and future/proposed collider
-experiments (sPHENIX, ePHENIX/BeAST, JLEIC)
+choice for several current (ALICE, STAR) and future (sPHENIX) collider
+experiments
 
-- The purpose of the TPC Response Simulator (TPC RS) is to model the real
-detector (digitized) output signal as close as possible with the ability to
-adjust to time-dependent detector performance
+  <div class="hcenter" style="height: 200px;">
+  <img src="graphics/tpc_sphenix.png" class="plain"/>
+  <img src="graphics/tpc_star.png" class="plain"/>
+  <img src="graphics/tpc_alice.png" class="plain"/>
+  </div>
 
-- The implementation of TPC RS for the STAR experiment can serve as a basis for
-a more generic library
+  - TPC is also considered as a tracking detector for ePHENIX, BeAST, and JLEIC
+  prototypes
 
-  - The STAR implementation is based on a few published works<br>
-    [Reference 1](Induced_charge_distributions_in_proportional_detectors,_E._Mathieson),
-    [Reference 2](Ionization_energy_loss_in_very_thin_absorbers,_V.M._Grishin_et_al.,_Nucl._Instr._Meth._A309:476-484,_1991), and
-    [Reference 3](A_method_to_improve_tracking_and_particle_identification_in_TPC's_and_silicon_detectors,_H._Bichsel,_Nucl._Inst._Meth._A562:154-197,_2006)
+- A full simulation of a TPC is required for most physics analyses. It is not
+complete without modeling of the real detector output
 
-  - Mostly coded by Yuri Fisyak who does not mind attaching an open source
-  license to the code (private communication)
+  - A TPC response simulator, an integral part of the full simulation, provides
+  such ability and enables one to study the time-dependent performance of the
+  detector
+
+- We introduce [tpc-rs](https://github.com/bnlnpps/tpc-rs), a C++ library to
+generate and digitize the signal produced by charged particles traversing the
+sensitive volume of a TPC
 
 </textarea>
 </section>
 
 
 
-<section data-markdown> <textarea data-template> <h1>Overview of STAR TPC RS</h1>
+<section data-markdown> <textarea data-template> <h1>Overview of Requirements and Assumptions</h1>
 
-- The following lists essential properties of the STAR TPC RS:
+- The following lists essential properties for TPC RS:
 
-  - An adequate description of ionization in TPC gas, electron transport to anode wires, and gas amplification
+  - An adequate description of ionization in TPC gas, electron transport to readout planes, and signal amplification
   - Accounting for distortions
-  - Simulation of analog signal and a proper digitization of the signal
+  - Aggregation of simulated signal and its digitization
 
-- The main TPC RS routine takes Geant hits as input and populates a container
-with ADC and TDC values indexed by sector, row, and pad ID just like real data
+- TPC RS should be able to take simulated hits as input and populate a container
+with ADC values indexed by hardware channel address, e.g.  sector, row, and pad
+ID
 
-- Simulated output ADC/TDC values are to be fed into the track reconstruction,
-i.e. the simulated data must be "uncalibrated" and packed in the same format as
-the raw data
+  - Simulated output to be fed into a track reconstruction algorithm, i.e. the
+  simulated data must be "uncalibrated" just like real data
 
-</textarea>
-</section>
+- TPC is assumed to have a barrel shape split azimuthally into sectors and
+two halves along `z`
 
-
-
-<section data-markdown> <textarea data-template> <h1>Overview of STAR TPC RS</h1>
-
-- The available implementation is strongly tied to the STAR detector and
-software framework
-
-- It depends on a multitude of parameters
-
-  - Model parameters, e.g. average pedestal width and position, pad gains, dE/dx
-  correction, ...
-
-  - Detector parameters, e.g. dimensions, magnetic field, pad row configuration,
-  wire spacing, anode high voltages (per sector and pad row), ...
-
-  - Electronics parameters, e.g. chip thresholds, T0 offsets, ...
-
-- Currently, the code requires approximately 50 data structures with various
-database values to be set and linked
+  - Each sector is radially segmented into rows with a certain number of
+  sensitive "pads" in each row
 
 </textarea>
 </section>
 
 
 
-<section data-markdown> <textarea data-template> <h1>Standalone Implementation of TPC RS</h1>
+<section data-markdown> <textarea data-template> <h1 style="margin-bottom: -0.1em;">Overview of Algorithm</h1>
 
-- The extraction of the relevant code from the STAR code base is done under
-continuous testing
+- The user provides a list of simulated hits (e.g. from Geant) in a certain format (next slide)
+<img src="graphics/tpc_rs_segment.svg" class="plain" style="width: 43%; float: right;"/>
 
-  - The main idea is to produce identical output by running the main TPC RS
-  conversion routine from the standalone library and in a fixed STAR release
+  - The hits must be grouped by original track/particle
 
-  - We dump input and output values into a data file by running an official
-  simulation test and use these values for testing the standalone implementation
+- Track segments are formed around the hits within the row boundaries
 
-</textarea>
-</section>
+- Based on empirical distributions (models) primary ionization electrons are
+stochastically generated along each segment
 
+- A number of secondary electrons is generated and individually projected onto
+the readout planes. The signal is spread in transverse and longitudinal
+directions
 
+- Position of the charge on the readout plane is determined and the total charge
+per sensitive element is calculated
 
-<section data-markdown> <textarea data-template> <h1>Current Status</h1>
-
-- Identified and extracted all the relevant code from the STAR repository
-
-- Observe identical numerical outputs (standalone lib vs STAR release) when
-testing on a single event with a couple dozens of tracks (equiv. 1k Geant hits
-equiv. 10k digi hits)
-
-- Currently develop under a personal repository on
-[github](https://github.com/plexoos/tpc-rs) 
-
-  - We use CMake to build the library
-
-  - So far defined a few compilable pre-minor releases (0.0.x) to mark essential
-  milestones. The first minor release (0.1.0) should include extended tests on
-  larger statistics
-
-- Keep minimally required external dependencies. Currently depends only on ROOT.
-Dependency on MySQL has been factored out
+- Finally, the collected charge is digitized with the chip emulator
 
 </textarea>
 </section>
 
 
 
-<section data-markdown> <textarea data-template> <h1>Plans</h1>
+<section data-markdown> <textarea data-template> <h1>Primary Data Types</h1>
+<!--{{{-->
+<dl>
+  <dt><code>Simulated Hit</code></dt>
+  <dd>
 
-- Perform tests on larger samples and include more simulation jobs from the STAR
-test suite
+  The user type for simulated hits must provide the following data members
 
-- Understand which configuration parameters vary from experiment to experiment
-
-- Come up with a public API for Geant hits, ADC/TDC container, and
-configuration structures. The conversion routine signature may look similar to
-std algorithms
-  <pre><code data-trim style="font-size: 0.7em;" class="cpluscplus">
-  namespace tpcrs {
-    template&lt; class InputIt, class OutputIt, class Configurator &gt;
-    OutputIt transform(InputIt first1, InputIt last1, OutputIt d_first, Configurator conf);
-  }
+  <pre style="width: 100%;"><code class="lang-cpp" data-trim style="font-size: 0.7em; height: 500px; overflow: auto; white-space: pre;">
+  struct SimulatedHit
+  {
+    /// Unique id of the particle produced this hit. The simulated signal is
+    /// associated with tracks using these ids
+    int track_id;
+  
+    /// Physical particle id. It is primarily used to get the particle's charge
+    /// and mass from a local list of known particles
+    int particle_id;
+  
+    /// Volume id packed as a four digit decimal number SSRR, SS = sector, RR = pad row
+    /// Many configuration properties are defined on per sector basis. The prior
+    /// knowledge of hits' pad row allows to split loopers into multiple shorter
+    /// tracks
+    int volume_id;
+  
+    /// Position of the simulated hit at the center of a pad row layer in the
+    /// global coordinate system
+    double x[3];
+  
+    /// Local particle momentum at point x
+    double p[3];
+  
+    /// Energy deposited by the particle within pad row boundaries. Not strictly
+    /// necessary as it is used only in special cases such as "stopped electrons"
+    /// and indicated by negative `de` and `ds` < 50 um
+    double de;
+  
+    /// Path length within pad row boundaries. Used to define beginning and end
+    /// points of the track rebuilt around the distorted hit. Also used in
+    /// calculation of local gain correction due to de/ds effects
+    double ds;
+  
+    /// Distance from the origin to the point x. Not strictly necessary as it is
+    /// used only for hit ordering
+    double s;
+  
+    /// Time of flight up to the point x including the vertex production time. The
+    /// time of flight is used to correct the hit `z` position for drift velocity
+    /// in cm/us obtained from laser data
+    double tof;
+  
+    /// log_10(E_kin/mass) -- Deprecated
+    float lgam;
+  };
   </code></pre>
 
-- Implement a proper installation procedure with CMake and formalize tests
-(likely with CTest and pytest)
+  </dd>
 
-- Establish a build matrix with different compilers and ROOT versions
+</dl>
 
+<!--}}}-->
 </textarea>
 </section>
 
 
 
-<section data-markdown> <textarea data-template> <h1>Future Improvements</h1>
+<section data-markdown> <textarea data-template> <h1>Primary Data Types</h1>
 
-- STAR TPC RS has been reported to be slow. A single HIJING event with 1000's
-tracks can take hours to simulate and reconstruct
+<dl>
 
-  - Not sure about the scaling yet (at least O(N)) but from my experience
-  simulating a few dozens of tracks takes a few minutes (10 tracks per minute?)
+  <dt><code>Distorted Hit</code></dt>
+  <dd>
   
-  - Timing to be confirmed in the both standalone and an official STAR release
+  Stochastically updated hit properties with recalculated energy deposition and
+path within pad row. This intermediate state can be used to study various
+distortion effects
 
-- In general STAR parametrization heavily depends on the ROOT's TTable/TChair
-classes from deprecated Table module. In fact, Table was completely removed in
-ROOT 6.18
+  <pre style="width: 1000px;"><code class="lang-cpp" data-trim style="font-size: 0.7em; height: 500px; overflow: auto; white-space: pre;">
+  struct DistortedHit
+  {
+    /// Distorted position of the simulated hit at the center of a pad row layer
+    /// in the global coordinate system
+    double x[3];
+  
+    /// Distorted particle momentum at point x
+    double p[3];
+  
+    /// Energy deposited by the particle within pad row boundaries
+    double de;
+  
+    /// Path length within pad row boundaries
+    double ds;
+  
+    /// Number of primary electrons
+    int np;
+  };
+  </code></pre>
+  </dd>
 
-  - Templated containers seem like a possible replacement for TTable/TChair
-
-- The code can be moved to BNLNPPS organization
+</dl>
 
 </textarea>
 </section>
 
 
 
-<section data-markdown> <textarea data-template> <h1>Status of STAR Activities</h1>
+<section data-markdown> <textarea data-template> <h1>Primary Data Types</h1>
 
-- Integration of a new forward tracking `Stg` based on `KiTracks` and `GenFit`
+<dl>
 
-  - `Sti` cannot reconstruct tracks in the forward region whereas `Stv` can and
-  is being integrated in the code base
+  <dt><code>Hardware Channel</code></dt>
+  <dd>
+  Hardware address packed into bit fields
 
-  - At this time `Stg` can produce tracks in the output format similar to the
-  standard `Sti` and `Stv` algorithms
+  <pre><code class="lang-cpp" data-trim style="font-size: 0.7em;">
+  //                sector   row    pad   timebin
+  // max value          32   128   1024      1024
+  struct DigiChannel
+  {
+    unsigned int sector : 5, row : 7, pad : 10, timebin : 10;
+  };
+  </code></pre>
 
-  - `Stg` is being tested on larger samples of more realistic Pythia and HIJING
-  events
+  This type can be used to index zero-suppressed output as currently returned by the main `tpc-rs` conversion routine
 
-  - The plan is to comparison `Stg` and `Stv` with forward  tracks once they are
-  deployed 
+  <pre><code class="lang-cpp" data-trim style="font-size: 0.7em;">
+  struct DigiHit
+  {
+    DigiChannel channel;
 
-- STAR migration to 64-bit releases
+    /// Digitized signal
+    short adc;
 
-  - The slowness of the 64-bit "optimized" release w.r.t. 32-bit one seems to be
-  due to overlooked optimization flags in a custom installation of ROOT5 on RACF
-  machines
+    /// The unique id of the particle with largest contribution
+    short idt;
+  };
+  </code></pre>
 
-  - Pending confirmation (on my side) of an anticipated speedup due to
-  replacement of matrix calculations in `Sti` with Eigen routines
+  </dd>
+
+</dl>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Primary Components and Concepts</h1>
+
+<dl style="margin-top: -0.8em;">
+
+<dt><code>Configurator</code></dt>
+<dd>
+Provides direct access to various configuration and calibration parameters.  Any
+user type can be incorporated in <code>Configurator</code> by providing a
+mapping between the type and a unique string identifying the source of the data.
+E.g.
+
+<pre><code class="lang-cpp" data-trim style="font-size: 0.8em;">
+template<>
+std::string ConfigNodeName< tpcGas >() { return "Calibrations/tpc/tpcGas"; };
+// Then access via template< class T > const T& Configurator::S(int i=0) const;
+double param = configurator.S< tpcGas >().barometricPressure;
+</code></pre>
+
+Currently, supports reading from text files (in YAML format) but can be extended
+to read values from any source. <code>Configurator</code> should be initialized
+before one can start using the <code>Simulator</code>
+</dd>
+
+<dt><code>Simulator</code></dt>
+<dd>
+Transforms simulated hits to distorted ones, generates and projects the
+ionization charge onto readout planes, produces digitized output. Responsible
+for the entire transformation cycle while applying appropriate gain corrections,
+distortions, etc.
+
+<pre><code class="lang-cpp" data-trim style="font-size: 0.8em;">
+template<&ZeroWidthSpace;typename InIt, typename OutIt>
+OutIt Simulator::Digitize(InIt first_hit, InIt last_hit, OutIt digitized) const;
+</code></pre>
+</dd>
+
+</dl>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1 style="margin-bottom: -0.0em;">Primary Components and Concepts</h1>
+
+<code>Simulator</code> depends on the following components:
+
+  <dl style="margin-top: 0em;">
+  
+  <dt><code>Distorter</code></dt>
+  <dd>
+The simulated hit distorter is responsible for moving the hit due to various
+effects. Currently implemented distortion due to the shape of magnetic field.
+Other distortions can be added based on knowledge from STAR: <em>space
+charge</em> distribution, <em>charge leak</em> due to radial gaps, etc.
+<code>Distorter</code> depends on the magnetic field
+  </dd>
+  
+  <dt><code>Magnetic Field</code></dt>
+  <dd>
+  Can be arbitrary user type <code>MagField</code> defining a member function as
+
+  <pre><code class="cplusplus" data-trim style="font-size: 0.8em;">
+  template< typename Vec3> Vec3 MagField::ValueAt(Vec3 p) const;
+  template< typename T> struct Vec3 { T x, y, z; };
+  </code></pre>
+
+  </dd>
+  
+  <dt><code>Gain Corrector</code></dt>
+  <dd>
+  Applies corrections due to variations in track length, multiplicity, ADC
+  nonlinearity, gas density, etc. Corrections can be disabled until proper values
+  extracted from real data
+  </dd>
+  
+  <dt><code>Digitizer</code></dt>
+  <dd>
+  Converts charges propagated to the readout plane to ADC values. Current
+  implementation is based on the ALTRO chip emulation developed for ALICE TPC
+  </dd>
+  
+  </dl>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>How to Use</h1>
+
+- A basic working example is provided in the `tpc-rs` repository
+
+  <pre><code class="cplusplus" data-trim style="font-size: 0.7em;">
+  #include "tpcrs/tpcrs.h"
+
+  // ...
+
+  tpcrs::Configurator cfg("some_name", "path/to/config_file.yaml");
+  tpcrs::Simulator simulator(cfg);
+
+  // Fill input container with simulated hits
+  vector< tpcrs::SimulatedHit > simu_hits;
+
+  // Convert simulated hits to distorted ones and fill output container 
+  vector< tpcrs::DistortedHit > dist_hits;
+  tpcrs::distort(begin(simu_hits), end(simu_hits), back_inserter(dist_hits), simulator);
+
+  // Obtain simulated ADC values in container
+  vector< tpcrs::DigiHit > digi_hits;
+  tpcrs::digitize(begin(simu_hits), end(simu_hits), back_inserter(digi_hits), simulator);
+  </code></pre>
+
+- This looks simple but the catch is that many configuration parameters must be
+defined and adjusted for specific TPC detector...
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1 style="margin-bottom: -0.2em;">Technical Details</h1>
+
+- The code is covered by the LGPL and available for download from github
+repository: https://github.com/bnlnpps/tpc-rs
+
+- Current version
+[v0.1.0](https://github.com/bnlnpps/tpc-rs/releases/tag/v0.1.0) is the first
+stable release after a dozen of private pre-releases
+
+- **Dependencies:** Requires external installation of ROOT. The library to parse
+YAML is integrated
+
+- `CMake` and `CTest` are utilized to build, install, and test the library
+
+- CI established with build matrix including builds against ROOT v5.34 and v6.20
+in 64-bit Ubuntu 14, 16, and 18 releases
+
+- Tests are based on STAR simulated data for multiple runs/years and colliding species
+
+  - **200 GeV** dAu, pp, AuAu, He3Au, CuAu, UU; **500 GeV** pp; **62 GeV** AuAu;<br>
+    **11 GeV** AuAu
+  - For development convenience defined quick and long test<br>
+  ~minutes for 1-2 events and ~hour(s) for 10 events respectively
+  - Currently reference data for tests is valid only for ROOT 5 and 32-bit setup
+
+<!--
+    - Tests perform with identical numerical results since day one 
+-->
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Next Steps</h1>
+
+- Further generalize the code by removing remaining experiment dependent
+assumptions
+
+- Introduce more distortion effects. Verify statistically that implemented
+distortions work as expected 
+
+- Define a metric to routinely monitor changes in execution time for available
+tests
+
+  - Perhaps average time per simulated hit should be sufficient
+
+- Prepare references for tests with ROOT6 and 64-bit environment
+
+- User support and documentation...
+
+
+<p style="margin-top: 2em;">&nbsp;
+
+
+- **Long term idea:** Possible use of ML techniques to approximate the response
+function
+
+  - Many if not all internal calculations for projected charge are based on
+empirical distributions
+
+  - Eliminating iterations over individual electrons can potentially save tons
+of CPU cycles
+
 
 </textarea>
 </section>
