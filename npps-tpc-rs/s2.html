@@ -1,0 +1,378 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>TPC-RS:  Response Simulator</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section data-markdown> <textarea data-template> <h1 style="margin-bottom: -0.1em;">Overview</h1>
+
+- [tpc-rs](https://github.com/bnlnpps/tpc-rs) is a C++ library to generate and
+digitize the signal produced by charged particles traversing the sensitive
+volume of a TPC
+
+  - Latest version v0.2.0. Depends on external ROOT. Build with `CMake`
+  - Quick tests (10 events) available, based on STAR simulated data for various
+colliding species. Continuous integration (CI) setup with travis
+
+- Primary features:
+
+  - Distortions (limited to B field shape for now) 
+  - Ionization in TPC gas
+    - Generation of primary and secondary electrons, transport to readout planes
+    - Gain correction
+  - Aggregation of simulated signal per pad
+  - Digitization of accumulated charge by channel
+
+- Link to my [previous presentation](s1.html)
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1 style="margin-bottom: -0.1em;">General Assumptions</h1>
+
+- **TPC geometry:**
+
+  - Detector is assumed to have a barrel shape split into two halves along `z`
+and azimuthally into sectors
+
+  - Each sector is radially segmented into rows (**planar surfaces**) with a
+certain number of sensitive pads in each row
+
+- **Input:**
+
+  - Simulated Geant hits
+
+- **Output:**
+
+  - Distorted hit positions
+  - Zero suppressed charges aggregated by channels
+  - ADC values (and track/truth id of the dominant contributor)
+
+- Hardware channel address defined by (TPC half,) sector, row, pad id, and **time bin**
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1 style="margin-bottom: -0.1em;">Overview of Algorithm</h1>
+
+- The user provides a list of simulated hits in a certain format (next slide)
+<img src="graphics/tpc_rs_segment.svg" class="plain" style="width: 43%; float: right;"/>
+
+  - The hits must be grouped by original track/particle
+
+- Track segments are formed around the hits within the row boundaries
+
+- Based on dE/dx models primary ionization electrons are stochastically
+generated along each segment
+
+- Secondary electrons are generated and individually projected onto the readout
+planes. The signal is spread in transverse and longitudinal directions
+
+- Position of the charge on the readout plane is determined and the total charge
+per sensitive element is calculated
+
+- Finally, the collected charge is digitized with the chip emulator
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Primary Data Type Concepts</h1>
+<!--{{{-->
+<dl>
+  <dt><code>Simulated Hit</code></dt>
+  <dd>
+
+  The user type for simulated hits must provide the following data members
+
+  <pre style="width: 90%;"><code class="lang-cpp" data-trim style="font-size: 0.7em; height: 300px; overflow: auto; white-space: pre;">
+  struct SimulatedHit
+  {
+    /// Unique id of the particle produced this hit. The simulated signal is
+    /// associated with tracks using these ids
+    int track_id;
+  
+    /// Physical particle id. It is primarily used to get the particle's charge
+    /// and mass from a local list of known particles
+    int particle_id;
+  
+    /// Volume id packed as a four digit decimal number SSRR, SS = sector, RR = pad row
+    /// Many configuration properties are defined on per sector basis. The prior
+    /// knowledge of hits' pad row allows to split loopers into multiple shorter
+    /// tracks
+    int volume_id;
+  
+    /// Position of the simulated hit at the center of a pad row layer in the
+    /// global coordinate system
+    double x[3];
+  
+    /// Local particle momentum at point x
+    double p[3];
+  
+    /// Energy deposited by the particle within pad row boundaries. Not strictly
+    /// necessary as it is used only in special cases such as "stopped electrons"
+    /// and indicated by negative `de` and `ds` < 50 um
+    double de;
+  
+    /// Path length within pad row boundaries. Used to define beginning and end
+    /// points of the track rebuilt around the distorted hit. Also used in
+    /// calculation of local gain correction due to de/ds effects
+    double ds;
+  
+    /// Distance from the origin to the point x. Not strictly necessary as it is
+    /// used only for hit ordering
+    double s;
+  
+    /// Time of flight up to the point x including the vertex production time. The
+    /// time of flight is used to correct the hit `z` position for drift velocity
+    /// in cm/us obtained from laser data
+    double tof;
+  
+    /// log_10(E_kin/mass) -- Deprecated
+    float lgam;
+  };
+  </code></pre>
+
+  </dd>
+
+  <dt><code>Distorted Hit</code></dt>
+  <dd>
+  Position of simulated hit after distortions applied. This intermediate state
+can be used to study distortion effects individually
+  </dd>
+
+</dl>
+
+<!--}}}-->
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Primary Data Type Concepts</h1>
+
+<dl>
+
+  <dt><code>Hardware Channel</code></dt>
+  <dd>
+  Hardware address packed into bit fields
+
+  <pre><code class="lang-cpp" data-trim style="font-size: 0.7em;">
+  //                sector   row    pad   timebin
+  // max value          32   128   1024      1024
+  struct DigiChannel
+  {
+    unsigned int sector : 5, row : 7, pad : 10, timebin : 10;
+  };
+  </code></pre>
+
+  This type can be used to index zero-suppressed output as currently returned by the main `tpc-rs` conversion routine
+
+  <pre><code class="lang-cpp" data-trim style="font-size: 0.7em;">
+  struct DigiHit
+  {
+    DigiChannel channel;
+
+    /// Digitized signal
+    short adc;
+
+    /// The unique id of the particle with largest contribution
+    short idt;
+  };
+  </code></pre>
+
+  </dd>
+
+</dl>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Primary Component Concepts</h1>
+
+<dl style="margin-top: -0.8em;">
+
+<dt><code>Configurator</code></dt>
+<dd>
+Provides direct access to various configuration and calibration parameters.  Any
+user type can be incorporated in <code>Configurator</code> by providing a
+mapping between the type and a unique string identifying the source of the data.
+E.g.
+
+<pre><code class="lang-cpp" data-trim style="font-size: 0.8em; overflow: auto; white-space: pre;">
+template<>
+std::string ConfigNodeName< tpcGas >() { return "Calibrations/tpc/tpcGas"; };
+// Then access via template< class T > const T& Configurator::S(int i=0) const;
+double param = configurator.S< tpcGas >().barometricPressure;
+</code></pre>
+
+Currently, supports reading from text files (in YAML format) but can be extended
+to read values from any source. <code>Configurator</code> should be initialized
+before one can start using the <code>Simulator</code>
+</dd>
+
+<dt><code>Simulator</code></dt>
+<dd>
+Transforms simulated hits to distorted ones, generates and projects the
+ionization charge onto readout planes, produces digitized output. Responsible
+for the entire transformation cycle while applying appropriate gain corrections,
+distortions, etc.
+
+<pre><code class="lang-cpp" data-trim style="font-size: 0.8em;">
+template<&ZeroWidthSpace;typename InIt, typename OutIt>
+OutIt Simulator::Digitize(InIt first_hit, InIt last_hit, OutIt digitized) const;
+</code></pre>
+</dd>
+
+</dl>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Primary Component Concepts</h1>
+
+<code>Simulator</code> depends on the following components:
+
+  <dl style="margin-top: 0em;">
+  
+  <dt><code>Distorter</code></dt>
+  <dd>
+The simulated hit distorter is responsible for moving the hit due to various
+effects. Currently implemented distortion due to the shape of magnetic field.
+Other distortions can be added based on knowledge from STAR/ALICE: <em>space
+charge</em> distribution, <em>charge leak</em> due to radial gaps, etc.
+<code>Distorter</code> depends on the magnetic field
+  </dd>
+  
+  <dt><code>Magnetic Field</code></dt>
+  <dd>
+  Can be arbitrary user type <code>MagField</code> defining a member function as
+
+  <pre><code class="cplusplus" data-trim style="font-size: 0.8em;">
+  template< typename Vec3> Vec3 MagField::ValueAt(Vec3 p) const;
+  template< typename T> struct Vec3 { T x, y, z; };
+  </code></pre>
+
+  </dd>
+  
+  <dt><code>Gain Corrector</code></dt>
+  <dd>
+  Applies corrections due to variations in track length, multiplicity, ADC
+  nonlinearity, gas density, etc. Corrections can be disabled until proper values
+  extracted from real data
+  </dd>
+  
+  <dt><code>Digitizer</code></dt>
+  <dd>
+  Converts charges propagated to the readout plane to ADC values. Current
+  implementation is based on the ALTRO chip emulation developed for ALICE TPC
+  </dd>
+  
+  </dl>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>How to Use</h1>
+
+- A basic working example is provided in the `tpc-rs` repository
+
+  <pre><code class="cplusplus" data-trim style="font-size: 0.7em;">
+  #include "tpcrs/tpcrs.h"
+
+  // ...
+
+  tpcrs::Configurator cfg("some_name", "path/to/config_file.yaml");
+  tpcrs::Simulator simulator(cfg);
+
+  // Fill input container with simulated hits
+  vector< tpcrs::SimulatedHit > simu_hits;
+
+  // Convert simulated hits to distorted ones and fill output container 
+  vector< tpcrs::DistortedHit > dist_hits;
+  simulator.Distort(begin(simu_hits), end(simu_hits), back_inserter(dist_hits));
+
+  // Obtain simulated ADC values in container
+  vector< tpcrs::DigiHit > digi_hits;
+  simulator.Digitize(begin(simu_hits), end(simu_hits), back_inserter(digi_hits));
+  </code></pre>
+
+- This looks simple but the catch is that many configuration parameters must be
+defined and adjusted for specific TPC detector...
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Next Steps</h1>
+
+- Incorporate sPHENIX magnetic field
+
+- Produce maps for the available distortion
+
+- Produce charge projections for simulated hits
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
