@@ -6,7 +6,7 @@
    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
    <link rel="stylesheet" href="../assets/common.css">
 
-   <title>Migrating CVS to Git</title>
+   <title>Improving Software Infrastructure in STAR</title>
 </head>
 
 <body>
@@ -34,20 +34,20 @@ Updated <script>document.write((new Date(document.lastModified)).toLocaleDateStr
 
 <section data-markdown> <textarea data-template> <h1>Improving Software Infrastructure in STAR</h1>
 
-- Phase 1: Migration from CVS to Git
+- **Phase 1:** Migration from CVS to Git
 
   - Most of the machinery is ready and available
 
   - Primary concerns are: Repository size and unfamiliar workflow
 
-- Phase 2: Offer alternative build system based on CMake
+- **Phase 2:** Offer alternative build system based on CMake
 
   - Current build system (Cons) can co-exist with CMake
 
   - Principle requirement is transparency of integration (i.e. libraries build
     with either tool need to produce equivalent results)
 
-- Phase 3: Better (quick feedback) test suite and automated CI
+- **Phase 3:** Better (quick feedback) test suite and automated CI
 
   - Main purpose is to reject erroneous changes before they get into the history
 
