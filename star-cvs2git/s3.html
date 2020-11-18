@@ -1,0 +1,112 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>Improving Software Infrastructure in STAR</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section data-markdown> <textarea data-template> <h1>Migrating STAR code from CVS to Git</h1>
+
+<div style="font-size: 95%;">
+
+- Links to previous discussions
+
+  - [Proposal for CVS to Git Migration](s1.html)
+  - [Update on CVS to Git Migration](s2.html)
+
+- Established two Git repositories
+ 
+  - https://github.com/star-bnl/star-sw &mdash; All STAR libraries for event reconstruction and simulation
+  - https://github.com/star-bnl/star-mcgen &mdash; A separate repo for MC event generators
+
+- There is no overlap between the two despite being produced from the same CVS repo
+
+- RACF accounts used in CVS are mapped to real user's name and their email using the STAR collaborator database
+
+- Bare repository sizes of `star-sw` and `star-mcgen` are 160 and 80 MB respectively (as reported by github)
+
+- Migration scripts, user tools, and documentation are available in a support repository 
+
+  - https://github.com/star-bnl/star-git-tools
+
+</div>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Getting and Building STAR code from Git</h1>
+
+- To build a release with all the libraries one can merge the code from the two
+repositories into a single local directory and proceed as usual
+
+- For example, to get the code corresponding to the `SL20a` tag do
+
+  <pre class="code"><code data-trim style="font-size: 0.60em;" class="shell">
+  mkdir release-SL20a && cd release-SL20a
+  curl -sL https://github.com/star-bnl/star-sw/archive/SL20a.tar.gz | tar -xz  --strip-components 1
+  curl -sL https://github.com/star-bnl/star-mcgen/archive/SL20a.tar.gz | tar -xz  --strip-components 1
+  </code></pre>
+
+- Similarly, to get the most recent code for a "DEV" release replace `SL20a`
+with `master` in the above example
+
+- The code can be compiled and used as usual, e.g. by running `cons` and the
+`bfc.C` macro
+
+- The setup was tested with a few short test jobs executed interactively on the farm
+
+- If you find problems with this workflow please let me know
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
