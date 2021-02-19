@@ -104,16 +104,26 @@ and decision to keep or discard is known prior to calls of
 
 <section data-markdown> <textarea data-template> <h1><span style="font-size: smaller;">Investigating Memory Consumption by sPHENIX Simulation</span></h1>
 
+<div style="font-size: 80%;">
+
 - **Proposed solution.** Discard unwanted particles early
 
   - Since the flag to save the particle is know at the end of Geant4 track
-  processing, the decision to keep it can be made without actually adding them
+  processing, the decision to keep it can be made without adding all of them
   into the final container. This can be done by maintaining a stack of all
-  upstream tracks
+  upstream tracks. For example,
+
+  - At some point in time we consider a chain of Geant4 tracks 6 $\to$ 7 $\to$ 8
+  which do not deposit any energy in the active detector volumes
+
+  - On the other hand, track 9 does produce a hit and we would like to keep it.
+  Therefore, at the next iteration, we will choose to keep its parent, track 6, but get rid of tracks 7 and 8
 
 <div class="hcenter">
-<img class="plain" style="width: 49%;" src="graphics/track_tree_stack_1.png" />
-<img class="plain" style="width: 49%;" src="graphics/track_tree_stack_2.png" />
+<img class="plain" style="width: 49%;" src="graphics/track_tree_stack_1_call_order.png" />
+<img class="plain" style="width: 49%;" src="graphics/track_tree_stack_2_call_order.png" />
+</div>
+
 </div>
 
 </textarea>
