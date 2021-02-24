@@ -1,0 +1,292 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="../assets/common.css">
+
+   <title>Repository Administration and Policies</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section data-markdown> <textarea data-template> <h1>An Issue with CVS Workflow?</h1>
+
+- Amol mentioned a problem with a new directory (`StRoot/RTS/src/TRG_FCS`) not
+checked out by default in the local area (`cvs update` vs `cvs checkout`)
+
+- The new directory is in the CVS repository on the main branch and transferred
+to the Git repository as expected
+
+  - So, anyone checking out a fresh copy of the parent directory from either Git
+  or CVS would have a local copy
+
+- The fact that the production team is updating there local files instead of
+checking out seems very specific to their workflow
+
+  - The need for a private communication cannot qualify the workflow as reproducible
+
+<!--
+
+- Is there really a problem if the new code compiles 
+
+  -->
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Introduction</h1>
+
+<div style="font-size: 90%;">
+
+- Thanks to the Production Team and Amol's tests we now have confidence in the
+STAR libraries built from the Git repo
+
+- It is time to make STAR presence on GitHub official:
+
+  - https://github.com/star-bnl &mdash; The STAR organization
+  - https://github.com/star-bnl/star-sw &mdash; The primary repository with the
+  code migrated from CVS
+
+- Important to note for all collaborators
+
+  - A GitHub account is required for submitting code changes, receiving
+  notifications, and participating in discussions
+
+    - Notifications sent to your email are highly customizable. But the easiest
+    way is to click the "Watch" button in a repository and select a watch option
+    from the drop-down menu
+
+- Tons of documentation and guides for Git and GitHub available. Online
+resources cover everything from very basic and common operations to advanced
+topics:
+
+  - https://docs.github.com/ &mdash; Documentation for GitHub interface and features
+  - https://www.atlassian.com/git/tutorials/ &mdash; Tutorials, e.g. workflows explained
+  - https://git-scm.com/book/ &mdash; Reference for all Git CLI utilities
+
+</div>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Policies: General Ideas</h1>
+
+<div style="font-size: 90%;">
+
+- With technical details sorted out it is time to think about the rules
+
+- GitHub provides the ability to configure and enforce certain workflows for
+collaborative development
+
+  - We suggest to start with stricter policies and relax them later if/when find
+  appropriate
+
+- **Protect all branches:** Disable force pushes and prevent branches from being deleted
+
+- **Maintain linear history:** Prevent merge commits from being pushed to branches
+
+  - Linear history is usually easier for humans to apprehend, and arguably easier to debug
+
+  - Consistent with historical development in CVS
+
+- **Require pull requests on GitHub** as the only way to merge commits onto
+remote branch
+ 
+  - Direct pushes to remote branches are disabled for all collaborators
+
+  - PRs encourage better documentation of proposed changes (via GitHub interface)
+
+- *Require status checks to pass before merging (not implemented)* 
+
+  - *Currently, we don't have any automatic status checks...*
+
+  - Require branches to be up to date before merging 
+
+</div>
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Policies: Code Reviews</h1>
+
+<div style="font-size: 95%;">
+
+- **Require pull request reviews before merging**
+
+  - All pull requests must have a required number of approving reviews
+
+    - We suggest two required approving reviews before a pull request can be
+    merged
+
+  - GitHub suggests reviewers based on historical code changes. It is also
+  possible to request a review from someone other than a suggested person
+
+  - Other collaborators can still review/comment on a submitted pull request
+
+  - Require reviews from code owners/maintainers
+  
+    - Similar to `CVSROOT/avail` we create a file mapping paths/subdirectories
+    to specific people whose approval is required
+
+    - A `CODEOWNERS` file in a GitHub repository defines individuals responsible
+    for code in a repository
+
+    - It is not very clear if a code owner can approve their own PR... This
+    might be critical for merging quick fixes
+  
+  - In cases when reviewers cannot be easily identified the Infrastructure Team
+  will step in
+
+</div>
+
+</textarea>
+</section>
+
+
+<!--
+
+<section data-markdown> <textarea data-template> <h1>Policies: Details</h1>
+
+<div style="font-size: 95%;">
+
+- 
+
+- **There will be no special branch for hot fixes in the central repository**
+
+  - Hot fixes assume quick actions, i.e. quick tests, a quick re-build and
+  deployment on the farm and so on. The machinery for such quick turn around
+  was never available
+
+  - In the past all emergencies were manually orchestrated and it will not be
+  different now. Except
+
+  - In an absolute emergency, the production team can maintain a branch in
+  their local clone
+
+  - Additional reminders and notes
+
+    - Emergency fixes are typical for online but rare for offline
+    - The online code is not a part of the current migration
+
+- As a last resort: If there is an absolute denial of the proposed workflow
+
+  I suggest such code is extracted into a separate repository as was done with generators
+
+</div>
+
+</textarea>
+</section>
+-->
+
+
+
+<section data-markdown> <textarea data-template> <h1>Quick Recap</h1>
+
+- Maintenance of the Git repository will be the responsibility of Infrastructure Team
+
+- In general, the gist of the proposed workflow is not very different from the
+historical one
+
+  - The major difference is in the requirements to review submitted changes by
+  code owners/maintainers
+
+- Taking care of documentation on agreed workflows, specific commands, links to
+external resources, examples, etc.
+
+  - It is generally a good idea to keep the documentation close to the code.
+  Ideally, it should be in the same repository and evolve with the code
+
+  - Before `star-sw` is made writable, the following support repository can be
+  used to share and discuss documentation:
+
+    https://github.com/star-bnl/star-git-tools
+
+    - It can be used to build the `CODEOWNERS` file for `star-sw`
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Proposed Timeline (Xin)</h1>
+
+- **March 1** &mdash; Make announcement to the collaboration about the intention for this transition
+
+- **March 8** &mdash; Presentation at the Collaboration meeting plenary session
+
+- **March 15** &mdash; Deadline for feedback from the collaboration
+
+- **March 17/24** &mdash; Discussion in the S&C management to respond to the feedbacks
+
+- **March 29** &mdash; Responses to feedback and final call for the transition
+
+- **April 1** &mdash; The switch day
+
+<hr style="width: 50%">
+
+<div style="font-size: 90%;">
+
+- A quick reminder about action items on the "switch day"
+
+  - In `CVSROOT/avail` disable write access to top-level directories
+  transferred to Git for all users
+
+  - Stop the crontab job synchronizing Git and CVS
+
+  - Push `CODEOWNERS` file to `star-sw`
+</div>
+
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="../assets/reveal.js/js/reveal.js"></script>
+
+<script>
+Reveal.initialize({
+   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
+   // AR = 1.6
+   width: 1120, height: 700,
+   math: {
+      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+      config: 'TeX-AMS_SVG-full'
+   },
+   dependencies: [
+      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
+      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
+      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
+      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
+   ],
+   controls: false,
+   history: true,
+   center: false,
+   progress: false,
+   transition: 'none',
+   transitionSpeed: 'fast',
+   viewDistance: 100
+});
+
+Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
+</script>
+
+</body>
+</html>
