@@ -128,20 +128,23 @@ body {
 .reveal ul ul ol li::before { color: rgb(0, 0, 180); }
 
 .reveal ul {
-  list-style-type: disc;
-  list-style-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1.1em 1.1em" width="1.1em" height="1em"><circle fill="rgb(180, 0, 0)" cx="0.5em" cy="0.5em" r="0.4em"/></svg>');
-  margin-right: 0em;
+  list-style: none;
 }
 
-.reveal ul ul {
-  list-style-type: square;
-  list-style-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1.1em 1.1em" width="1.1em" height="1em"><circle fill="rgb(0, 127, 0)" cx="0.5em" cy="0.5em" r="0.4em"/></svg>');
-  margin-top: 0em;
+.reveal ul li::before {
+  content: "\2022";
+  color: rgb(180, 0, 0);
+  margin-left: -0.8em;
+  float: left;
+  font-weight: bold;
 }
 
-.reveal ul ul ul {
-  list-style-type: circle;
-  list-style-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1.1em 1.1em" width="1.1em" height="1em"><circle fill="rgb(0, 0, 180)" cx="0.5em" cy="0.5em" r="0.4em"/></svg>');
+.reveal ul ul li::before {
+  content: "\2011";
+}
+
+.reveal ul ul ul li::before {
+  content: "\2023";
 }
 
 .reveal ul ul,
