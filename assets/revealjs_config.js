@@ -7,24 +7,24 @@ function loadScript(url)
   head.appendChild(script);
 }
 
-loadScript('/pub-docs/assets/reveal.js/js/reveal.js');
+loadScript('/pub-docs/assets/reveal.js/dist/reveal.js');
+loadScript('/pub-docs/assets/reveal.js/plugin/notes/notes.js');
+loadScript('/pub-docs/assets/reveal.js/plugin/markdown/markdown.js');
+loadScript('/pub-docs/assets/reveal.js/plugin/highlight/highlight.js');
 
 window.onload = function() {
+  // More info about initialization & config:
+  // - https://revealjs.com/initialization/
+  // - https://revealjs.com/config/
   Reveal.initialize({
+    hash: true,
     // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
     // AR = 1.6
     width: 1120, height: 700,
-    math: {
-       mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
-       config: 'TeX-AMS_SVG-full'
-    },
-    dependencies: [
-       { src: '../assets/reveal.js/plugin/markdown/marked.js' },
-       { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
-       { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
-       { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-       { src: '../assets/reveal.js/plugin/math/math.js', async: true }
-    ],
+
+    // Learn about plugins: https://revealjs.com/plugins/
+    plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+
     controls: false,
     history: true,
     center: false,
@@ -33,7 +33,6 @@ window.onload = function() {
     transitionSpeed: 'fast',
     viewDistance: 100
   });
-  
-  Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
 
+  Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
 };
