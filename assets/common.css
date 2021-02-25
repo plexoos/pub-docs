@@ -1,5 +1,5 @@
-@import url("../assets/revealjs_css_reveal.css");
-@import url("../assets/revealjs_css_print_paper.css");
-@import url("../assets/revealjs_css_theme_white.css");
-@import url("../assets/github-gist.css");
-@import url("../assets/my.css");
+@import url("/pub-docs/assets/revealjs_css_reveal.css");
+@import url("/pub-docs/assets/revealjs_css_print_paper.css");
+@import url("/pub-docs/assets/revealjs_css_theme_white.css");
+@import url("/pub-docs/assets/github-gist.css");
+@import url("/pub-docs/assets/my.css");
