@@ -32,12 +32,6 @@ checking out seems very specific to their workflow
 
   - The need for a private communication cannot qualify the workflow as reproducible
 
-<!--
-
-- Is there really a problem if the new code compiles 
-
-  -->
-
 </textarea>
 </section>
 
@@ -96,7 +90,7 @@ collaborative development
 
 - **Maintain linear history:** Prevent merge commits from being pushed to branches
 
-  - Linear history is usually easier for humans to apprehend, and arguably easier to debug
+  - Linear history is usually easier for humans to understand and debug
 
   - Consistent with historical development in CVS
 
@@ -239,12 +233,14 @@ external resources, examples, etc.
 
 <div style="font-size: 90%;">
 
-- A quick reminder about action items on the "switch day"
+- A list of action items for the "switch day"
 
   - In `CVSROOT/avail` disable write access to top-level directories
   transferred to Git for all users
 
-  - Stop the crontab job synchronizing Git and CVS
+  - Tag the code in CVS with next `SL21x` tag
+
+  - Run sync jobs and stop the crontab job synchronizing Git and CVS
 
   - Push `CODEOWNERS` file to `star-sw`
 </div>

@@ -123,8 +123,6 @@ between Git and CVS tagged trees
 
 <section data-markdown> <textarea data-template> <h1>Partial Clone, Sparse Checkout</h1>
 
-<div style="font-size: 95%;">
-
 - Sparse checkout (i.e. checkout of specific subdirectories selected by the
 user) is available since early versions of Git and works reliably. UI improved
 in recent versions
@@ -135,38 +133,36 @@ does not appear very stable
 - We provide a simple interface to help CVS users with adoption of Git<br>
   https://github.com/star-bnl/star-git-tools
 
-  <table style="margin: 0em 0 0 -0.5em;">
-  <tr>
-  <td style="vertical-align: top;">
+<table>
+<tr>
+<td style="width: 60%;">
 
-  CVS like checkout
+CVS like checkout
 
-  <pre class="code"><code data-trim style="font-size: 0.75em;" class="shell">
-  $ git star-checkout StRoot/StMuDSTMaker StRoot/StPicoEvent
-  Cloning into 'star-cvs'...
+<pre style="font-size: 0.85em;"><code data-trim class="shell">
+$ git star-checkout StRoot/StMuDSTMaker StRoot/StPicoEvent
+Cloning into 'star-cvs'...
 
-  $ tree -a -L 2 star-cvs/
-  star-cvs/
-  |-- .git
-  |   ...
-  `-- StRoot
-      |-- StMuDSTMaker
-      `-- StPicoEvent
-  </code></pre>
+$ tree -a -L 2 star-cvs/
+star-cvs/
+|-- .git
+|   ...
+`-- StRoot
+    |-- StMuDSTMaker
+    `-- StPicoEvent
+</code></pre>
 
-  <td style="vertical-align: top;">
+<td>
 
-  Manageable size
+Manageable size
 
-  <pre class="code"><code data-trim style="font-size: 0.75em;" class="shell">
-  $ du -b --si -d1 star-cvs/
-  29M     star-cvs/.git
-  1.3M    star-cvs/StRoot
-  30M     star-cvs/
-  </code></pre>
-  </table>
-
-</div>
+<pre style="font-size: 0.85em;"><code data-trim class="shell">
+$ du -b --si -d1 star-cvs/
+29M     star-cvs/.git
+1.3M    star-cvs/StRoot
+30M     star-cvs/
+</code></pre>
+</table>
 
 </textarea>
 </section>
@@ -214,7 +210,7 @@ from the new source
 
 R1: baseline scenario
 
-<pre style="width: 400px;"><code data-trim style="font-size: 0.5em; height: 200px;" class="shell">
+<pre style="width: 400px; font-size: 0.8em;"><code data-trim style="height: 200px;">
 - /.backup
 - /Cons
 - /CVSROOT
@@ -237,14 +233,14 @@ R1: baseline scenario
 
 R2: all of R1 and the following
 
-<pre style="width: 400px;"><code data-trim style="font-size: 0.5em;" class="shell">
+<pre style="width: 400px; font-size: 0.8em;"><code data-trim>
 - /StarDb/AgiGeometry
 - /StarDb/VmcGeometry
 </code></pre>
 
 R5: all of R4 and the following
 
-<pre style="width: 400px;"><code data-trim style="font-size: 0.5em;" class="shell">
+<pre style="width: 500px; font-size: 0.8em;"><code data-trim>
 - /StRoot/StJetMaker/StarTrigSimuSetup
 - /StRoot/StSpinPool/StMCAsymMaker
 </code></pre>
@@ -255,7 +251,7 @@ R5: all of R4 and the following
 
 R3: all of R2 and the following
 
-<pre style="width: 400px;"><code data-trim style="font-size: 0.5em; height: 200px;" class="shell">
+<pre style="width: 500px; font-size: 0.8em;"><code data-trim style="height: 200px;">
 - /StRoot/StarGenerator/Hijing1_383
 - /StRoot/StarGenerator/Photos3_61
 - /StRoot/StarGenerator/Pepsi
@@ -274,7 +270,7 @@ R3: all of R2 and the following
 
 R4: all of R3 and the following
 
-<pre style="width: 400px;"><code data-trim style="font-size: 0.5em; height: 200px;" class="shell">
+<pre style="width: 500px; font-size: 0.8em;"><code data-trim style="height: 300px;">
 - /pams/gen/Herwig6_5_20
 - /pams/gen/hijing_381
 - /pams/gen/hijing_382
@@ -299,21 +295,21 @@ R4: all of R3 and the following
 
 
 
-<section data-markdown id="excluded"> <textarea data-template> <h1>Excluded Paths &mdash; Step 2</h1>
+<section data-markdown> <textarea data-template> <h1>Excluded Paths &mdash; Step 2</h1>
 
 - Files removed from the Git repository using the `bfg` utility program
 
   - Manually selected files:
-  
-  <pre style="width: 400px;"><code data-trim style="font-size: 0.5em;" class="shell">
-  StarDb/AgiGeometry/devE.h
-  StarDb/AgiGeometry/devT.h
-  StRoot/RTS/EventTracker/mapbin.h
-  StarVMC/geant3/data/xsneut95.dat
-  pams/sim/gphysdata/xsneut96.dat
-  tpcPadGainT0B.*.root
-  tpcDriftVelocity.*.C
-  </code></pre>
+
+    <pre style="width: 500px; font-size: 0.8em;"><code data-trim>
+    StarDb/AgiGeometry/devE.h
+    StarDb/AgiGeometry/devT.h
+    StRoot/RTS/EventTracker/mapbin.h
+    StarVMC/geant3/data/xsneut95.dat
+    pams/sim/gphysdata/xsneut96.dat
+    tpcPadGainT0B.*.root
+    tpcDriftVelocity.*.C
+    </code></pre>
   
   - Files larger than 200 kB and not present in any release/tag `SL1*` or `SL2*`
 
