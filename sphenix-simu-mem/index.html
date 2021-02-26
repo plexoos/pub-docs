@@ -4,7 +4,7 @@
 <head>
    <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-   <link rel="stylesheet" href="../assets/common.css">
+   <link rel="stylesheet" href="/pub-docs/assets/common.css">
 
    <title>Investigating large memory consumption by sPHENIX simulation jobs</title>
 </head>
@@ -144,35 +144,7 @@ rather than adding new tracks in `PreUserTrackingAction()`?
 </div>
 </div>
 
-<script src="../assets/reveal.js/js/reveal.js"></script>
-
-<script>
-Reveal.initialize({
-   // XGA (1024 x 768, AR = 1.334), WXGA (1280 x 800, AR = 1.6), HD (1920 x 1080, AR = 1.778)
-   // AR = 1.6
-   width: 1120, height: 700,
-   math: {
-      mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
-      config: 'TeX-AMS_SVG-full'
-   },
-   dependencies: [
-      { src: '../assets/reveal.js/plugin/markdown/marked.js' },
-      { src: '../assets/reveal.js/plugin/markdown/markdown.js' },
-      { src: '../assets/reveal.js/plugin/notes/notes.js', async: true },
-      { src: '../assets/reveal.js/plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-      { src: '../assets/reveal.js/plugin/math/math.js', async: true }
-   ],
-   controls: false,
-   history: true,
-   center: false,
-   progress: false,
-   transition: 'none',
-   transitionSpeed: 'fast',
-   viewDistance: 100
-});
-
-Reveal.configure( { slideNumber: 'c', hashOneBasedIndex: true, showSlideNumber: 'all' } );
-</script>
+<script src="/pub-docs/assets/revealjs_config.js"></script>
 
 </body>
 </html>
