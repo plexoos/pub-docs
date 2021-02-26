@@ -58,8 +58,6 @@ Updated <script>document.write((new Date(document.lastModified)).toLocaleDateStr
 
 <section data-markdown> <textarea data-template> <h1>Cleaning up Git repository</h1>
 
-<div style="font-size: 95%;">
-
 - Clean up is performed in two steps
 
   - Step 1: Exclude select directories from conversion with `cvs2git` (a.k.a. `svn2git`)
@@ -68,10 +66,9 @@ Updated <script>document.write((new Date(document.lastModified)).toLocaleDateStr
 - Main inconvenience is that one cannot expect identical equivalence between Git
   and CVS tagged trees
 
-<table style="margin: -1.2em 0 0 -0.5em;">
-<tr><td style="vertical-align: top;">
-
 - Considered several sequentially increasing clean-up scenarios
+
+  <img style="float: right; width: 45%; margin: 0.3em; border: 0;" src="graphics/cvs2git.png" />
 
   - R5 excludes more directories than R4 than R3 than ... than R0
   - Notably, in R3 we exclude all external generators (Pythin{6,8}, HIJING,
@@ -79,19 +76,11 @@ Updated <script>document.write((new Date(document.lastModified)).toLocaleDateStr
 
 - Bare sizes under 200MB achievable
 
-<td style="width: 50%; vertical-align: bottom;">
-<img class="plain" src="graphics/cvs2git.png" />
-</table>
-
-</div>
-
 </textarea>
 </section>
 
 
 <section data-markdown> <textarea data-template> <h1>Partial Clone, Sparse Checkout</h1>
-
-<div style="font-size: 95%;">
 
 - Sparse checkout (i.e. checking out only some paths) is available since early
 versions and works reliably. UI improved in recent versions
@@ -102,38 +91,36 @@ does not appear very stable
 - We provide a simple interface to help CVS users with adoption of Git<br>
   https://github.com/star-bnl/star-git-tools
 
-  <table style="margin: 0em 0 0 -0.5em;">
-  <tr>
-  <td style="vertical-align: top;">
+<table>
+<tr>
+<td style="width: 60%;">
 
-  CVS like checkout
+CVS like checkout
 
-  <pre class="code"><code data-trim style="font-size: 0.75em;" class="shell">
-  $ git star-checkout StRoot/StMuDSTMaker StRoot/StPicoEvent
-  Cloning into 'star-cvs'...
+<pre style="font-size: 0.85em;"><code data-trim class="shell">
+$ git star-checkout StRoot/StMuDSTMaker StRoot/StPicoEvent
+Cloning into 'star-cvs'...
 
-  $ tree -a -L 2 star-cvs/
-  star-cvs/
-  |-- .git
-  |   ...
-  `-- StRoot
-      |-- StMuDSTMaker
-      `-- StPicoEvent
-  </code></pre>
+$ tree -a -L 2 star-cvs/
+star-cvs/
+|-- .git
+|   ...
+`-- StRoot
+    |-- StMuDSTMaker
+    `-- StPicoEvent
+</code></pre>
 
-  <td style="vertical-align: top;">
+<td>
 
-  Manageable size
+Manageable size
 
-  <pre class="code"><code data-trim style="font-size: 0.75em;" class="shell">
-  $ du -b --si -d1 star-cvs/
-  29M     star-cvs/.git
-  1.3M    star-cvs/StRoot
-  30M     star-cvs/
-  </code></pre>
-  </table>
-
-</div>
+<pre style="font-size: 0.85em;"><code data-trim class="shell">
+$ du -b --si -d1 star-cvs/
+29M     star-cvs/.git
+1.3M    star-cvs/StRoot
+30M     star-cvs/
+</code></pre>
+</table>
 
 </textarea>
 </section>
