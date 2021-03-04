@@ -1,7 +1,18 @@
 https://plexoos.github.io/pub-docs/
 
-https://plexoos.gitlab.io/pub-docs/
 
+## 2021
+
+- [Migrating STAR Code to Git](/pub-docs/star-sw/git-repo.html), March 8, STAR Collaboration Meeting
+- [Repository Administration and Policies](/pub-docs/star-sw/s4.html), February 24, STAR S&C Meeting
+
+## 2020
+
+- [Separate Git Repository for MC Event Generators](/pub-docs/star-sw/s3.html), November 18, STAR S&C Meeting
+- [Update on CVS to Git Migration](/pub-docs/star-sw/s2.html), October 7, STAR S&C Meeting
+- [Update on CVS to Git Migration](/pub-docs/star-sw/s1.html)
+- [STAR Software Infrastructure](/pub-docs/npps-star-snc), July 1, STAR S&C Meeting
+- [Proposal for CVS to Git Migration](/pub-docs/star-sw/s0.html), June 3, STAR S&C Meeting
 
 ## 2019
 
