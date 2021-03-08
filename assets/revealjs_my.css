@@ -42,11 +42,12 @@
 }
 
 .reveal h3.title {
-  margin-top: 3.5em;
+  margin-top: 3em;
   margin-bottom: 1.5em;
 }
 
 .reveal h5.title {
+  margin-top: 3em;
   font-size: 0.8em;
 }
 
@@ -76,7 +77,8 @@
 
 .reveal ul,
 .reveal ul ul,
-.reveal ul ul ul {
+.reveal ul ul ul
+{
   list-style: none;
 }
 
@@ -84,21 +86,33 @@
   content: "\2022";
   color: rgb(180, 0, 0);
   float: left;
-  width: 1em;
+  width: 0.5em;
+  margin-left: -0.8em;
   font-weight: bold;
 }
 
 .reveal ul ul li::before {
   content: "\2011";
+  margin-left: -0.8em;
 }
 
 .reveal ul ul ul li::before {
   content: "\2023";
+  margin-left: -1em;
 }
 
 .reveal ol li,
 .reveal ul li {
-  margin: 0.4em 0em;
+  margin: 0.4em;
+}
+
+.reveal ul li p,
+.reveal ul ul li,
+.reveal ul ul li p,
+.reveal ul ul ul li,
+.reveal ul ul ul li p
+{
+  margin-left: 0em;
 }
 
 .reveal dd {
