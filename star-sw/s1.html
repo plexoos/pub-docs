@@ -15,22 +15,6 @@
 <div class="slides">
 
 
-<!--
-<section>
-
-<h1 class="title">Building STAR Software Libraries</h1>
-
-<h2 class="title">from Git Repository with CMake</h2>
-
-<h3 class="title">Dmitri Smirnov</h3>
-
-<h5 class="title">
-Updated <script>document.write((new Date(document.lastModified)).toLocaleDateString("en-US", {year: 'numeric', month: 'long', day: 'numeric'}))</script>
-</h5>
-
-</section>
--->
-
 
 <section data-markdown> <textarea data-template> <h1>Improving Software Infrastructure in STAR</h1>
 
@@ -39,6 +23,8 @@ Updated <script>document.write((new Date(document.lastModified)).toLocaleDateStr
   - Most of the machinery is ready and available
 
   - Primary concerns are: Repository size and unfamiliar workflow
+
+<hr style="width: 90%;">
 
 - **Phase 2:** Offer alternative build system based on CMake
 
@@ -60,8 +46,8 @@ Updated <script>document.write((new Date(document.lastModified)).toLocaleDateStr
 
 - Clean up is performed in two steps
 
-  - Step 1: Exclude select directories from conversion with `cvs2git` (a.k.a. `svn2git`)
-  - Step 2: Remove individual files (large or unused blobs)
+  - **Step 1:** Exclude select directories from conversion with `cvs2git` (a.k.a. `svn2git`)
+  - **Step 2:** Remove individual files (large or unused blobs)
 
 - Main inconvenience is that one cannot expect identical equivalence between Git
   and CVS tagged trees
@@ -80,10 +66,12 @@ Updated <script>document.write((new Date(document.lastModified)).toLocaleDateStr
 </section>
 
 
+
 <section data-markdown> <textarea data-template> <h1>Partial Clone, Sparse Checkout</h1>
 
-- Sparse checkout (i.e. checking out only some paths) is available since early
-versions and works reliably. UI improved in recent versions
+- Sparse checkout (i.e. checkout of specific subdirectories selected by the
+user) is available since early versions of Git and works reliably. UI improved
+in recent versions
 
 - Partial clone is a relatively new feature (documented in recent versions). UI
 does not appear very stable
