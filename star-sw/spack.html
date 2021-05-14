@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="/pub-docs/assets/common.css">
+
+   <title>Managing STAR packages with Spack</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section data-markdown> <textarea data-template> <h1>Managing STAR packages with Spack</h1>
+
+- Recently proposed and expected changes in STAR software stack
+
+  - Adopting Geant4 for simulation (Jason)
+  - ROOT6 and removed libTable (Victor)
+  - New version of CA tracking and Vc library (Hongwei)
+  - New packages for STAR forward tracking `KiTrack`, `GenFit`, `RAVE` (Daniel)
+
+  - STAR uses 32-bit releases. Need to support both 32-bit and 64-bit builds 
+
+  - Switching to newer compilers is foreseen
+
+- Spack is a package management tool designed to support multiple versions and
+  configurations of software
+
+  - Binary distributions are not available
+
+- The goal is to install all dependencies and switch between configurations with
+  a single command
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Managing STAR packages with Spack</h1>
+
+- A Spack repository has been configured for STAR with the official repo linked
+  as a submodule
+
+  - https://github.com/star-bnl/star-spack
+
+  - Changes w.r.t. built-in packages mostly include adjustments for 32-bit
+    builds
+
+  - Predefined Spack environments allow to install selected packages and
+    versions at once
+
+- For STAR users Spack is available from CVMFS
+
+  <pre style="font-size: 0.80em;"><code data-trim class="shell">
+  $ source /cvmfs/star.sdcc.bnl.gov/star-spack/spack/share/spack/setup-env.sh
+  $ spack repo add /cvmfs/star.sdcc.bnl.gov/star-spack
+  </code></pre>
+
+- A (dummy) bundle package is used to "activate" pre-defined dependencies or set
+  custom variables
+
+  <pre style="font-size: 0.80em;"><code data-trim class="shell">
+  $ spack load star-env-root6 target=x86_64
+  $ spack load star-env-root6 target=x86
+  </code></pre>
+
+- This sets env variables such as `CMAKE_PREFIX_PATH`, `CPATH`,
+  `PKG_CONFIG_PATH`
+
+- The users can load individual packages of their choice from the installed ones
+
+</textarea>
+</section>
+
+
+
+<!--
+<section data-markdown> <textarea data-template> <h1>Basic Usage</h1>
+
+- For STAR users Spack is available from CVMFS
+
+  <pre style="font-size: 0.80em;">
+  $ source /cvmfs/star.sdcc.bnl.gov/star-spack/spack/share/spack/setup-env.sh
+  </pre>
+
+  List available packages and predefined environmets
+
+  <pre style="font-size: 0.80em; border: 1;" >
+  $ spack find
+  ==> 303 installed packages
+  <b>-- linux-rhel7-x86 / gcc@4.8.5 ----------------------------------</b>
+  apr@1.7.0   damageproto@1.2.1  fontsproto@2.1.3  gperf@3.1 ...
+  ...
+  <b>-- linux-rhel7-x86_64 / gcc@4.8.5 -------------------------------</b>
+  apr@1.7.0   damageproto@1.2.1  ftgl@2.4.0    geant4-vmc@4-0-p3 ...
+  ...
+
+  $ spack env list
+  ==> 2 environments
+      star-x86  star-x86_64
+  </pre>
+
+</textarea>
+</section>
+-->
+
+
+
+</div>
+</div>
+
+<script src="/pub-docs/assets/revealjs_config.js"></script>
+
+</body>
+</html>
