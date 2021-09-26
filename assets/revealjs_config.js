@@ -11,6 +11,7 @@ loadScript('/pub-docs/assets/reveal.js/dist/reveal.js');
 loadScript('/pub-docs/assets/reveal.js/plugin/notes/notes.js');
 loadScript('/pub-docs/assets/reveal.js/plugin/markdown/markdown.js');
 loadScript('/pub-docs/assets/reveal.js/plugin/highlight/highlight.js');
+loadScript('/pub-docs/assets/reveal.js/plugin/math/math.js');
 
 window.onload = function() {
   // More info about initialization & config:
@@ -24,6 +25,7 @@ window.onload = function() {
 
     // Learn about plugins: https://revealjs.com/plugins/
     plugins: [ RevealMarkdown, RevealHighlight, RevealNotes ],
+    plugins: [ RevealMarkdown, RevealHighlight, RevealNotes, RevealMath ],
 
     controls: false,
     history: true,
