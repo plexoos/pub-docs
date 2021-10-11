@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+
+<head>
+   <meta charset="utf-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+   <link rel="stylesheet" href="/pub-docs/assets/common.css">
+
+   <title>xpload</title>
+</head>
+
+<body>
+
+<div class="reveal">
+<div class="slides">
+
+
+
+<section data-markdown> <textarea data-template> <h1>Goals and Requirements</h1>
+
+- **The goal:**
+
+  - Allow reco jobs to fetch calibrations and other parameters needed to process
+    the data from a database
+
+<hr style="width: 50%;"/>
+
+- Minimum interval with stable parameters is expected to last for $\sim\\! 1$
+minutes
+
+- Reconstruction jobs are expected to run for $\sim\\! 10$ hours and process
+$\sim\\! 1$ seconds worth of data
+
+- Therefore, a typical reco job should be able to fetch all the necessary
+conditions data once 
+
+- $\sim\\! 10^5$ jobs are expected to run simultaneously
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Solution</h1>
+
+- The proposed solution is not to store the actuall values (payload data) in
+  the database (Paul&nbsp;L. and Ruslan&nbsp;M.)
+
+  - Instead store the payload outside of the database as files
+
+  - The database contains the info about the location of payload, its validity
+    periods, etc. (metadata)
+
+<div class="hcenter">
+<img src="graphics/no_payload_db_schema.png" class="plain"/>
+</div>
+
+- **The bottom line:** The data handling complexity is shifted from the server to
+  the client
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Implementation</h1>
+
+- A PostgreSQL database is used as a backend containing the metadata
+
+- A Django app is provided to send queries to PostgreSQL via web API requests
+  and return responses
+
+  - https://github.com/BNLNPPS/NPDB
+
+- The app is containerized (?) and deployed at SDCC
+
+    <pre><code class="shell" data-trim style="font-size: 0.9em; overflow: auto;">
+    $ curl 'http://nopayloaddb-nopayloaddb.apps.sdcc.bnl.gov/api/cdb_rest/payloadiovs/?gtName=GT1&majorIOV=1&minorIOV=2'
+    []
+    </code></pre>
+
+<hr style="width: 50%;"/>
+
+- The layer transferring requests from reco jobs to NPDB has to be a part of the
+  client
+
+  - Proposed implementation using `libcurl`
+
+- The database is currently empty. Needs to be filled with something to allow
+  for reasonable responses for test purposes
+
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Usage Scenarios</h1>
+
+- **Option 1**
+
+  - A subsystem submits a request with a timestamp corresponding to the data
+    being processed (naturally the time when the data was recorded)
+  
+  - Receives one or more payload locations
+
+  - Subsystem experts provide the code to access the payload data, unpack, and
+    use it
+
+  - The API can be as simple as
+
+    <pre><code class="lang-cpp" data-trim style="font-size: 0.9em; white-space: pre;">
+    std::vector< std::string > fetch_paths(SubSystemId, uint64_t timestamp);
+    </code></pre>
+
+- **Option 2**
+
+  - Same as **Option 1** but in addition fills the user data type (assuming
+    a common interface)
+
+    <pre><code class="lang-cpp" data-trim style="font-size: 0.9em; white-space: pre;">
+    template< typename SubSystemDataType >
+    void fetch(SubSystemDataType& d, uint64_t timestamp);
+    </code></pre>
+
+    <!-- - May be provided later or in addition to **Option 1**... 
+    -->
+
+
+- At this point is not very clear what the final users expect and how the
+  interface layer needs to function
+
+</textarea>
+</section>
+
+
+
+</div>
+</div>
+
+<script src="/pub-docs/assets/revealjs_config.js"></script>
+
+</body>
+</html>
