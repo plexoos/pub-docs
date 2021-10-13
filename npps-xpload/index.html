@@ -126,6 +126,42 @@ conditions data once
 
 - Other options?
 
+</textarea>
+</section>
+
+
+
+<section data-markdown> <textarea data-template> <h1>Next steps</h1>
+
+<div style="font-size: 97%;">
+
+- At this point it is not very clear what the final users expect and how the
+  interface layer needs to function
+
+- For testing purposes, it would be good to have:
+
+   - Instructions how to start up the Django app in a container
+   - Some realistic entries in the database in order to develop a parser for
+     server response
+
+- Should we worry about how the metadata is inserted in the database?
+
+- Caching
+
+  - It appears that each job should be able to get all needed data once at the
+    beginning
+
+    - Not clear if there is any benefit from caching on the client side
+
+  - $\sim\\! 10^5$ independent processes may need to access the same set of files at the same time
+
+    - The client is unlikely to be able to control the caching at the file
+      system level...
+
+    - It seems to be the server's (i.e. the Django app) responsibility to cache
+      results from identical web API requests to avoid opening too many
+      connections to PostgreSQL
+</div>
 
 </textarea>
 </section>
