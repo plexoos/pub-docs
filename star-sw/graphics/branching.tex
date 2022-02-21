@@ -3,9 +3,9 @@
 \usepackage{xcolor-solarized}
 \usetikzlibrary{positioning}
 
-\newcommand\commit[2][]{\node[commit, #1] (#2) { \texttt{#2} };}
-%\newcommand\commit[2][]{\node[commit, #1] (#2) {};}
+\newcommand\commit[2][]{\node[commit, fill=solarized-orange!50, #1] (#2) { \texttt{#2} };}
 \newcommand\commitWork[2][]{\node[commit, fill=solarized-blue!50, #1] (#2) { \texttt{#2} };}
+\newcommand\commitEmpty[2][]{\node[commit, #1] (#2) {};}
 %\newcommand\commitWork[2][]{\node[commit, fill=solarized-blue!50, #1] (#2) {};}
 \newcommand\ghost[1]{\coordinate (#1);}
 \newcommand\connect[2]{\path[thick] (#1) to[out=0, in=180] (#2);}
@@ -19,17 +19,19 @@
 \tikzstyle{every path}=[draw]
 
 \node[] (start) {};
-\commit[right of=start]{A};
-\commit[right of=A]{B};
-\commit[right of=B]{C};
-\commit[right of=C]{D};
-\commit[right of=D]{E};
-\commit[right of=E]{F};
-\commit[right of=F]{G};
-\commit[right of=G]{H};
+\commitEmpty[right of=start]{P1};
+\commit[right=2em of P1]{A};
+\commit[right=2em of A]{B};
+\commit[right=2em of B]{C};
+\commit[right=2em of C]{D};
+\commit[right=2em of D]{E};
+\commit[right=2em of E]{F};
+\commit[right=2em of F]{G};
+\commit[right=2em of G]{H};
 %\node[right=4em of H] (end) {};
 
-\connect{start}{A};
+\connect{start}{P1};
+\connect{P1}{A};
 \connect{A}{B};
 \connect{B}{C};
 \connect{C}{D};
@@ -39,69 +41,74 @@
 \connect{G}{H};
 %\connect{H}{end};
 
-\commitWork[below right=4em and 0em of B]{X};
-\commitWork[right=4em of X]{Y};
+\commitWork[below right=4em and 4em of A]{X};
+\commitWork[right=2em of X]{Y};
 \commitWork[right=2em of Y]{Z};
-\commitWork[right=2em of Z]{M};
 
 \connect{A}{X};
 \connect{X}{Y};
 \connect{Y}{Z};
-\connect{Z}{M};
-\connect{C}{Y};
 
-\node[below=1em of X] (YW) {\textlangle SL21a\textrangle};
+\node[below=6em of A] (ZW) {\textlangle SL21a\_0\textrangle};
+\path[thick, -stealth, shorten >=0.1em] (ZW) to[out=north, in=south] (A);
+
+\node[below=1em of X] (YW) {\textlangle SL21a\_1\textrangle};
 \path[thick, -stealth, shorten >=0.1em] (YW) to[out=north, in=south] (X);
 
-\node[below=1em of Z] (ZW) {\textlangle SL21b\textrangle};
-\path[thick, -stealth, shorten >=0.1em] (ZW) to[out=north, in=south] (Z);
+\node[below=1em of Z] (SL21c_2) {\textlangle SL21c\_2\textrangle};
+\path[thick, -stealth, shorten >=0.1em] (SL21c_2) to[out=north, in=south] (Z);
 
-\node[below=1em of M] (SL21c) {\textlangle SL21c\textrangle};
-\path[thick, -stealth, shorten >=0.1em] (SL21c) to[out=north, in=south] (M);
-
-\node[above=1em of M] (SL21) {[SL21]};
-\path[thick, -stealth, shorten >=0.1em] (SL21) to[out=south, in=north] (M);
+\node[above=1em of Z] (SL21c) {[SL21c]};
+\path[thick, -stealth, shorten >=0.1em] (SL21c) to[out=south, in=north] (Z);
 
 %\node[above=1em of H] (MAIN) {[main]};
 %\path[thick, -stealth, shorten >=0.1em] (MAIN) to[out=south, in=north, outer sep=0.5em] (H);
 
 %\gittag[vA]{vA}{above=of A}{A};
 
-\commit[right of=H]{A'};
-\commit[right of=A']{B'};
-\commit[right of=B']{C'};
-\commit[right of=C']{D'};
-\commit[right of=D']{E'};
-\commit[right of=E']{F'};
-\commit[right of=F']{G'};
-\commit[right of=G']{H'};
+\commit[right of=H]{I};
+\commit[right of=I]{J};
+\commit[right of=J]{K};
+\commit[right of=K]{L};
+\commit[right of=L]{M};
+\commit[right of=M]{N};
+\commit[right of=N]{O};
 
-\connect{H}{A'};
-\connect{A'}{B'};
-\connect{B'}{C'};
-\connect{C'}{D'};
-\connect{D'}{E'};
-\connect{E'}{F'};
-\connect{F'}{G'};
-\connect{G'}{H'};
+\connect{H}{I};
+\connect{I}{J};
+\connect{J}{K};
+\connect{K}{L};
+\connect{L}{M};
+\connect{M}{N};
+\connect{N}{O};
 
-\commitWork[below right=4em and 0em of C']{X'};
-\commitWork[right=3em of X']{Y'};
-\commitWork[right=3em of Y']{Z'};
+\commitWork[below right=4em and 4em of G]{X'};
+\commitWork[right=2em of X']{Y'};
+\commitWork[right=2em of Y']{Z'};
 
-\connect{B'}{X'};
+\connect{G}{X'};
 \connect{X'}{Y'};
 \connect{Y'}{Z'};
-\connect{E'}{Z'};
 
-\node[below=6em of B'] (SL22a) {\textlangle SL22a\textrangle};
-\path[thick, -stealth, shorten >=0.1em] (SL22a) to[out=north, in=south] (B');
+\node[below=6em of G] (SL21d_0) {\textlangle SL21d\_0\textrangle};
+\path[thick, -stealth, shorten >=0.1em] (SL21d_0) to[out=north, in=south] (G);
 
-\node[above=1em of Z'] (SL22) {[SL22]};
-\path[thick, -stealth, shorten >=0.1em] (SL22) to[out=south, in=north] (Z');
+\node[below=1em of Y'] (SL21d_1) {\textlangle SL21d\_1\textrangle};
+\path[thick, -stealth, shorten >=0.1em] (SL21d_1) to[out=north, in=south] (Y');
 
-\node[above=1em of H'] (MAIN) {[main]};
-\path[thick, -stealth, shorten >=0.1em] (MAIN) to[out=south, in=north, outer sep=0.5em] (H');
+\node[above=1em of Z'] (SL21d) {[SL21d]};
+\path[thick, -stealth, shorten >=0.1em] (SL21d) to[out=south, in=north] (Z');
+
+
+\node[above=1em of M] (SL22a) {[SL22a]};
+\path[thick, -stealth, shorten >=0.1em] (SL22a) to[out=south, in=north, outer sep=0.5em] (M);
+
+\node[below=6em of M] (SL22a_0) {\textlangle SL22a\_0\textrangle};
+\path[thick, -stealth, shorten >=0.1em] (SL22a_0) to[out=north, in=south] (M);
+
+
+\node[above=1em of O] (MAIN) {[main]};
+\path[thick, -stealth, shorten >=0.1em] (MAIN) to[out=south, in=north, outer sep=0.5em] (O);
 
 \end{tikzpicture}
 \end{document}
